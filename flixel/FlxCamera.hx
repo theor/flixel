@@ -83,6 +83,21 @@ class FlxCamera extends FlxBasic
 	 * How tall the camera display is, in game pixels.
 	 */
 	public var height(default, set):Int;
+	
+	public var initZoom:Float;
+	
+	public var visibleStartX:Float;
+	
+	public var visibleStartY:Float;
+	
+	public var visibleFinishX:Float;
+	
+	public var visibleFinishY:Float;
+	
+	public var visibleCenterX:Float;
+	
+	public var visibleCenterY:Float;
+	
 	/**
 	 * Tells the camera to use this following style.
 	 */
@@ -439,6 +454,12 @@ class FlxCamera extends FlxBasic
 		flashSprite = new Sprite();
 		zoom = Zoom; //sets the scale of flash sprite, which in turn loads flashoffset values
 		
+		visibleStartX = 0;
+		visibleStartY = 0;
+		visibleFinishX = width;
+		visibleFinishY = height;
+		initZoom = zoom;
+		
 		flashOffsetX = width * 0.5 * zoom;
 		flashOffsetY = height * 0.5 * zoom;
 		
@@ -601,7 +622,7 @@ class FlxCamera extends FlxBasic
 					}
 				}
 				
-				if((followLead != null) && (Std.is(target, FlxSprite)))
+				if ((followLead != null) && (Std.is(target, FlxSprite)))
 				{
 					if (_lastTargetPosition == null)  
 					{
@@ -613,7 +634,6 @@ class FlxCamera extends FlxBasic
 					_lastTargetPosition.x = target.x;
 					_lastTargetPosition.y = target.y;
 				}
-
 				
 				if (followLerp == 0) 
 				{
@@ -622,9 +642,8 @@ class FlxCamera extends FlxBasic
 				} else 
 				{
 					scroll.x += (_scrollTarget.x - scroll.x) * FlxG.elapsed / (FlxG.elapsed + followLerp * FlxG.elapsed);
-					scroll.y += (_scrollTarget.y - scroll.y) * FlxG.elapsed / (FlxG.elapsed + followLerp * FlxG.elapsed);
+					scroll.y += (_scrollTarget.y - scroll.y) * FlxG.elapsed / (FlxG.elapsed + followLerp * FlxG.elapsed);	
 				}
-				
 			}
 		}
 		
@@ -738,7 +757,7 @@ class FlxCamera extends FlxBasic
 		var w:Float = 0;
 		var h:Float = 0;
 		_lastTargetPosition = null;
-		switch(Style)
+		switch (Style)
 		{
 			case STYLE_PLATFORMER:
 				var w:Float = (width / 8) + (Offset != null ? Offset.x : 0);
@@ -944,7 +963,7 @@ class FlxCamera extends FlxBasic
 	 */
 	private function set_zoom(Zoom:Float):Float
 	{
-		if (Zoom == 0)
+		if (Zoom <= 0)
 		{
 			zoom = defaultZoom;
 		}
@@ -1051,9 +1070,31 @@ class FlxCamera extends FlxBasic
 		flashSprite.scaleX = X;
 		flashSprite.scaleY = Y;
 		
+		calcVisibleArea();
+		
 		//camera positioning fix from bomski (https://github.com/Beeblerox/HaxeFlixel/issues/66)
 		flashOffsetX = width * 0.5 * X;
-		flashOffsetY = height * 0.5 * Y;	
+		flashOffsetY = height * 0.5 * Y;
+		
+	#if flash
+		regen = ((X != initZoom) || (Y != initZoom));
+	#else
+		// TODO: scrollRect on non-flash targets
+		if (canvas == null) return;
+		
+		var rect:Rectangle = (canvas.scrollRect != null) ? canvas.scrollRect : new Rectangle();
+		rect.width = width * flashSprite.scaleX / 1/*initZoom*/;
+		rect.height = height * flashSprite.scaleY / 1/*initZoom*/;
+		canvas.scrollRect = rect;
+		
+		canvas.x = -width * 0.5;
+		canvas.y = -height * 0.5;
+		#if !FLX_NO_DEBUG
+		if (debugLayer == null) return;
+		debugLayer.x = canvas.x;
+		debugLayer.y = canvas.y;
+		#end	
+	#end
 	}
 	
 	/**
@@ -1132,9 +1173,10 @@ class FlxCamera extends FlxBasic
 	{
 		if (Value > 0)
 		{
-			width = Value; 
+			width = Value;
+			calcVisibleArea();
 			#if flash
-			if ( _flashBitmap != null )
+			if (_flashBitmap != null)
 			{
 				regen = (Value != buffer.width);
 				flashOffsetX = width * 0.5 * zoom;
@@ -1167,6 +1209,7 @@ class FlxCamera extends FlxBasic
 		if (Value > 0)
 		{
 			height = Value;
+			calcVisibleArea();
 			#if flash
 			if (_flashBitmap != null)
 			{
@@ -1210,25 +1253,57 @@ class FlxCamera extends FlxBasic
 	#if flash
 	public function checkResize():Void
 	{
+		// TODO: add "buffer zone"
+		// so the scaling won't require more presice bitmapdata size calculations
+		
+		var newWidth:Float = (width * initZoom / flashSprite.scaleX);
+		var newHeight:Float = (height * initZoom / flashSprite.scaleY);
+		
+		while (Math.floor(width * initZoom) > Math.floor(newWidth * flashSprite.scaleX))
+		{
+			newWidth++;
+		}
+		
+		while (Math.floor(width * initZoom) < Math.floor(newWidth * flashSprite.scaleX))
+		{
+			newWidth--;
+		}
+		
+		
 		if (regen)
 		{
-			if (width != buffer.width || height != buffer.height)
+			if (newWidth != buffer.width || newHeight != buffer.height)
 			{
 				FlxG.bitmap.remove(screen.cachedGraphics.key);
-				buffer = new BitmapData(width, height, true, 0);
+				buffer = new BitmapData(Math.floor(newWidth), Math.floor(newHeight), true, FlxColor.TRANSPARENT);
 				screen.pixels = buffer;
 				screen.origin.set();
 				_flashBitmap.bitmapData = buffer;
-				_flashRect.width = width;
-				_flashRect.height = height;
+				_flashBitmap.x = Math.floor(-0.5 * newWidth * flashSprite.scaleX / initZoom);
+				_flashBitmap.y = Math.floor(-0.5 * newHeight * flashSprite.scaleY / initZoom);
+				_flashRect.width = newWidth;
+				_flashRect.height = newHeight;
 				_fill.dispose();
-				_fill = new BitmapData(width, height, true, FlxColor.TRANSPARENT);
+				_fill = new BitmapData(Math.floor(newWidth), Math.floor(newHeight), true, FlxColor.TRANSPARENT);
+				flashOffsetX = (0.5 * newWidth * flashSprite.scaleX);
+				flashOffsetY = (0.5 * newHeight * flashSprite.scaleY);
+				
+				calcVisibleArea();
 			}
 			
 			regen = false;
 		}
 	}
 	#end
+	
+	private function calcVisibleArea():Void
+	{
+		if (flashSprite == null) return;
+		visibleStartX = 0.5 * width * (flashSprite.scaleX - initZoom) / flashSprite.scaleX;
+		visibleStartY = 0.5 * height * (flashSprite.scaleY - initZoom) / flashSprite.scaleY;
+		visibleFinishX = width - visibleStartX;
+		visibleFinishY = height - visibleStartY;
+	}
 	
 	/**
 	 * Shortcut for setting both width and Height.

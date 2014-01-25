@@ -515,10 +515,10 @@ class FlxSprite extends FlxObject
 		bakedRotation = 0;
 		cachedGraphics = FlxG.bitmap.create(Width, Height, Color, Unique, Key);
 		region = new Region();
-		region.width = Width;
-		region.height = Height;
-		width = region.tileWidth = frameWidth = cachedGraphics.bitmap.width;
-		height = region.tileHeight = frameHeight = cachedGraphics.bitmap.height;
+		region.width = region.tileWidth = Width;
+		region.height = region.tileHeight = Height;
+		width = frameWidth = cachedGraphics.bitmap.width;
+		height = frameHeight = cachedGraphics.bitmap.height;
 		animation.destroyAnimations();
 		updateFrameData();
 		resetHelpers();
@@ -783,8 +783,9 @@ class FlxSprite extends FlxObject
 			_point.y = Math.floor(_point.y);
 			#end
 		#else
-			_point.x = x - (camera.scroll.x * _scrollFactor.x) - (_offset.x);
-			_point.y = y - (camera.scroll.y * _scrollFactor.y) - (_offset.y);
+			_point.x = x - (camera.scroll.x * _scrollFactor.x) - (_offset.x) - camera.visibleStartX;
+		//	if (x == 0) trace(_point.x);
+			_point.y = y - (camera.scroll.y * _scrollFactor.y) - (_offset.y) - camera.visibleStartY;
 		#end
 #if flash
 			if (isSimpleRender)
@@ -1106,7 +1107,7 @@ class FlxSprite extends FlxObject
 	 * Differs from <code>FlxObject</code>'s implementation
 	 * in that it takes the actual graphic into account,
 	 * not just the hitbox or bounding box or whatever.
-	 * @param	Camera		Specify which game camera you want.  If null getScreenXY() will just grab the first global camera.
+	 * @param	Camera		Specify which game camera you want.  If null getScregetScreenXY() will just grab the first global camera.
 	 * @return	Whether the object is on screen or not.
 	 */
 	override public function onScreen(Camera:FlxCamera = null):Bool
@@ -1169,10 +1170,10 @@ class FlxSprite extends FlxObject
 			minY -= radius;
 		}
 		
-		if (maxX < 0 || minX > Camera.width)
+		if (maxX < Camera.visibleStartX || minX > Camera.visibleFinishX)
 			return false;
 		
-		if (maxY < 0 || minY > Camera.height)
+		if (maxY < Camera.visibleStartY || minY > Camera.visibleFinishY)
 			return false;
 		
 		return true;
@@ -1219,7 +1220,7 @@ class FlxSprite extends FlxObject
 	 */
 	private function calcFrame(RunOnCpp:Bool = false):Void
 	{
-		if (cachedGraphics == null)	loadGraphic(FlxAssets.IMG_DEFAULT);
+		if (cachedGraphics == null) loadGraphic(FlxAssets.IMG_DEFAULT);
 		
 		#if !(flash || js)
 		if (!RunOnCpp)
@@ -1359,10 +1360,12 @@ class FlxSprite extends FlxObject
 		
 		region.startX = 0;
 		region.startY = 0;
-		region.tileWidth = region.width = cachedGraphics.bitmap.width;
-		region.tileHeight = region.height = cachedGraphics.bitmap.height;
+		region.tileWidth = 0;
+		region.tileHeight = 0;
 		region.spacingX = 0;
 		region.spacingY = 0;
+		region.width = cachedGraphics.bitmap.width;
+		region.height = cachedGraphics.bitmap.height;
 		
 		width = frameWidth = cachedGraphics.bitmap.width;
 		height = frameHeight = cachedGraphics.bitmap.height;

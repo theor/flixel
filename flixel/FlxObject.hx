@@ -562,7 +562,7 @@ class FlxObject extends FlxBasic
 			Camera = FlxG.camera;
 		}
 		getScreenXY(_point, Camera);
-		return (_point.x + width > 0) && (_point.x < Camera.width) && (_point.y + height > 0) && (_point.y < Camera.height);
+		return (_point.x + width > Camera.visibleStartX) && (_point.x < Camera.visibleFinishX) && (_point.y + height > Camera.visibleStartY) && (_point.y < Camera.visibleFinishY);
 	}
 	
 	/**
