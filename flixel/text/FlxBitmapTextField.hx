@@ -147,7 +147,6 @@ class FlxBitmapTextField extends FlxSprite
 		return Value;
 	}
 	
-	#if FLX_RENDER_BLIT
 	override public function draw():Void 
 	{
 		if (_pendingTextChange)
@@ -155,16 +154,9 @@ class FlxBitmapTextField extends FlxSprite
 			updateBitmapData();
 		}
 		
+		#if FLX_RENDER_BLIT
 		super.draw();
-	}
-	#else
-	override public function draw():Void 
-	{
-		if (_pendingTextChange)
-		{
-			updateBitmapData();
-		}
-		
+		#else	
 		var bgDrawItem:DrawStackItem = null;
 		var drawItem:DrawStackItem;
 		var currDrawData:Array<Float>;
@@ -297,8 +289,10 @@ class FlxBitmapTextField extends FlxSprite
 			FlxBasic._VISIBLECOUNT++;
 			#end
 		}
+		#end
 	}
 	
+	#if FLX_RENDER_TILE
 	override private function set_color(Color:Int):Int
 	{
 		super.set_color(Color);

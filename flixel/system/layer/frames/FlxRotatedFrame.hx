@@ -6,7 +6,7 @@ import flixel.util.FlxColor;
 
 class FlxRotatedFrame extends FlxFrame
 {
-	public function new(tileSheet:TileSheetData) 
+	public function new(tileSheet:TileSheetExt) 
 	{
 		super(tileSheet);
 		
@@ -33,7 +33,7 @@ class FlxRotatedFrame extends FlxFrame
 		
 		var temp:BitmapData = new BitmapData(Std.int(frame.width), Std.int(frame.height), true, FlxColor.TRANSPARENT);
 		FlxFrame.POINT.x = FlxFrame.POINT.y = 0;
-		temp.copyPixels(_tileSheet.bitmap, frame, FlxFrame.POINT);
+		temp.copyPixels(tileSheet.bitmap, frame, FlxFrame.POINT);
 		
 		FlxFrame.MATRIX.identity();
 		FlxFrame.MATRIX.translate( -0.5 * frame.width, -0.5 * frame.height);

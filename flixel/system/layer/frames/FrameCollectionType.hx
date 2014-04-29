@@ -2,8 +2,9 @@ package flixel.system.layer.frames;
 
 enum FrameCollectionType 
 {
-	SINGLE;
+	IMAGE;
 	SPRITESHEET;
 	ATLAS;
 	FONT;
+	USER;
 }

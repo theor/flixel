@@ -5,13 +5,13 @@ import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flixel.FlxG;
-import flixel.system.layer.TileSheetData;
+import flixel.interfaces.IFlxDestroyable;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
 
-class FlxFrame
+class FlxFrame implements IFlxDestroyable
 {
 	public static var POINT:Point = new Point();
 	public static var MATRIX:Matrix = new Matrix();
@@ -20,8 +20,10 @@ class FlxFrame
 	public var name:String;
 	public var frame:Rectangle;
 	
-	public var trimmed:Bool = false;
-	
+	// TODO: don't forget update tilesheet reference
+	// after undumping it 
+	// (do it in cachedgraphics' undump method)
+	public var tileSheet:TileSheetExt;
 	public var tileID:Int = -1;
 	public var additionalAngle:Float = 0;
 	
@@ -35,11 +37,10 @@ class FlxFrame
 	private var _hReversedBitmapData:BitmapData;
 	private var _vReversedBitmapData:BitmapData;
 	private var _hvReversedBitmapData:BitmapData;
-	private var _tileSheet:TileSheetData;
 	
-	public function new(tileSheet:TileSheetData)
+	public function new(tileSheet:TileSheetExt)
 	{
-		_tileSheet = tileSheet;
+		this.tileSheet = tileSheet;
 		additionalAngle = 0;
 		
 		sourceSize = FlxPoint.get();
@@ -80,7 +81,7 @@ class FlxFrame
 		
 		FlxFrame.POINT.x = offset.x;
 		FlxFrame.POINT.y = offset.y;
-		result.copyPixels(_tileSheet.bitmap, frame, FlxFrame.POINT);
+		result.copyPixels(tileSheet.bitmap, frame, FlxFrame.POINT);
 		
 		return result;
 	}
@@ -152,16 +153,16 @@ class FlxFrame
 	{
 		name = null;
 		frame = null;
-		_tileSheet = null;
+		tileSheet = null;
 		
 		sourceSize = FlxDestroyUtil.put(sourceSize);
 		offset = FlxDestroyUtil.put(offset);
 		center = FlxDestroyUtil.put(center);
 		
-		destroyBitmapDatas();
+		destroyBitmaps();
 	}
 	
-	public function destroyBitmapDatas():Void
+	public function destroyBitmaps():Void
 	{
 		_bitmapData = FlxDestroyUtil.dispose(_bitmapData);
 		_hReversedBitmapData = FlxDestroyUtil.dispose(_hReversedBitmapData);

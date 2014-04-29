@@ -29,15 +29,10 @@ import openfl.display.Tilesheet;
 private class GraphicDefault extends BitmapData {}
 
 /**
- * The main "game object" class, the sprite is a FlxObject
- * with a bunch of graphics options and abilities, like animation and stamping.
+ * Non-animated image. Can be drawn on the screen with transformations.
  */
-class FlxSprite extends FlxObject
+class FlxImage extends FlxObject
 {
-	/**
-	 * Class that handles adding and playing animations on this sprite.
-	 */
-	public var animation:FlxAnimationController;
 	/**
 	 * The actual Flash BitmapData object representing the current display state of the sprite.
 	 */
@@ -74,20 +69,11 @@ class FlxSprite extends FlxObject
 	 */
 	public var frameHeight(default, null):Int = 0;
 	/**
-	 * The total number of frames in this image.  WARNING: assumes each row in the sprite sheet is full!
-	 */
-	public var frames(default, null):Int = 0;
-	/**
 	 * Rendering variables.
 	 */
 	public var region(default, null):Region;
 	public var framesData(default, null):FlxSpriteFrames;
 	public var cachedGraphics(default, set):CachedGraphics;
-	/**
-	 * The minimum angle (out of 360°) for which a new baked rotation exists. Example: 90 means there 
-	 * are 4 baked rotations in the spritesheet. 0 if this sprite does not have any baked rotations.
-	 */
-	public var bakedRotationAngle(default, null):Float = 0;
 	/**
 	 * Set alpha to a number between 0 and 1 to change the opacity of the sprite.
 	 */
@@ -97,14 +83,6 @@ class FlxSprite extends FlxObject
 	 * of flipped sprites and/or just track player orientation more easily.
 	 */
 	public var facing(default, set):Int = FlxObject.RIGHT;
-	/**
-	 * Whether this sprite is flipped on the X axis
-	 */
-	public var flipX(default, set):Bool = false;
-	/**
-	 * Whether this sprite is flipped on the Y axis
-	 */
-	public var flipY(default, set):Bool = false;
 	 
 	/**
 	 * WARNING: The origin of the sprite will default to its center. If you change this, 
@@ -177,10 +155,6 @@ class FlxSprite extends FlxObject
 	private var _sinAngle:Float = 0;
 	private var _cosAngle:Float = 1;
 	private var _angleChanged:Bool = false;
-	/**
-	 * Maps FlxObject direction constants to axis flips
-	 */
-	private var _facingFlip:Map<Int, {x:Bool, y:Bool}> = new Map<Int, {x:Bool, y:Bool}>();
 	
 	/**
 	 * Creates a FlxSprite at a specified position with a specified one-frame graphic. 
@@ -196,6 +170,7 @@ class FlxSprite extends FlxObject
 		
 		if (SimpleGraphic != null)
 		{
+			// TODO: create new method for loading image
 			loadGraphic(SimpleGraphic);
 		}
 	}
@@ -203,8 +178,6 @@ class FlxSprite extends FlxObject
 	override private function initVars():Void 
 	{
 		super.initVars();
-		
-		animation = new FlxAnimationController(this);
 		
 		_flashPoint = new Point();
 		_flashRect = new Rectangle();
@@ -223,8 +196,6 @@ class FlxSprite extends FlxObject
 	override public function destroy():Void
 	{
 		super.destroy();
-		
-		animation = FlxDestroyUtil.destroy(animation);
 		
 		offset = FlxDestroyUtil.put(offset);
 		origin = FlxDestroyUtil.put(origin);
@@ -246,11 +217,11 @@ class FlxSprite extends FlxObject
 		region = null;
 	}
 	
-	public function clone(?NewSprite:FlxSprite):FlxSprite
+	public function clone(?NewSprite:FlxImage):FlxImage
 	{
 		if (NewSprite == null)
 		{
-			NewSprite = new FlxSprite();
+			NewSprite = new FlxImage();
 		}
 		
 		return NewSprite.loadGraphicFromSprite(this);
@@ -351,158 +322,6 @@ class FlxSprite extends FlxObject
 	}
 	
 	/**
-	 * Create a pre-rotated sprite sheet from a simple sprite.
-	 * This can make a huge difference in graphical performance!
-	 * 
-	 * @param	Graphic			The image you want to rotate and stamp.
-	 * @param	Rotations		The number of rotation frames the final sprite should have.  For small sprites this can be quite a large number (360 even) without any problems.
-	 * @param	Frame			If the Graphic has a single row of square animation frames on it, you can specify which of the frames you want to use here.  Default is -1, or "use whole graphic."
-	 * @param	AntiAliasing	Whether to use high quality rotations when creating the graphic.  Default is false.
-	 * @param	AutoBuffer		Whether to automatically increase the image size to accomodate rotated corners.  Default is false.  Will create frames that are 150% larger on each axis than the original frame or graphic.
-	 * @param	Key			Optional, set this parameter if you're loading BitmapData.
-	 * @return	This FlxSprite instance (nice for chaining stuff together, if you're into that).
-	 */
-	public function loadRotatedGraphic(Graphic:Dynamic, Rotations:Int = 16, Frame:Int = -1, AntiAliasing:Bool = false, AutoBuffer:Bool = false, ?Key:String):FlxSprite
-	{
-		//Create the brush and canvas
-		var rows:Int = Std.int(Math.sqrt(Rotations));
-		var brush:BitmapData = FlxG.bitmap.add(Graphic, false, Key).bitmap;
-		var isRegion:Bool = Std.is(Graphic, TextureRegion);
-		var spriteRegion:TextureRegion = (isRegion == true) ? cast Graphic : null;
-		var tempRegion:Region = (isRegion == true) ? spriteRegion.region : null;
-		
-		if (Frame >= 0 || isRegion)
-		{
-			//Using just a segment of the graphic - find the right bit here
-			var full:BitmapData = brush;
-			
-			if (isRegion)
-			{
-				brush = new BitmapData(tempRegion.width, tempRegion.height);
-				_flashRect.x = tempRegion.startX;
-				_flashRect.y = tempRegion.startY;
-				_flashRect.width = tempRegion.width;
-				_flashRect.height = tempRegion.height;
-				brush.copyPixels(full, _flashRect, _flashPointZero);
-			}
-			else
-			{
-				brush = new BitmapData(full.height, full.height);
-				var rx:Int = Frame * brush.width;
-				var ry:Int = 0;
-				var fw:Int = full.width;
-				if (rx >= fw)
-				{
-					ry = Std.int(rx / fw) * brush.height;
-					rx %= fw;
-				}
-				_flashRect.x = rx;
-				_flashRect.y = ry;
-				_flashRect.width = brush.width;
-				_flashRect.height = brush.height;
-				brush.copyPixels(full, _flashRect, _flashPointZero);
-			}
-		}
-		
-		var max:Int = brush.width;
-		if (brush.height > max)
-		{
-			max = brush.height;
-		}
-		
-		if (AutoBuffer)
-		{
-			max = Std.int(max * 1.5);
-		}
-		
-		var columns:Int = Math.ceil(Rotations / rows);
-		width = max * columns;
-		height = max * rows;
-		var key:String = "";
-		if (Std.is(Graphic, String))
-		{
-			key = Graphic;
-		}
-		else if (Std.is(Graphic, Class))
-		{
-			key = Type.getClassName(Graphic);
-		}
-		else if (Std.is(Graphic, BitmapData) && Key != null)
-		{
-			key = Key;
-		}
-		else if (isRegion)
-		{
-			key = spriteRegion.data.key;
-			key += ":" + tempRegion.startX + ":" + tempRegion.startY + ":" + tempRegion.width + ":" + tempRegion.height + ":" + Rotations;
-		}
-		else
-		{
-			return null;
-		}
-		
-		if (!isRegion)
-		{
-			key += ":" + Frame + ":" + width + "x" + height + ":" + Rotations;
-		}
-		
-		var skipGen:Bool = FlxG.bitmap.checkCache(key);
-		cachedGraphics = FlxG.bitmap.create(Std.int(width) + columns - 1, Std.int(height) + rows - 1, FlxColor.TRANSPARENT, true, key);
-		bakedRotationAngle = 360 / Rotations;
-		
-		//Generate a new sheet if necessary, then fix up the width and height
-		if (!skipGen)
-		{
-			var row:Int = 0;
-			var column:Int;
-			var bakedAngle:Float = 0;
-			var halfBrushWidth:Int = Std.int(brush.width * 0.5);
-			var halfBrushHeight:Int = Std.int(brush.height * 0.5);
-			var midpointX:Int = Std.int(max * 0.5);
-			var midpointY:Int = Std.int(max * 0.5);
-			while (row < rows)
-			{
-				column = 0;
-				while (column < columns)
-				{
-					_matrix.identity();
-					_matrix.translate( -halfBrushWidth, -halfBrushHeight);
-					_matrix.rotate(bakedAngle * FlxAngle.TO_RAD);
-					_matrix.translate(max * column + midpointX + column, midpointY + row);
-					bakedAngle += bakedRotationAngle;
-					cachedGraphics.bitmap.draw(brush, _matrix, null, null, null, AntiAliasing);
-					column++;
-				}
-				midpointY += max;
-				row++;
-			}
-		}
-		frameWidth = frameHeight = max;
-		width = height = max;
-		
-		region = new Region(0, 0, max, max, 1, 1);
-		region.width = cachedGraphics.bitmap.width;
-		region.height = cachedGraphics.bitmap.height;
-		
-		#if FLX_RENDER_TILE
-		antialiasing = AntiAliasing;
-		#end
-		
-		updateFrameData();
-		resetHelpers();
-		
-		if (AutoBuffer)
-		{
-			width = brush.width;
-			height = brush.height;
-			centerOffsets();
-		}
-		
-		animation.createPrerotated();
-		return this;
-	}
-	
-	/**
 	 * Loads TexturePacker atlas.
 	 * 
 	 * @param	Data		Atlas data holding links to json-data and atlas image
@@ -547,38 +366,6 @@ class FlxSprite extends FlxObject
 		
 		resetSizeFromFrame();
 		centerOrigin();
-		return this;
-	}
-	
-	/**
-	 * Creates a pre-rotated sprite sheet from provided image in atlas.
-	 * This can make a huge difference in graphical performance on flash target!
-	 * 
-	 * @param	Data			Atlas data holding links to json-data and atlas image
-	 * @param	Image			The image from atlas you want to rotate and stamp.
-	 * @param	Rotations		The number of rotation frames the final sprite should have.  For small sprites this can be quite a large number (360 even) without any problems.
-	 * @param	AntiAliasing	Whether to use high quality rotations when creating the graphic.  Default is false.
-	 * @param	AutoBuffer		Whether to automatically increase the image size to accomodate rotated corners.
-	 * @return This FlxSprite instance (nice for chaining stuff together, if you're into that).
-	 */
-	public function loadRotatedGraphicFromTexture(Data:Dynamic, Image:String, Rotations:Int = 16, AntiAliasing:Bool = false, AutoBuffer:Bool = false):FlxSprite
-	{
-		var temp = loadGraphicFromTexture(Data);
-		
-		if (temp == null)
-		{
-			return null;
-		}
-		
-		animation.frameName = Image;
-		
-		#if FLX_RENDER_TILE
-		antialiasing = AntiAliasing;
-		#else
-		var frameBitmapData:BitmapData = getFlxFrameBitmapData();
-		loadRotatedGraphic(frameBitmapData, Rotations, -1, AntiAliasing, AutoBuffer, Data.assetName + ":" + Image);
-		#end
-		
 		return this;
 	}
 	
@@ -702,12 +489,6 @@ class FlxSprite extends FlxObject
 		
 		_halfWidth = frameWidth * 0.5;
 		_halfHeight = frameHeight * 0.5;
-	}
-	
-	override public function update():Void 
-	{
-		super.update();
-		animation.update();
 	}
 	
 	/**
@@ -1366,21 +1147,6 @@ class FlxSprite extends FlxObject
 	}
 	
 	/**
-	 * Set how a sprite flips when facing in a particular direction.
-	 * 
-	 * @param	Direction Use constants from FlxObject: LEFT, RIGHT, UP, and DOWN.
-	 * 			These may be combined with the bitwise OR operator.
-	 * 			E.g. To make a sprite flip horizontally when it is facing both UP and LEFT,
-	 * 			use setFacingFlip(FlxObject.LEFT | FlxObject.UP, true, false);
-	 * @param	FlipX Whether to flip the sprite on the X axis
-	 * @param	FlipY Whether to flip the sprite on the Y axis
-	 */
-	public inline function setFacingFlip(Direction:Int, FlipX:Bool, FlipY:Bool):Void
-	{
-		_facingFlip.set(Direction, {x: FlipX, y: FlipY});
-	}
-	
-	/**
 	 * PROPERTIES
 	 */
 	private function get_pixels():BitmapData
@@ -1443,18 +1209,6 @@ class FlxSprite extends FlxObject
 			dirty = true;
 		}
 		return frame;
-	}
-	
-	private function set_facing(Direction:Int):Int
-	{		
-		var flip = _facingFlip.get(Direction);
-		if (flip != null)
-		{
-			flipX = flip.x;
-			flipY = flip.y;
-		}
-		
-		return facing = Direction;
 	}
 	
 	private function set_alpha(Alpha:Float):Float
@@ -1549,29 +1303,5 @@ class FlxSprite extends FlxObject
 		}
 		
 		return cachedGraphics = Value;
-	}
-	
-	private function set_flipX(Value:Bool):Bool
-	{
-		#if FLX_RENDER_TILE
-		_facingHorizontalMult = Value ? -1 : 1;
-		#end
-		if (flipX != Value)
-		{
-			dirty = true;
-		}
-		return flipX = Value;
-	}
-	
-	private function set_flipY(Value:Bool):Bool
-	{
-		#if FLX_RENDER_TILE
-		_facingVerticalMult = Value ? -1 : 1;
-		#end
-		if (flipY != Value)
-		{
-			dirty = true;
-		}
-		return flipY = Value;
 	}
 }

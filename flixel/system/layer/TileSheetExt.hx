@@ -6,91 +6,74 @@ import flash.geom.Rectangle;
 import flixel.FlxG;
 import flixel.interfaces.IFlxDestroyable;
 import flixel.util.FlxDestroyUtil;
+import flixel.util.loaders.CachedGraphics;
 import openfl.display.Tilesheet;
 
 class TileSheetExt extends Tilesheet implements IFlxDestroyable
 {
 	public static var _DRAWCALLS:Int = 0;
 	
+	public var cachedGraphics:CachedGraphics;
+	
+	public var bitmap:BitmapData;
+	
+	public var width:Int;
+	
+	public var height:Int;
+	
 	public var numTiles:Int = 0;
 	
-	public var tileIDs:Map<String, RectPointTileID>;
-	public var tileOrder:Array<String>;
+	public var tileOrder:Array<RectPointTileID>;
 	
-	public function new(bitmap:BitmapData)
+	public function new(cachedGraphics:CachedGraphics)
 	{
-		super(bitmap);
+		super(cachedGraphics.bitmap);
 		
-		tileIDs = new Map<String, RectPointTileID>();
-		tileOrder = new Array<String>();
+		this.cachedGraphics = cachedGraphics;
+		bitmap = cachedGraphics.bitmap;
+		width = bitmap.width;
+		height = bitmap.height;
+		tileOrder = new Array<RectPointTileID>();
 	}
 	
-	public function rebuildFromOld(old:TileSheetExt):Void
+	public static function rebuildFromOld(old:TileSheetExt, cached:CachedGraphics):TileSheetExt
 	{
+		var newSheet:TileSheetExt = new TileSheetExt(cached);
+		
 		for (i in 0...(old.tileOrder.length))
 		{
-			var tileName:String = old.tileOrder[i];
-			var tileObj:RectPointTileID = old.tileIDs.get(tileName);
-			addTileRect(tileObj.rect, tileObj.point);
+			var tileObj:RectPointTileID = old.tileOrder[i];
+			newSheet.addTileRect(tileObj.rect, tileObj.point);
 		}
 		
-		tileIDs = old.tileIDs;
-		tileOrder = old.tileOrder;
-		numTiles = old.numTiles;
-		
-		old.tileIDs = null;
 		old.tileOrder = null;
 		FlxDestroyUtil.destroy(old);
-	}
-	
-	/**
-	 * Hashing Functionality (TODO: use numbers as Map keys):
-	 * 
-	 * http://stackoverflow.com/questions/892618/create-a-hashcode-of-two-numbers
-	 * http://stackoverflow.com/questions/299304/why-does-javas-hashcode-in-string-use-31-as-a-multiplier
-	*/
-	private function getKey(rect:Rectangle, ?point:Point):String
-	{
-		var key:String = rect.x + "_" + rect.y + "_" + rect.width + "_" + rect.height + "_";
-		if (point != null)
-		{
-			key = key + point.x + "_" + point.y;
-		}
-		return key;
+		
+		return newSheet;
 	}
 	
 	/**
 	 * Adds new tileRect to tileSheet object
 	 * @return id of added tileRect
 	 */
-	public function addTileRectID(rect:Rectangle, ?point:Point):Int
+	override public function addTileRect(rectangle:Rectangle, centerPoint:Point = null):Int 
 	{
-		var key:String = getKey(rect, point);
-		
-		if (tileIDs.exists(key))
-		{
-			return tileIDs.get(key).id;
-		}
-		
-		addTileRect(rect, point);
-		var tileID:Int = numTiles;
-		numTiles++;
-		tileOrder[tileID] = key;
-		tileIDs.set(key, new RectPointTileID(tileID, rect, point));
+		var tileID:Int = super.addTileRect(rectangle, centerPoint);
+		tileOrder[tileID] = new RectPointTileID(tileID, rectangle, centerPoint);
 		return tileID;
 	}
 	
 	public function destroy():Void
 	{
-		tileOrder = null;
-		if (tileIDs != null)
+		cachedGraphics = null;
+		bitmap = FlxDestroyUtil.dispose(bitmap);
+		
+		for (rectPoint in tileOrder)
 		{
-			for (tileObj in tileIDs)
-			{
-				FlxDestroyUtil.destroy(tileObj);
-			}
+			FlxDestroyUtil.destroy(rectPoint);
 		}
-		tileIDs = null;
+		
+		tileOrder = null;
 	}
 }
 

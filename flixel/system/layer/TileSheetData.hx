@@ -178,7 +178,7 @@ class TileSheetData implements IFlxDestroyable
 	#if FLX_RENDER_TILE
 	public inline function addTileRect(tileRect:Rectangle, ?point:Point):Int
 	{
-		return tileSheet.addTileRectID(tileRect, point);
+		return tileSheet.addTileRect(tileRect, point);
 	}
 	#end
 	
@@ -219,7 +219,7 @@ class TileSheetData implements IFlxDestroyable
 	/**
 	 * Parses provided TexturePackerData object and returns generated FlxSpriteFrames object
 	 */
-	public function getTexturePackerFrames(data:TexturePackerData, startX:Int = 0, startY:Int = 0):FlxSpriteFrames
+	public function getTexturePackerFrames(data:TexturePackerData):FlxSpriteFrames
 	{
 		// No need to parse data again
 		if (flxSpriteFrames.exists(data.assetName))	
@@ -235,7 +235,7 @@ class TileSheetData implements IFlxDestroyable
 		var l:Int = data.frames.length;
 		for (i in 0...l)
 		{
-			frame = addTexturePackerFrame(data.frames[i], startX, startY);
+			frame = addTexturePackerFrame(data.frames[i]);
 			packerFrames.addFrame(frame);
 		}
 		
@@ -246,7 +246,7 @@ class TileSheetData implements IFlxDestroyable
 	/**
 	 * Parses frame TexturePacker data object and returns it
 	 */
-	private function addTexturePackerFrame(frameData:TextureAtlasFrame, startX:Int = 0, startY:Int = 0):FlxFrame
+	/*private function addTexturePackerFrame(frameData:TextureAtlasFrame, startX:Int = 0, startY:Int = 0):FlxFrame
 	{
 		var key:String = frameData.name;
 		if (containsFrame(key))
@@ -265,7 +265,6 @@ class TileSheetData implements IFlxDestroyable
 			texFrame = new FlxFrame(this);
 		}
 		
-		texFrame.trimmed = frameData.trimmed;
 		texFrame.name = key;
 		texFrame.sourceSize.copyFrom(frameData.sourceSize);
 		texFrame.offset.copyFrom(frameData.offset);
@@ -290,14 +289,14 @@ class TileSheetData implements IFlxDestroyable
 		frameNames.push(key);
 		framesArr.push(texFrame);
 		return texFrame;
-	}
+	}*/
 	
-	public function destroyFrameBitmapDatas():Void
+	public function destroyBitmaps():Void
 	{
 		var numFrames:Int = frameNames.length;
 		for (frame in framesArr)
 		{
-			frame.destroyBitmapDatas();
+			frame.destroyBitmaps();
 		}
 	}
 }
