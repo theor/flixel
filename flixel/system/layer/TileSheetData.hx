@@ -120,67 +120,10 @@ class TileSheetData implements IFlxDestroyable
 		return spriteData;
 	}
 	
-	/**
-	 * Hashing Functionality - TODO: use numbers as keys!
-	 * 
-	 * http://stackoverflow.com/questions/892618/create-a-hashcode-of-two-numbers
-	 * http://stackoverflow.com/questions/299304/why-does-javas-hashcode-in-string-use-31-as-a-multiplier
-	 */
-	public inline function getSpriteSheetFrameKey(rect:Rectangle, point:Point):String
-	{
-		return rect.x + "_" + rect.y + "_" + rect.width + "_" + rect.height + "_" + point.x + "_" + point.y;
-	}
-	
-	public inline function getKeyForSpriteSheetFrames(width:Int, height:Int, startX:Int, startY:Int, endX:Int, endY:Int, xSpacing:Int, ySpacing:Int, pointX:Float, pointY:Float):String
-	{
-		return width + "_" + height + "_" + startX + "_" + startY + "_" + endX + "_" + endY + "_" + xSpacing + "_" + ySpacing + "_" + pointX + "_" + pointY;
-	}
-	
-	public function containsSpriteSheetFrames(width:Int, height:Int, startX:Int, startY:Int, endX:Int, endY:Int, xSpacing:Int, ySpacing:Int, pointX:Float, pointY:Float):Bool
-	{
-		var key = getKeyForSpriteSheetFrames(width, height, startX, startY, endX, endY, xSpacing, ySpacing, pointX, pointY);
-		return flxSpriteFrames.exists(key);
-	}
-	
-	/**
-	 * Adds new FlxFrame to this TileSheetData object
-	 */
-	public function addSpriteSheetFrame(rect:Rectangle, point:Point):FlxFrame
-	{
-		var key:String = getSpriteSheetFrameKey(rect, point);
-		if (containsFrame(key))
-		{
-			return flxFrames.get(key);
-		}
-		
-		var frame:FlxFrame = new FlxFrame(this);
-		#if FLX_RENDER_TILE
-		frame.tileID = addTileRect(rect, point);
-		#end
-		frame.name = key;
-		frame.frame = rect;
-		frame.trimmed = false;
-		frame.sourceSize.set(rect.width, rect.height);
-		frame.offset.set(0, 0);
-		
-		frame.center.set(0.5 * rect.width, 0.5 * rect.height);
-		flxFrames.set(key, frame);
-		frameNames.push(key);
-		framesArr.push(frame);
-		return frame;
-	}
-	
 	public inline function containsFrame(key:String):Bool
 	{
 		return flxFrames.exists(key);
 	}
-	
-	#if FLX_RENDER_TILE
-	public inline function addTileRect(tileRect:Rectangle, ?point:Point):Int
-	{
-		return tileSheet.addTileRect(tileRect, point);
-	}
-	#end
 	
 	public function destroy():Void
 	{
@@ -215,81 +158,6 @@ class TileSheetData implements IFlxDestroyable
 		tileSheet = newSheet;
 	}
 	#end
-	
-	/**
-	 * Parses provided TexturePackerData object and returns generated FlxSpriteFrames object
-	 */
-	public function getTexturePackerFrames(data:TexturePackerData):FlxSpriteFrames
-	{
-		// No need to parse data again
-		if (flxSpriteFrames.exists(data.assetName))	
-		{
-			return flxSpriteFrames.get(data.assetName);
-		}
-		
-		data.parseData();
-		
-		var frame:FlxFrame;
-		var packerFrames:FlxSpriteFrames = new FlxSpriteFrames(data.assetName);
-		
-		var l:Int = data.frames.length;
-		for (i in 0...l)
-		{
-			frame = addTexturePackerFrame(data.frames[i]);
-			packerFrames.addFrame(frame);
-		}
-		
-		flxSpriteFrames.set(data.assetName, packerFrames);
-		return packerFrames;
-	}
-	
-	/**
-	 * Parses frame TexturePacker data object and returns it
-	 */
-	/*private function addTexturePackerFrame(frameData:TextureAtlasFrame, startX:Int = 0, startY:Int = 0):FlxFrame
-	{
-		var key:String = frameData.name;
-		if (containsFrame(key))
-		{
-			return flxFrames.get(key);
-		}
-		
-		var texFrame:FlxFrame = null;
-		
-		if (frameData.rotated)
-		{
-			texFrame = new FlxRotatedFrame(this);
-		}
-		else
-		{
-			texFrame = new FlxFrame(this);
-		}
-		
-		texFrame.name = key;
-		texFrame.sourceSize.copyFrom(frameData.sourceSize);
-		texFrame.offset.copyFrom(frameData.offset);
-		texFrame.center.set(0, 0);
-		texFrame.frame = frameData.frame.clone();
-		
-		if (frameData.rotated)
-		{
-			texFrame.center.set(texFrame.frame.height * 0.5 + texFrame.offset.x, texFrame.frame.width * 0.5 + texFrame.offset.y);
-		}
-		else
-		{
-			texFrame.center.set(texFrame.frame.width * 0.5 + texFrame.offset.x, texFrame.frame.height * 0.5 + texFrame.offset.y);
-		}
-		
-		texFrame.additionalAngle = frameData.additionalAngle;
-		
-		#if FLX_RENDER_TILE
-		texFrame.tileID = addTileRect(texFrame.frame, new Point(0.5 * texFrame.frame.width, 0.5 * texFrame.frame.height));
-		#end
-		flxFrames.set(key, texFrame);
-		frameNames.push(key);
-		framesArr.push(texFrame);
-		return texFrame;
-	}*/
 	
 	public function destroyBitmaps():Void
 	{

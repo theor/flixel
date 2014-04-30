@@ -44,8 +44,6 @@ class AtlasFrames extends FlxSpriteFrames
 		return frame;
 	}
 	
-	// TODO: implement this and other parsing methods
-	
 	// Description - contents of JSON file: Assets.getText(description)
 	public static function texturePackerJSON(Source:Dynamic, Description:String):AtlasFrames
 	{
@@ -246,7 +244,7 @@ class AtlasFrames extends FlxSpriteFrames
 											Std.parseInt(sprite.get("h"))
 										);
 			
-			var sourceSize:FlxPoint = FlxPoint.get(texFrame.frame.width, texFrame.frame.height);
+			var sourceSize:FlxPoint = FlxPoint.get(rect.width, rect.height);
 			
 			frames.addAtlasFrame(rect, sourceSize, offset, name, angle);
 		}
