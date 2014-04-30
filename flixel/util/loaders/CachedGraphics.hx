@@ -11,6 +11,7 @@ import flixel.system.layer.frames.SpritesheetFrames;
 import flixel.system.layer.TileSheetExt;
 import flixel.util.FlxDestroyUtil;
 
+// TODO: merge CachedGraphics and TilesheetExt
 class CachedGraphics
 {
 	/**
@@ -56,13 +57,12 @@ class CachedGraphics
 	 */
 	public var useCount(get, set):Int;
 	
-	// TODO: init these vars and use them (somehow)
+	// TODO: use these vars (somehow)
 	public var spritesheetFrames:Array<SpritesheetFrames>;
 	
 	public var imageFrames:Array<ImageFrame>;
 	
 	public var atlasFrames:AtlasFrames;
-	// END OF TODO
 	
 	private var _tilesheet:TileSheetExt;
 	
@@ -75,6 +75,9 @@ class CachedGraphics
 		key = Key;
 		bitmap = Bitmap;
 		persist = Persist;
+		
+		spritesheetFrames = new Array<SpritesheetFrames>();
+		imageFrames = new Array<ImageFrame>();
 	}
 	
 	/**
@@ -111,7 +114,8 @@ class CachedGraphics
 				{
 					_tilesheet = TileSheetExt.rebuildFromOld(_tilesheet, this);
 					
-					// TODO: "regen" frames (set theit tilesheets)
+					// TODO: "regen" frames (set their tilesheets)
+					
 				}
 			}
 			
@@ -133,23 +137,7 @@ class CachedGraphics
 			dump();	// and dump bitmapdata again
 		}
 	}
-	/*
-	public function getRegionForFrame(FrameName:String):TextureRegion
-	{
-		var region:TextureRegion = new TextureRegion(this);
-		var frame:FlxFrame = tilesheet.getFrame(FrameName);
-		
-		if (frame != null)
-		{
-			region.region.startX = Std.int(frame.frame.x);
-			region.region.startY = Std.int(frame.frame.y);
-			region.region.width = Std.int(frame.frame.width);
-			region.region.height = Std.int(frame.frame.height);
-		}
-		
-		return region;
-	}
-	*/
+	
 	public function destroy():Void
 	{
 		bitmap = FlxDestroyUtil.dispose(bitmap);
@@ -157,6 +145,9 @@ class CachedGraphics
 		key = null;
 		assetsKey = null;
 		assetsClass = null;
+		
+		// TODO: destroy all frames and their collections
+		// do it here or in TilesheetExt
 	}
 	
 	private function get_tilesheet():TileSheetExt
