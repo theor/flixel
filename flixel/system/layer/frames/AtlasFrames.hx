@@ -86,6 +86,94 @@ class AtlasFrames extends FlxSpriteFrames
 		return frames;
 	}
 	
+	// Description - contents of description file: Assets.getText(description)
+	public static function libGDX(Source:Dynamic, Description:String):AtlasFrames
+	{
+		var cached:CachedGraphics = FlxSpriteFrames.resolveSource(Source);
+		
+		// No need to parse data again
+		if (cached.atlasFrames != null)
+			return cached.atlasFrames;
+		
+		if ((cached == null) || (Description == null)) return null;
+		
+		var frames:AtlasFrames = new AtlasFrames(cached.tilesheet);
+		
+		var pack:String = StringTools.trim(Description);
+		var lines:Array<String> = pack.split("\n");
+		lines.splice(0, 4);
+		var numElementsPerImage:Int = 7;
+		var numImages:Int = Std.int(lines.length / numElementsPerImage);
+		
+		var curIndex:Int;
+		var imageX:Int;
+		var imageY:Int;
+		
+		var imageWidth:Int;
+		var imageHeight:Int;
+		
+		var size:Array<Int> = [];
+		var tempString:String;
+		
+		for (i in 0...numImages)
+		{
+			curIndex = i * numElementsPerImage;
+			
+			var name:String = lines[curIndex++];
+			var rotated:Bool = (lines[curIndex++].indexOf("true") >= 0);
+			var angle:Float = 0;
+			
+			tempString = lines[curIndex++];
+			size = getDimensions(tempString, size);
+			
+			imageX = size[0];
+			imageY = size[1];
+			
+			tempString = lines[curIndex++];
+			size = getDimensions(tempString, size);
+			
+			imageWidth = size[0];
+			imageHeight = size[1];
+			
+			var rect:Rectangle = null;
+			
+			if (rotated)
+			{
+				rect = new Rectangle(imageX, imageY, imageHeight, imageWidth);
+				angle = 90;
+			}
+			else
+			{
+				rect = new Rectangle(imageX, imageY, imageWidth, imageHeight);
+			}
+			
+			tempString = lines[curIndex++];
+			size = getDimensions(tempString, size);
+			
+			var sourceSize:FlxPoint = FlxPoint.get(size[0], size[1]);
+			
+			tempString = lines[curIndex++];
+			size = getDimensions(tempString, size);
+			
+			var offset:FlxPoint = FlxPoint.get(size[0], size[1]);
+			frames.addAtlasFrame(rect, sourceSize, offset, name, angle);
+		}
+		
+		cached.atlasFrames = frames;
+		return frames;
+	}
+	
+	private static function getDimensions(line:String, size:Array<Int>):Array<Int>
+	{
+		var colonPosition:Int = line.indexOf(":");
+		var comaPosition:Int = line.indexOf(",");
+		
+		size[0] = Std.parseInt(line.substring(colonPosition + 1, comaPosition));
+		size[1] = Std.parseInt(line.substring(comaPosition + 1, line.length));
+		
+		return size;
+	}
+	
 	// Description - contents of XML file: Assets.getText(description)
 	public static function sparrow(Source:Dynamic, Description:String):AtlasFrames
 	{
@@ -107,33 +195,63 @@ class AtlasFrames extends FlxSpriteFrames
 			var name:String = texture.att.name;
 			var trimmed:Bool = texture.has.frameX;
 			
-			//var frameRect:Rectangle = new Rectangle(frame.frame.x, frame.frame.y, frame.frame.w, frame.frame.h);
-			
-			/*
 			var rect:Rectangle = new Rectangle(
 				Std.parseFloat(texture.att.x), Std.parseFloat(texture.att.y),
 				Std.parseFloat(texture.att.width), Std.parseFloat(texture.att.height));
 			
-			var size:Rectangle = if (trimmed) // trimmed
+			var size:Rectangle = if (trimmed)
 					new Rectangle(
 						Std.parseInt(texture.att.frameX), Std.parseInt(texture.att.frameY),
 						Std.parseInt(texture.att.frameWidth), Std.parseInt(texture.att.frameHeight));
 				else 
 					new Rectangle(0, 0, rect.width, rect.height);
+					
+			var offset:FlxPoint = FlxPoint.get(-size.left, -size.top);
+			var sourceSize:FlxPoint = FlxPoint.get(size.width, size.height);
 			
-			texFrame.offset = FlxPoint.get(0, 0);
-			texFrame.offset.set(-size.left, -size.top);
-			
-			texFrame.sourceSize = FlxPoint.get(size.width, size.height);	
-			texFrame.frame = rect;
-			
-			frames.push(texFrame);
-			*/
+			frames.addAtlasFrame(rect, sourceSize, offset, name, angle);
 		}
 		
 		cached.atlasFrames = frames;
 		return frames;
 	}
 	
-	
+	public static function texturePackerXML(Source:Dynamic, Description:String):AtlasFrames
+	{
+		var cached:CachedGraphics = FlxSpriteFrames.resolveSource(Source);
+		
+		// No need to parse data again
+		if (cached.atlasFrames != null)
+			return cached.atlasFrames;
+		
+		if ((cached == null) || (Description == null)) return null;
+		
+		var frames:AtlasFrames = new AtlasFrames(cached.tilesheet);
+		
+		var xml = Xml.parse(Description);
+		var root = xml.firstElement();
+		
+		for (sprite in root.elements())
+		{
+			// trimmed images aren't supported yet for this type of atlas
+			var rotated:Bool = (sprite.exists("r") && sprite.get("r") == "y");
+			var angle:Float = (rotated) ? -90 : 0;
+			var name:String = sprite.get("n");
+			var offset:FlxPoint = FlxPoint.get(0, 0);
+			
+			var rect:Rectangle = new Rectangle(	
+											Std.parseInt(sprite.get("x")),
+											Std.parseInt(sprite.get("y")),
+											Std.parseInt(sprite.get("w")),
+											Std.parseInt(sprite.get("h"))
+										);
+			
+			var sourceSize:FlxPoint = FlxPoint.get(texFrame.frame.width, texFrame.frame.height);
+			
+			frames.addAtlasFrame(rect, sourceSize, offset, name, angle);
+		}
+		
+		cached.atlasFrames = frames;
+		return frames;
+	}
 }
