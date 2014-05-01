@@ -29,6 +29,11 @@ class FlxSpriteFrames implements IFlxDestroyable
 		type = null;
 	}
 	
+	// todo: add empty frame
+	
+	// todo: add tiles only with centered origin 
+	// (this will require to change some of the rendering methods)
+	
 	/**
 	 * Adds new FlxFrame to this TileSheetData object
 	 */

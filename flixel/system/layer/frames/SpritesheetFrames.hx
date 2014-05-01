@@ -54,7 +54,17 @@ class SpritesheetFrames extends FlxSpriteFrames
 		var rotated:Bool = (frame.type == FrameType.ROTATED);
 		
 		// TODO: continue from here...
+		var trimmed:Bool;
 		
+		
+		if (!rotated) // easier case, less math
+		{
+			
+		}
+		else
+		{
+			
+		}
 		
 		cached.spritesheetFrames.push(spritesheetFrames);
 		return spritesheetFrames;
