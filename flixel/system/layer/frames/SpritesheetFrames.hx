@@ -97,28 +97,48 @@ class SpritesheetFrames extends FlxSpriteFrames
 		var frameY:Int = 0;
 		
 		var rotated:Bool = (frame.type == FrameType.ROTATED);
-		
 		var angle:Float = 0;
 		
-		if (rotated) // more complex case, need more math
+		var startX:Int = 0;
+		var startY:Int = 0;
+		var dX:Int = spacedWidth;
+		var dY:Int = spacedHeight;
+		
+		if (rotated)
 		{
-			// TODO: implement rotated frame support
 			var rotatedFrame:FlxRotatedFrame = cast frame;
 			
 			angle = rotatedFrame.additionalAngle;
 			
+			if (angle == -90)
+			{
+				startX = Std.int(frame.sourceSize.x);
+				startY = 0;
+				dX = -spacedHeight;
+				dY = spacedWidth;
+				clippedRect.x = frame.sourceSize.y - frame.offset.y - frame.frame.width;
+				clippedRect.y = frame.offset.x;
+			}
+			else if (angle == 90)
+			{
+				startX = 0;
+				startY = Std.int(frame.sourceSize.y);
+				dX = spacedHeight;
+				dY = -spacedWidth;
+				clippedRect.x = frame.offset.y;
+				clippedRect.y = frame.sourceSize.x - frame.offset.x - frame.frame.height;
+			}
 			
-			
-			trace("Rotated frames aren't supported yet");
-			return null;
+			helperRect.width = frameHeight;
+			helperRect.height = frameWidth;
 		}
 		
 		for (j in 0...(numRows))
 		{
 			for (i in 0...(numCols))
 			{
-				helperRect.x = frameX = spacedWidth * i;
-				helperRect.y = frameY = spacedHeight * j;
+				helperRect.x = frameX = startX + dX * i;
+				helperRect.y = frameY = startY + dY * j;
 				
 				frameRect = clippedRect.intersection(helperRect);
 				
