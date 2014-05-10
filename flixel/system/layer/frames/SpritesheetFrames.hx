@@ -6,6 +6,7 @@ import flixel.system.layer.frames.FlxFrame;
 import flixel.system.layer.frames.FlxSpriteFrames;
 import flixel.system.layer.frames.FrameCollectionType;
 import flixel.system.layer.TileSheetExt;
+import flixel.util.FlxPoint;
 import flixel.util.loaders.CachedGraphics;
 
 /**
@@ -22,7 +23,6 @@ class SpritesheetFrames extends FlxSpriteFrames
 	private var atlasFrame:FlxFrame;
 	private var region:Rectangle;
 	private var frameSize:Point;
-	private var frameOrigin:Point;
 	private var frameSpacing:Point;
 	
 	private function new(tilesheet:TileSheetExt) 
@@ -32,7 +32,7 @@ class SpritesheetFrames extends FlxSpriteFrames
 	}
 	
 	// TODO: implement these methods and think about their signatures (i doubt about first param)
-	public static function fromFrame(frame:FlxFrame, frameSize:Point, frameOrigin:Point = null, frameSpacing:Point = null):SpritesheetFrames
+	public static function fromFrame(frame:FlxFrame, frameSize:Point, frameSpacing:Point = null):SpritesheetFrames
 	{
 		var tilesheet:TileSheetExt = frame.tileSheet;
 		var cached:CachedGraphics = tilesheet.cachedGraphics;
@@ -42,7 +42,7 @@ class SpritesheetFrames extends FlxSpriteFrames
 		
 		for (sheet in cached.spritesheetFrames)
 		{
-			if (sheet.equals(frameSize, null, frame, frameOrigin, frameSpacing))
+			if (sheet.equals(frameSize, null, frame, frameSpacing))
 			{
 				return sheet;
 			}
@@ -51,27 +51,105 @@ class SpritesheetFrames extends FlxSpriteFrames
 		// or create it, if there is no such object
 		spritesheetFrames = new SpritesheetFrames(tilesheet);
 		
+		if (frameSpacing == null)
+		{
+			frameSpacing = new Point();
+		}
+		
+		spritesheetFrames.atlasFrame = frame;
+		spritesheetFrames.region = frame.frame;
+		spritesheetFrames.frameSize = frameSize;
+		spritesheetFrames.frameSpacing = frameSpacing;
+		
+		var bitmapWidth:Int = Std.int(frame.sourceSize.x);
+		var bitmapHeight:Int = Std.int(frame.sourceSize.y);
+		
+		var xSpacing:Int = Std.int(frameSpacing.x);
+		var ySpacing:Int = Std.int(frameSpacing.y);
+		
+		var frameWidth:Int = Std.int(frameSize.x);
+		var frameHeight:Int = Std.int(frameSize.y);
+		
+		var spacedWidth:Int = frameWidth + xSpacing;
+		var spacedHeight:Int = frameHeight + ySpacing;
+		
+		var numRows:Int = 1;
+		if (frameHeight != 0)
+		{
+			numRows = Std.int((bitmapHeight + ySpacing) / spacedHeight);
+		}
+		
+		var numCols:Int = 1;
+		if (frameWidth != 0)
+		{
+			numCols = Std.int((bitmapWidth + xSpacing) / spacedWidth);
+		}
+		
+		var clippedRect:Rectangle = new Rectangle(frame.offset.x, frame.offset.y, frame.frame.width, frame.frame.height);
+		
+		var frameRect:Rectangle;
+		
+		var helperRect:Rectangle = new Rectangle(0, 0, frameWidth, frameHeight);
+		
+		var frameOffset:FlxPoint;
+		
+		var frameX:Int = 0;
+		var frameY:Int = 0;
+		
 		var rotated:Bool = (frame.type == FrameType.ROTATED);
 		
-		// TODO: continue from here...
-		var trimmed:Bool;
+		var angle:Float = 0;
 		
-		
-		if (!rotated) // easier case, less math
+		if (rotated) // more complex case, need more math
 		{
+			// TODO: implement rotated frame support
+			var rotatedFrame:FlxRotatedFrame = cast frame;
 			
+			angle = rotatedFrame.additionalAngle;
+			
+			
+			
+			trace("Rotated frames aren't supported yet");
+			return null;
 		}
-		else
+		
+		for (j in 0...(numRows))
 		{
-			
+			for (i in 0...(numCols))
+			{
+				helperRect.x = frameX = spacedWidth * i;
+				helperRect.y = frameY = spacedHeight * j;
+				
+				frameRect = clippedRect.intersection(helperRect);
+				
+				if (frameRect.width == 0 || frameRect.height == 0)
+				{
+					frameRect.x = frameRect.y = 0;
+					frameRect.width = frameWidth;
+					frameRect.height = frameHeight;
+					
+					spritesheetFrames.addEmptyFrame(frameRect);
+				}
+				else
+				{
+					frameOffset = FlxPoint.get(frameRect.x - frameX, frameRect.y - frameY);
+					
+					frameRect.x += frame.frame.x;
+					frameRect.y += frame.frame.y;
+					
+					spritesheetFrames.addAtlasFrame(frameRect, FlxPoint.get(frameWidth, frameHeight), frameOffset, null, angle);
+				}
+			}
 		}
 		
 		cached.spritesheetFrames.push(spritesheetFrames);
 		return spritesheetFrames;
 	}
 	
+	// TODO: use FlxPoint and FlxRect as method arguments
+	
 	// source can be string, class, cachedGraphics, tilesheetExt or bitmapdata
-	public static function fromRectangle(source:Dynamic, frameSize:Point, region:Rectangle = null, frameOrigin:Point = null, frameSpacing:Point = null):SpritesheetFrames
+	public static function fromRectangle(source:Dynamic, frameSize:Point, region:Rectangle = null, frameSpacing:Point = null):SpritesheetFrames
 	{
 		var cached:CachedGraphics = FlxSpriteFrames.resolveSource(source);
 		var tilesheet:TileSheetExt = cached.tilesheet;
@@ -81,7 +159,7 @@ class SpritesheetFrames extends FlxSpriteFrames
 		
 		for (sheet in cached.spritesheetFrames)
 		{
-			if (sheet.equals(frameSize, region, null, frameOrigin, frameSpacing))
+			if (sheet.equals(frameSize, region, null, frameSpacing))
 			{
 				return sheet;
 			}
@@ -93,6 +171,18 @@ class SpritesheetFrames extends FlxSpriteFrames
 		if (region == null)
 		{
 			region = cached.bitmap.rect;
+		}
+		else
+		{
+			if (region.width == 0)
+			{
+				region.width = tilesheet.width - region.x;
+			}
+			
+			if (region.height == 0)
+			{
+				region.height = tilesheet.height - region.y;
+			}
 		}
 		
 		if (frameSpacing == null)
@@ -111,45 +201,35 @@ class SpritesheetFrames extends FlxSpriteFrames
 		var startX:Int = Std.int(region.x);
 		var startY:Int = Std.int(region.y);
 		
-		var endX:Int = startX + bitmapWidth;
-		var endY:Int = startY + bitmapHeight;
-		
 		var xSpacing:Int = Std.int(frameSpacing.x);
 		var ySpacing:Int = Std.int(frameSpacing.y);
 		
 		var width:Int = Std.int(frameSize.x);
 		var height:Int = Std.int(frameSize.y);
 		
-		if (frameOrigin == null)
-		{
-			frameOrigin = new Point(0.5 * width, 0.5 * height);
-		}
-		
-		spritesheetFrames.frameOrigin = frameOrigin;
+		var spacedWidth:Int = width + xSpacing;
+		var spacedHeight:Int = height + ySpacing;
 		
 		var numRows:Int = 1;
 		if (height != 0)
 		{
-			numRows = Std.int((bitmapHeight + ySpacing) / (height + ySpacing));
+			numRows = Std.int((bitmapHeight + ySpacing) / spacedHeight);
 		}
 		
 		var numCols:Int = 1;
 		if (width != 0)
 		{
-			numCols = Std.int((bitmapWidth + xSpacing) / (width + xSpacing));
+			numCols = Std.int((bitmapWidth + xSpacing) / spacedWidth);
 		}
 		
 		var tempRect:Rectangle;
-		
-		var spacedWidth:Int = width + xSpacing;
-		var spacedHeight:Int = height + ySpacing;
 		
 		for (j in 0...(numRows))
 		{
 			for (i in 0...(numCols))
 			{
 				tempRect = new Rectangle(startX + i * spacedWidth, startY + j * spacedHeight, width, height);
-				spritesheetFrames.addSpriteSheetFrame(tempRect, frameOrigin);
+				spritesheetFrames.addSpriteSheetFrame(tempRect);
 			}
 		}
 		
@@ -157,7 +237,7 @@ class SpritesheetFrames extends FlxSpriteFrames
 		return spritesheetFrames;
 	}
 	
-	public function equals(frameSize:Point, region:Rectangle = null, atlasFrame:FlxFrame = null, frameOrigin:Point = null, frameSpacing:Point = null):Bool
+	public function equals(frameSize:Point, region:Rectangle = null, atlasFrame:FlxFrame = null, frameSpacing:Point = null):Bool
 	{
 		if (atlasFrame != null)
 		{
@@ -172,17 +252,10 @@ class SpritesheetFrames extends FlxSpriteFrames
 			RECT.height = tilesheet.height;
 		}
 		
-		if (frameOrigin == null)
-		{
-			frameOrigin = POINT1;
-			POINT1.x = 0.5 * frameSize.x;
-			POINT1.y = 0.5 * frameSize.y;
-		}
-		
 		if (frameSpacing == null)
 		{
-			frameSpacing = POINT2;
-			POINT2.x = POINT2.y = 0;
+			frameSpacing = POINT1;
+			POINT1.x = POINT1.y = 0;
 		}
 		
 		return (this.atlasFrame == atlasFrame && this.region.equals(region) && this.frameSize.equals(frameSize) && this.frameSpacing.equals(frameSpacing));
@@ -195,7 +268,6 @@ class SpritesheetFrames extends FlxSpriteFrames
 		atlasFrame = null;
 		region = null;
 		frameSize = null;
-		frameOrigin = null;
 		frameSpacing = null;
 	}
 }

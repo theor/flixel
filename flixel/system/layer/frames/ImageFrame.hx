@@ -13,7 +13,6 @@ class ImageFrame extends FlxSpriteFrames
 	public static var RECT:Rectangle = new Rectangle();
 	
 	public var frame:FlxFrame;
-	public var origin:Point;
 	
 	private function new(tilesheet:TileSheetExt) 
 	{
@@ -21,12 +20,12 @@ class ImageFrame extends FlxSpriteFrames
 		type = FrameCollectionType.IMAGE;
 	}
 	
-	public static function fromImage(source:Dynamic, origin:Point = null):ImageFrame
+	public static function fromImage(source:Dynamic):ImageFrame
 	{
-		return fromRectangle(source, null, origin);
+		return fromRectangle(source, null);
 	}
 	
-	public static function fromRectangle(source:Dynamic, region:Rectangle = null, origin:Point = null):ImageFrame
+	public static function fromRectangle(source:Dynamic, region:Rectangle = null):ImageFrame
 	{
 		var cached:CachedGraphics = FlxSpriteFrames.resolveSource(source);
 		var tilesheet:TileSheetExt = cached.tilesheet;
@@ -34,7 +33,6 @@ class ImageFrame extends FlxSpriteFrames
 		var imageFrame:ImageFrame = null;
 		
 		var checkRegion:Rectangle = region;
-		var checkOrigin:Point = origin;
 		
 		if (checkRegion == null)
 		{
@@ -44,16 +42,9 @@ class ImageFrame extends FlxSpriteFrames
 			checkRegion.height = tilesheet.height;
 		}
 		
-		if (checkOrigin == null)
-		{
-			checkOrigin = POINT;
-			checkOrigin.x = 0.5 * region.width;
-			checkOrigin.y = 0.5 * region.height;
-		}
-		
 		for (imageFrame in cached.imageFrames)
 		{
-			if (imageFrame.equals(checkRegion, checkOrigin))
+			if (imageFrame.equals(checkRegion))
 			{
 				return imageFrame;
 			}
@@ -66,28 +57,33 @@ class ImageFrame extends FlxSpriteFrames
 		{
 			region = new Rectangle(0, 0, tilesheet.width, tilesheet.height);
 		}
-		
-		if (origin == null)
+		else
 		{
-			origin = new Point(0.5 * region.width, 0.5 * region.height);
+			if (region.width == 0)
+			{
+				region.width = tilesheet.width - region.x;
+			}
+			
+			if (region.height == 0)
+			{
+				region.height = tilesheet.height - region.y;
+			}
 		}
 		
-		imageFrame.frame = imageFrame.addSpriteSheetFrame(region, origin);
-		imageFrame.origin = origin;
+		imageFrame.frame = imageFrame.addSpriteSheetFrame(region);
 		
 		cached.imageFrames.push(imageFrame);
 		return imageFrame;
 	}
 	
-	public function equals(rect:Rectangle = null, origin:Point = null):Bool
+	public function equals(rect:Rectangle = null):Bool
 	{
-		return (rect.equals(frame.frame) && origin.equals(this.origin));
+		return (rect.equals(frame.frame));
 	}
 	
 	override public function destroy():Void 
 	{
 		super.destroy();
 		frame = FlxDestroyUtil.destroy(frame);
-		origin = null;
 	}
 }

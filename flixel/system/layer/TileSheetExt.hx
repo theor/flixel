@@ -77,6 +77,8 @@ class TileSheetExt extends Tilesheet implements IFlxDestroyable
 	}
 }
 
+// TODO: rework tilesheet frame regeneration
+// and remove this class completely
 private class RectPointTileID implements IFlxDestroyable
 {
 	public var rect:Rectangle;

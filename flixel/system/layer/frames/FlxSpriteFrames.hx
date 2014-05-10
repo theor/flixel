@@ -29,24 +29,27 @@ class FlxSpriteFrames implements IFlxDestroyable
 		type = null;
 	}
 	
-	// todo: add empty frame
-	
 	// todo: add tiles only with centered origin 
 	// (this will require to change some of the rendering methods)
+	
+	// todo: add empty frame
+	public function addEmptyFrame(size:Rectangle):FlxFrame
+	{
+		var frame:FlxFrame = new FlxFrame(tilesheet);	
+		frame.frame = size;
+		frame.sourceSize.set(size.width, size.height);
+		frames.push(frame);
+		return frame;
+	}
 	
 	/**
 	 * Adds new FlxFrame to this TileSheetData object
 	 */
-	public function addSpriteSheetFrame(region:Rectangle, origin:Point = null):FlxFrame
+	public function addSpriteSheetFrame(region:Rectangle):FlxFrame
 	{
 		var frame:FlxFrame = new FlxFrame(tilesheet);	
 		#if FLX_RENDER_TILE
-		if (origin == null)
-		{
-			origin = new Point(0.5 * region.width, 0.5 * region.height);
-		}
-		
-		frame.tileID = tilesheet.addTileRect(region, origin);
+		frame.tileID = tilesheet.addTileRect(region, new Point(0.5 * region.width, 0.5 * region.height));
 		#end
 		frame.frame = region;
 		frame.sourceSize.set(region.width, region.height);
