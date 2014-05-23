@@ -533,8 +533,8 @@ class FlxSprite extends FlxObject
 		}
 		
 		region = new Region();
-		region.width = cachedGraphics.bitmap.width;
-		region.height = cachedGraphics.bitmap.height;
+		region.width = cachedGraphics.width;
+		region.height = cachedGraphics.height;
 		
 		animation.destroyAnimations();
 		updateFrameData();
@@ -689,15 +689,8 @@ class FlxSprite extends FlxObject
 		centerOrigin();
 		
 	#if FLX_RENDER_BLIT
-		if ((framePixels == null) || (framePixels.width != frameWidth) || (framePixels.height != frameHeight))
-		{
-			framePixels = new BitmapData(Std.int(width), Std.int(height));
-		}
-		framePixels.copyPixels(cachedGraphics.bitmap, _flashRect, _flashPointZero);
-		if (useColorTransform) 
-		{
-			framePixels.colorTransform(_flashRect, colorTransform);
-		}
+		dirty = true;
+		calcFrame();
 	#end
 		
 		_halfWidth = frameWidth * 0.5;
@@ -1202,7 +1195,7 @@ class FlxSprite extends FlxObject
 	 */
 	public inline function getFlxFrameBitmapData():BitmapData
 	{
-		if (frame != null)
+		if (frame != null && dirty)
 		{
 			if (!flipX && !flipY && frame.type == FrameType.REGULAR)
 			{
@@ -1246,7 +1239,6 @@ class FlxSprite extends FlxObject
 			}
 			
 			dirty = false;
-			
 		}
 		
 		return framePixels;

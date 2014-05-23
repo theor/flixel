@@ -10,6 +10,7 @@ import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
+import flixel.util.loaders.CachedGraphics;
 
 class FlxFrame implements IFlxDestroyable
 {
@@ -20,10 +21,7 @@ class FlxFrame implements IFlxDestroyable
 	public var name:String;
 	public var frame:Rectangle;
 	
-	// TODO: don't forget update tilesheet reference
-	// after undumping it 
-	// (do it in cachedgraphics' undump method)
-	public var tileSheet:TileSheetExt;
+	public var parent:CachedGraphics;
 	public var tileID:Int = -1;
 	public var additionalAngle:Float = 0;
 	
@@ -38,9 +36,9 @@ class FlxFrame implements IFlxDestroyable
 	private var _vReversedBitmapData:BitmapData;
 	private var _hvReversedBitmapData:BitmapData;
 	
-	public function new(tileSheet:TileSheetExt)
+	public function new(parent:CachedGraphics)
 	{
-		this.tileSheet = tileSheet;
+		this.parent = parent;
 		additionalAngle = 0;
 		
 		sourceSize = FlxPoint.get();
@@ -81,7 +79,7 @@ class FlxFrame implements IFlxDestroyable
 		
 		FlxFrame.POINT.x = offset.x;
 		FlxFrame.POINT.y = offset.y;
-		result.copyPixels(tileSheet.bitmap, frame, FlxFrame.POINT);
+		result.copyPixels(parent.bitmap, frame, FlxFrame.POINT);
 		
 		return result;
 	}
@@ -153,7 +151,7 @@ class FlxFrame implements IFlxDestroyable
 	{
 		name = null;
 		frame = null;
-		tileSheet = null;
+		parent = null;
 		
 		sourceSize = FlxDestroyUtil.put(sourceSize);
 		offset = FlxDestroyUtil.put(offset);

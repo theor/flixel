@@ -3,12 +3,13 @@ package flixel.system.layer.frames;
 import flash.display.BitmapData;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
+import flixel.util.loaders.CachedGraphics;
 
 class FlxRotatedFrame extends FlxFrame
 {
-	public function new(tileSheet:TileSheetExt) 
+	public function new(parent:CachedGraphics) 
 	{
-		super(tileSheet);
+		super(parent);
 		
 		type = FrameType.ROTATED;
 	}
@@ -33,7 +34,7 @@ class FlxRotatedFrame extends FlxFrame
 		
 		var temp:BitmapData = new BitmapData(Std.int(frame.width), Std.int(frame.height), true, FlxColor.TRANSPARENT);
 		FlxFrame.POINT.x = FlxFrame.POINT.y = 0;
-		temp.copyPixels(tileSheet.bitmap, frame, FlxFrame.POINT);
+		temp.copyPixels(parent.bitmap, frame, FlxFrame.POINT);
 		
 		FlxFrame.MATRIX.identity();
 		FlxFrame.MATRIX.translate( -0.5 * frame.width, -0.5 * frame.height);

@@ -22,6 +22,12 @@ class CachedGraphics
 	 * Cached BitmapData object
 	 */
 	public var bitmap:BitmapData;
+	
+	public var width(default, null):Int = 0;
+	
+	public var height(default, null):Int = 0;
+	
+	
 	/**
 	 * Asset name from openfl.Assets
 	 */
@@ -58,11 +64,15 @@ class CachedGraphics
 	public var useCount(get, set):Int;
 	
 	// TODO: use these vars (somehow)
-	public var spritesheetFrames:Array<SpritesheetFrames>;
+	public var imageFrame(get, null):ImageFrame;
+	
+	public var atlasFrames:AtlasFrames;
 	
 	public var imageFrames:Array<ImageFrame>;
 	
-	public var atlasFrames:AtlasFrames;
+	public var spritesheetFrames:Array<SpritesheetFrames>;
+	
+	private var _imageFrame:ImageFrame;
 	
 	private var _tilesheet:TileSheetExt;
 	
@@ -75,6 +85,9 @@ class CachedGraphics
 		key = Key;
 		bitmap = Bitmap;
 		persist = Persist;
+		
+		width = bitmap.width;
+		height = bitmap.height;
 		
 		spritesheetFrames = new Array<SpritesheetFrames>();
 		imageFrames = new Array<ImageFrame>();
@@ -140,8 +153,8 @@ class CachedGraphics
 	
 	public function destroy():Void
 	{
-		bitmap = FlxDestroyUtil.dispose(bitmap);
 		_tilesheet = FlxDestroyUtil.destroy(_tilesheet);
+		bitmap = FlxDestroyUtil.dispose(bitmap);
 		key = null;
 		assetsKey = null;
 		assetsClass = null;
@@ -159,7 +172,7 @@ class CachedGraphics
 				onContext();
 			}
 			
-			_tilesheet = new TileSheetExt(this);
+			_tilesheet = new TileSheetExt(bitmap);
 		}
 		
 		return _tilesheet;
@@ -213,5 +226,15 @@ class CachedGraphics
 		}
 		
 		return _destroyOnNoUse = Value;
+	}
+	
+	private function get_imageFrame():ImageFrame
+	{
+		if (_imageFrame == null)
+		{
+			_imageFrame = ImageFrame.fromRectangle(this, bitmap.rect);
+		}
+		
+		return _imageFrame;
 	}
 }

@@ -11,21 +11,24 @@ import flixel.util.loaders.CachedGraphics;
 class FlxSpriteFrames implements IFlxDestroyable
 {
 	public var frames:Array<FlxFrame>;
-	public var tilesheet:TileSheetExt;
+	public var framesHash:Map<String, FlxFrame>;
+	public var parent:CachedGraphics;
 	
 	public var type(default, null):FrameCollectionType;
 	
-	public function new(tilesheet:TileSheetExt)
+	public function new(parent:CachedGraphics)
 	{
-		this.tilesheet = tilesheet;
+		this.parent = parent;
 		frames = [];
+		framesHash = new Map<String, FlxFrame>();
 		type = FrameCollectionType.USER;
 	}
 	
 	public function destroy():Void
 	{
 		frames = null;
-		tilesheet = null;
+		framesHash = null;
+		parent = null;
 		type = null;
 	}
 	
@@ -35,7 +38,7 @@ class FlxSpriteFrames implements IFlxDestroyable
 	// todo: add empty frame
 	public function addEmptyFrame(size:Rectangle):FlxFrame
 	{
-		var frame:FlxFrame = new FlxFrame(tilesheet);	
+		var frame:FlxFrame = new FlxFrame(parent);	
 		frame.frame = size;
 		frame.sourceSize.set(size.width, size.height);
 		frames.push(frame);
@@ -47,9 +50,9 @@ class FlxSpriteFrames implements IFlxDestroyable
 	 */
 	public function addSpriteSheetFrame(region:Rectangle):FlxFrame
 	{
-		var frame:FlxFrame = new FlxFrame(tilesheet);	
+		var frame:FlxFrame = new FlxFrame(parent);	
 		#if FLX_RENDER_TILE
-		frame.tileID = tilesheet.addTileRect(region, new Point(0.5 * region.width, 0.5 * region.height));
+		frame.tileID = parent.tilesheet.addTileRect(region, new Point(0.5 * region.width, 0.5 * region.height));
 		#end
 		frame.frame = region;
 		frame.sourceSize.set(region.width, region.height);
@@ -62,16 +65,16 @@ class FlxSpriteFrames implements IFlxDestroyable
 	/**
 	 * Parses frame TexturePacker data object and returns it
 	 */
-	private function addAtlasFrame(frame:Rectangle, sourceSize:FlxPoint, offset:FlxPoint, name:String = null, angle:Float = 0):FlxFrame
+	public function addAtlasFrame(frame:Rectangle, sourceSize:FlxPoint, offset:FlxPoint, name:String = null, angle:Float = 0):FlxFrame
 	{
 		var texFrame:FlxFrame = null;
 		if (angle != 0)
 		{
-			texFrame = new FlxRotatedFrame(tilesheet);
+			texFrame = new FlxRotatedFrame(parent);
 		}
 		else
 		{
-			texFrame = new FlxFrame(tilesheet);
+			texFrame = new FlxFrame(parent);
 		}
 		
 		texFrame.name = name;
@@ -110,10 +113,6 @@ class FlxSpriteFrames implements IFlxDestroyable
 		if (Std.is(Source, CachedGraphics))
 		{
 			return cast Source;
-		}
-		else if (Std.is(Source, TileSheetExt))
-		{
-			return cast(Source, TileSheetExt).cachedGraphics;
 		}
 		else if (Std.is(Source, BitmapData) || Std.is(Source, String))
 		{

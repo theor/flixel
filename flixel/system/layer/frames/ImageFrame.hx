@@ -14,10 +14,16 @@ class ImageFrame extends FlxSpriteFrames
 	
 	public var frame:FlxFrame;
 	
-	private function new(tilesheet:TileSheetExt) 
+	private function new(parent:CachedGraphics) 
 	{
-		super(tilesheet);
+		super(parent);
 		type = FrameCollectionType.IMAGE;
+	}
+	
+	// TODO: implement it
+	public static function fromFrame(source:Dynamic):ImageFrame
+	{
+		return null;
 	}
 	
 	public static function fromImage(source:Dynamic):ImageFrame
@@ -28,7 +34,6 @@ class ImageFrame extends FlxSpriteFrames
 	public static function fromRectangle(source:Dynamic, region:Rectangle = null):ImageFrame
 	{
 		var cached:CachedGraphics = FlxSpriteFrames.resolveSource(source);
-		var tilesheet:TileSheetExt = cached.tilesheet;
 		// find ImageFrame, if there is one already
 		var imageFrame:ImageFrame = null;
 		
@@ -38,8 +43,8 @@ class ImageFrame extends FlxSpriteFrames
 		{
 			checkRegion = RECT;
 			checkRegion.x = checkRegion.y = 0;
-			checkRegion.width = tilesheet.width;
-			checkRegion.height = tilesheet.height;
+			checkRegion.width = cached.width;
+			checkRegion.height = cached.height;
 		}
 		
 		for (imageFrame in cached.imageFrames)
@@ -51,22 +56,22 @@ class ImageFrame extends FlxSpriteFrames
 		}
 		
 		// or create it, if there is no such object
-		imageFrame = new ImageFrame(tilesheet);
+		imageFrame = new ImageFrame(cached);
 		
 		if (region == null)
 		{
-			region = new Rectangle(0, 0, tilesheet.width, tilesheet.height);
+			region = new Rectangle(0, 0, cached.width, cached.height);
 		}
 		else
 		{
 			if (region.width == 0)
 			{
-				region.width = tilesheet.width - region.x;
+				region.width = cached.width - region.x;
 			}
 			
 			if (region.height == 0)
 			{
-				region.height = tilesheet.height - region.y;
+				region.height = cached.height - region.y;
 			}
 		}
 		

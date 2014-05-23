@@ -3,6 +3,7 @@ package flixel.atlas;
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
 import flixel.FlxG;
+import flixel.system.layer.frames.AtlasFrames;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
@@ -198,35 +199,31 @@ class FlxAtlas
 	 * Generates TexturePackerData object for this atlas. Where each frame represents one of the inserted images
 	 * @return TexturePackerData for this atlas
 	 */
-	public function getTextureData():TexturePackerData
+	public function getAtlasFrames():AtlasFrames
 	{
 		var cached:CachedGraphics = FlxG.bitmap.add(this.atlasBitmapData, false, name);
 		
-		if (cached.data == null)
+		if (cached.atlasFrames == null)
 		{
-			var packerData = new TexturePackerData(null, name);
+			var atlasFrames:AtlasFrames = new AtlasFrames(cached);
 			var node:FlxNode;
 			for (key in nodes.keys())
 			{
 				node = nodes.get(key);
 				if (node.filled)
 				{
-					var texFrame = new TextureAtlasFrame();
+					var frame:Rectangle = new Rectangle(node.x, node.y, node.width - borderX, node.height - borderY);
+					var sourceSize:FlxPoint = FlxPoint.get(node.width - borderX, node.height - borderY);
+					var offset:FlxPoint = FlxPoint.get(0, 0);
 					
-					texFrame.trimmed = false;
-					texFrame.name = key;
-					texFrame.sourceSize = FlxPoint.get(node.width, node.height);
-					texFrame.offset = FlxPoint.get(0, 0);
-					texFrame.frame = new Rectangle(node.x, node.y, node.width, node.height);
-					
-					packerData.frames.push(texFrame);
+					atlasFrames.addAtlasFrame(frame, sourceSize, offset, node.key, 0); 
 				}
 			}
 			
-			cached.data = packerData;
+			cached.atlasFrames = atlasFrames;
 		}
 		
-		return cached.data;
+		return cached.atlasFrames;
 	}
 	
 	/**

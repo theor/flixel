@@ -13,37 +13,21 @@ class TileSheetExt extends Tilesheet implements IFlxDestroyable
 {
 	public static var _DRAWCALLS:Int = 0;
 	
-	public var cachedGraphics:CachedGraphics;
+	public var tileOrder:Array<Rectangle>;
 	
-	public var bitmap:BitmapData;
-	
-	public var width:Int;
-	
-	public var height:Int;
-	
-	public var numTiles:Int = 0;
-	
-	public var tileOrder:Array<RectPointTileID>;
-	
-	public function new(cachedGraphics:CachedGraphics)
+	public function new(bitmap:BitmapData)
 	{
-		super(cachedGraphics.bitmap);
-		
-		this.cachedGraphics = cachedGraphics;
-		bitmap = cachedGraphics.bitmap;
-		width = bitmap.width;
-		height = bitmap.height;
-		tileOrder = new Array<RectPointTileID>();
+		super(bitmap);
+		tileOrder = new Array<Rectangle>();
 	}
 	
-	public static function rebuildFromOld(old:TileSheetExt, cached:CachedGraphics):TileSheetExt
+	public static function rebuildFromOld(old:TileSheetExt, bitmap:BitmapData):TileSheetExt
 	{
-		var newSheet:TileSheetExt = new TileSheetExt(cached);
+		var newSheet:TileSheetExt = new TileSheetExt(bitmap);
 		
 		for (i in 0...(old.tileOrder.length))
 		{
-			var tileObj:RectPointTileID = old.tileOrder[i];
-			newSheet.addTileRect(tileObj.rect, tileObj.point);
+			newSheet.addTileRect(old.tileOrder[i]);
 		}
 		
 		old.tileOrder = null;
@@ -58,43 +42,13 @@ class TileSheetExt extends Tilesheet implements IFlxDestroyable
 	 */
 	override public function addTileRect(rectangle:Rectangle, centerPoint:Point = null):Int 
 	{
-		var tileID:Int = super.addTileRect(rectangle, centerPoint);
-		tileOrder[tileID] = new RectPointTileID(tileID, rectangle, centerPoint);
+		var tileID:Int = super.addTileRect(rectangle);
+		tileOrder[tileID] = rectangle;
 		return tileID;
 	}
 	
 	public function destroy():Void
 	{
-		cachedGraphics = null;
-		bitmap = FlxDestroyUtil.dispose(bitmap);
-		
-		for (rectPoint in tileOrder)
-		{
-			FlxDestroyUtil.destroy(rectPoint);
-		}
-		
 		tileOrder = null;
-	}
-}
-
-// TODO: rework tilesheet frame regeneration
-// and remove this class completely
-private class RectPointTileID implements IFlxDestroyable
-{
-	public var rect:Rectangle;
-	public var point:Point;
-	public var id:Int;
-	
-	public function new(id, rect, point)
-	{
-		this.id = id;
-		this.rect = rect;
-		this.point = point;
-	}
-	
-	public function destroy():Void
-	{
-		rect = null;
-		point = null;
 	}
 }

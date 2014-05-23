@@ -6,7 +6,6 @@ import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flixel.FlxG;
-import flixel.system.layer.TileSheetData;
 import flixel.util.FlxColor;
 import flixel.system.layer.Region;
 import flixel.util.loaders.CachedGraphics;
@@ -99,7 +98,7 @@ class PxBitmapFont
 			#if FLX_RENDER_BLIT
 			updateGlyphData();
 			#else
-			updateGlyphData(cachedGraphics.tilesheet);
+			updateGlyphData(cachedGraphics);
 			#end
 		}
 		
@@ -137,7 +136,7 @@ class PxBitmapFont
 	/**
 	 * Updates and caches tile data for passed node object
 	 */
-	public function updateGlyphData(Tiles:TileSheetData = null):Void
+	public function updateGlyphData(Cached:CachedGraphics = null):Void
 	{
 		#if FLX_RENDER_TILE
 		_glyphs = new Map<Int, PxFontSymbol>();
@@ -196,11 +195,11 @@ class PxBitmapFont
 				#else
 				if (charString != " " && charString != "")
 				{
-					setGlyph(Tiles, symbol.charCode, rect, Math.floor(point.x), Math.floor(point.y), charWidth);
+					setGlyph(Cached, symbol.charCode, rect, Math.floor(point.x), Math.floor(point.y), charWidth);
 				}
 				else
 				{
-					setGlyph(Tiles, symbol.charCode, rect, Math.floor(point.x), 1, charWidth);
+					setGlyph(Cached, symbol.charCode, rect, Math.floor(point.x), 1, charWidth);
 				}
 				#end
 			}

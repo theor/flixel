@@ -25,17 +25,18 @@ class SpritesheetFrames extends FlxSpriteFrames
 	private var frameSize:Point;
 	private var frameSpacing:Point;
 	
-	private function new(tilesheet:TileSheetExt) 
+	private function new(parent:CachedGraphics) 
 	{
-		super(tilesheet);
+		super(parent);
 		type = FrameCollectionType.SPRITESHEET;
 	}
+	
+	// TODO: document everything
 	
 	// TODO: implement these methods and think about their signatures (i doubt about first param)
 	public static function fromFrame(frame:FlxFrame, frameSize:Point, frameSpacing:Point = null):SpritesheetFrames
 	{
-		var tilesheet:TileSheetExt = frame.tileSheet;
-		var cached:CachedGraphics = tilesheet.cachedGraphics;
+		var cached:CachedGraphics = frame.parent;
 		
 		// find SpritesheetFrames object, if there is one already
 		var spritesheetFrames:SpritesheetFrames = null;
@@ -49,7 +50,7 @@ class SpritesheetFrames extends FlxSpriteFrames
 		}
 		
 		// or create it, if there is no such object
-		spritesheetFrames = new SpritesheetFrames(tilesheet);
+		spritesheetFrames = new SpritesheetFrames(cached);
 		
 		if (frameSpacing == null)
 		{
@@ -186,7 +187,7 @@ class SpritesheetFrames extends FlxSpriteFrames
 		}
 		
 		// or create it, if there is no such object
-		spritesheetFrames = new SpritesheetFrames(tilesheet);
+		spritesheetFrames = new SpritesheetFrames(cached);
 		
 		if (region == null)
 		{
@@ -196,12 +197,12 @@ class SpritesheetFrames extends FlxSpriteFrames
 		{
 			if (region.width == 0)
 			{
-				region.width = tilesheet.width - region.x;
+				region.width = cached.width - region.x;
 			}
 			
 			if (region.height == 0)
 			{
-				region.height = tilesheet.height - region.y;
+				region.height = cached.height - region.y;
 			}
 		}
 		
@@ -268,8 +269,8 @@ class SpritesheetFrames extends FlxSpriteFrames
 		{
 			region = RECT;
 			RECT.x = RECT.y = 0;
-			RECT.width = tilesheet.width;
-			RECT.height = tilesheet.height;
+			RECT.width = parent.width;
+			RECT.height = parent.height;
 		}
 		
 		if (frameSpacing == null)

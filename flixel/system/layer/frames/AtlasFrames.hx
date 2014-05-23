@@ -1,4 +1,5 @@
 package flixel.system.layer.frames;
+
 import flixel.util.FlxPoint;
 import haxe.xml.Fast;
 
@@ -17,22 +18,15 @@ import haxe.Json;
  */
 class AtlasFrames extends FlxSpriteFrames
 {
-	public var framesHash:Map<String, FlxFrame>;
-	
-	private function new(tilesheet:TileSheetExt) 
+	@:allow(flixel.atlas.FlxAtlas)
+	private function new(parent:CachedGraphics) 
 	{
-		super(tilesheet);
+		super(parent);
 		type = FrameCollectionType.ATLAS;
 		framesHash = new Map<String, FlxFrame>();
 	}
 	
-	override public function destroy():Void
-	{
-		super.destroy();
-		framesHash = null;
-	}
-	
-	override function addAtlasFrame(frame:Rectangle, sourceSize:FlxPoint, offset:FlxPoint, name:String = null, angle:Float = 0):FlxFrame 
+	override public function addAtlasFrame(frame:Rectangle, sourceSize:FlxPoint, offset:FlxPoint, name:String = null, angle:Float = 0):FlxFrame 
 	{
 		var frame:FlxFrame = super.addAtlasFrame(frame, sourceSize, offset, name, angle);
 		
@@ -55,7 +49,7 @@ class AtlasFrames extends FlxSpriteFrames
 		
 		if ((cached == null) || (Description == null)) return null;
 		
-		var frames:AtlasFrames = new AtlasFrames(cached.tilesheet);
+		var frames:AtlasFrames = new AtlasFrames(cached);
 		var data:Dynamic = Json.parse(Description);
 		
 		for (frame in Lambda.array(data.frames))
@@ -95,7 +89,7 @@ class AtlasFrames extends FlxSpriteFrames
 		
 		if ((cached == null) || (Description == null)) return null;
 		
-		var frames:AtlasFrames = new AtlasFrames(cached.tilesheet);
+		var frames:AtlasFrames = new AtlasFrames(cached);
 		
 		var pack:String = StringTools.trim(Description);
 		var lines:Array<String> = pack.split("\n");
@@ -183,7 +177,7 @@ class AtlasFrames extends FlxSpriteFrames
 		
 		if ((cached == null) || (Description == null)) return null;
 		
-		var frames:AtlasFrames = new AtlasFrames(cached.tilesheet);
+		var frames:AtlasFrames = new AtlasFrames(cached);
 		
 		var data:Fast = new haxe.xml.Fast(Xml.parse(Description).firstElement());
 		
@@ -224,7 +218,7 @@ class AtlasFrames extends FlxSpriteFrames
 		
 		if ((cached == null) || (Description == null)) return null;
 		
-		var frames:AtlasFrames = new AtlasFrames(cached.tilesheet);
+		var frames:AtlasFrames = new AtlasFrames(cached);
 		
 		var xml = Xml.parse(Description);
 		var root = xml.firstElement();

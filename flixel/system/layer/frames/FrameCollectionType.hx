@@ -5,6 +5,6 @@ enum FrameCollectionType
 	IMAGE;
 	SPRITESHEET;
 	ATLAS;
-	FONT;
+	FONT; // TODO: implement it
 	USER;
 }
