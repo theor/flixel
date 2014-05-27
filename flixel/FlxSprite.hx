@@ -10,9 +10,9 @@ import flixel.animation.FlxAnimationController;
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.system.layer.DrawStackItem;
-import flixel.system.layer.frames.FlxFrame;
-import flixel.system.layer.frames.FlxSpriteFrames;
-import flixel.system.layer.frames.FrameType;
+import flixel.graphics.frames.FlxFrame;
+import flixel.graphics.frames.FlxSpriteFrames;
+import flixel.graphics.frames.FrameType;
 import flixel.system.layer.Region;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
@@ -20,7 +20,7 @@ import flixel.util.FlxColorUtil;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxMath;
 import flixel.util.FlxPoint;
-import flixel.util.loaders.CachedGraphics;
+import flixel.graphics.FlxGraphics;
 import flixel.util.loaders.TexturePackerData;
 import flixel.util.loaders.TextureRegion;
 import openfl.display.Tilesheet;
@@ -82,7 +82,7 @@ class FlxSprite extends FlxObject
 	 */
 	public var region(default, null):Region;
 	public var framesData(default, null):FlxSpriteFrames;
-	public var cachedGraphics(default, set):CachedGraphics;
+	public var graphics(default, set):FlxGraphics;
 	/**
 	 * The minimum angle (out of 360°) for which a new baked rotation exists. Example: 90 means there 
 	 * are 4 baked rotations in the spritesheet. 0 if this sprite does not have any baked rotations.
@@ -242,7 +242,7 @@ class FlxSprite extends FlxObject
 		frame = null;
 		
 		framesData = null;
-		cachedGraphics = null;
+		graphics = null;
 		region = null;
 	}
 	
@@ -272,7 +272,7 @@ class FlxSprite extends FlxObject
 		
 		region = Sprite.region.clone();
 		bakedRotationAngle = Sprite.bakedRotationAngle;
-		cachedGraphics = Sprite.cachedGraphics;
+		graphics = Sprite.graphics;
 		
 		width = frameWidth = Sprite.frameWidth;
 		height = frameHeight = Sprite.frameHeight;
@@ -304,25 +304,25 @@ class FlxSprite extends FlxObject
 	public function loadGraphic(Graphic:Dynamic, Animated:Bool = false, Width:Int = 0, Height:Int = 0, Unique:Bool = false, ?Key:String):FlxSprite
 	{
 		bakedRotationAngle = 0;
-		cachedGraphics = FlxG.bitmap.add(Graphic, Unique, Key);
+		graphics = FlxG.bitmap.add(Graphic, Unique, Key);
 		
 		if (Width == 0)
 		{
-			Width = (Animated == true) ? cachedGraphics.bitmap.height : cachedGraphics.bitmap.width;
-			Width = (Width > cachedGraphics.bitmap.width) ? cachedGraphics.bitmap.width : Width;
+			Width = (Animated == true) ? graphics.bitmap.height : graphics.bitmap.width;
+			Width = (Width > graphics.bitmap.width) ? graphics.bitmap.width : Width;
 		}
 		
 		if (Height == 0)
 		{
-			Height = (Animated == true) ? Width : cachedGraphics.bitmap.height;
-			Height = (Height > cachedGraphics.bitmap.height) ? cachedGraphics.bitmap.height : Height;
+			Height = (Animated == true) ? Width : graphics.bitmap.height;
+			Height = (Height > graphics.bitmap.height) ? graphics.bitmap.height : Height;
 		}
 		
 		if (!Std.is(Graphic, TextureRegion))
 		{
 			region = new Region(0, 0, Width, Height);
-			region.width = cachedGraphics.bitmap.width;
-			region.height = cachedGraphics.bitmap.height;
+			region.width = graphics.bitmap.width;
+			region.height = graphics.bitmap.height;
 		}
 		else
 		{
@@ -447,7 +447,7 @@ class FlxSprite extends FlxObject
 		}
 		
 		var skipGen:Bool = FlxG.bitmap.checkCache(key);
-		cachedGraphics = FlxG.bitmap.create(Std.int(width) + columns - 1, Std.int(height) + rows - 1, FlxColor.TRANSPARENT, true, key);
+		graphics = FlxG.bitmap.create(Std.int(width) + columns - 1, Std.int(height) + rows - 1, FlxColor.TRANSPARENT, true, key);
 		bakedRotationAngle = 360 / Rotations;
 		
 		//Generate a new sheet if necessary, then fix up the width and height
@@ -470,7 +470,7 @@ class FlxSprite extends FlxObject
 					_matrix.rotate(bakedAngle * FlxAngle.TO_RAD);
 					_matrix.translate(max * column + midpointX + column, midpointY + row);
 					bakedAngle += bakedRotationAngle;
-					cachedGraphics.bitmap.draw(brush, _matrix, null, null, null, AntiAliasing);
+					graphics.bitmap.draw(brush, _matrix, null, null, null, AntiAliasing);
 					column++;
 				}
 				midpointY += max;
@@ -481,8 +481,8 @@ class FlxSprite extends FlxObject
 		width = height = max;
 		
 		region = new Region(0, 0, max, max, 1, 1);
-		region.width = cachedGraphics.bitmap.width;
-		region.height = cachedGraphics.bitmap.height;
+		region.width = graphics.bitmap.width;
+		region.height = graphics.bitmap.height;
 		
 		#if FLX_RENDER_TILE
 		antialiasing = AntiAliasing;
@@ -514,18 +514,18 @@ class FlxSprite extends FlxObject
 	{
 		bakedRotationAngle = 0;
 		
-		if (Std.is(Data, CachedGraphics))
+		if (Std.is(Data, FlxGraphics))
 		{
-			cachedGraphics = cast Data;
-			if (cachedGraphics.data == null)
+			graphics = cast Data;
+			if (graphics.data == null)
 			{
 				return null;
 			}
 		}
 		else if (Std.is(Data, TexturePackerData))
 		{
-			cachedGraphics = FlxG.bitmap.add(Data.assetName, Unique);
-			cachedGraphics.data = cast Data;
+			graphics = FlxG.bitmap.add(Data.assetName, Unique);
+			graphics.data = cast Data;
 		}
 		else
 		{
@@ -533,8 +533,8 @@ class FlxSprite extends FlxObject
 		}
 		
 		region = new Region();
-		region.width = cachedGraphics.width;
-		region.height = cachedGraphics.height;
+		region.width = graphics.width;
+		region.height = graphics.height;
 		
 		animation.destroyAnimations();
 		updateFrameData();
@@ -594,12 +594,12 @@ class FlxSprite extends FlxObject
 	public function makeGraphic(Width:Int, Height:Int, Color:Int = FlxColor.WHITE, Unique:Bool = false, ?Key:String):FlxSprite
 	{
 		bakedRotationAngle = 0;
-		cachedGraphics = FlxG.bitmap.create(Width, Height, Color, Unique, Key);
+		graphics = FlxG.bitmap.create(Width, Height, Color, Unique, Key);
 		region = new Region();
 		region.width = Width;
 		region.height = Height;
-		width = region.tileWidth = frameWidth = cachedGraphics.bitmap.width;
-		height = region.tileHeight = frameHeight = cachedGraphics.bitmap.height;
+		width = region.tileWidth = frameWidth = graphics.bitmap.width;
+		height = region.tileHeight = frameHeight = graphics.bitmap.height;
 		animation.destroyAnimations();
 		updateFrameData();
 		resetHelpers();
@@ -684,8 +684,8 @@ class FlxSprite extends FlxObject
 		resetSize();
 		_flashRect2.x = 0;
 		_flashRect2.y = 0;
-		_flashRect2.width = cachedGraphics.bitmap.width;
-		_flashRect2.height = cachedGraphics.bitmap.height;
+		_flashRect2.width = graphics.bitmap.width;
+		_flashRect2.height = graphics.bitmap.height;
 		centerOrigin();
 		
 	#if FLX_RENDER_BLIT
@@ -748,7 +748,7 @@ class FlxSprite extends FlxObject
 			}
 			
 		#if FLX_RENDER_TILE
-			drawItem = camera.getDrawStackItem(cachedGraphics, isColored, _blendInt, antialiasing);
+			drawItem = camera.getDrawStackItem(graphics, isColored, _blendInt, antialiasing);
 			currDrawData = drawItem.drawData;
 			currIndex = drawItem.position;
 			
@@ -924,9 +924,9 @@ class FlxSprite extends FlxObject
 			_flashPoint.y = Y + region.startY;
 			_flashRect2.width = bitmapData.width;
 			_flashRect2.height = bitmapData.height;
-			cachedGraphics.bitmap.copyPixels(bitmapData, _flashRect2, _flashPoint, null, null, true);
-			_flashRect2.width = cachedGraphics.bitmap.width;
-			_flashRect2.height = cachedGraphics.bitmap.height;
+			graphics.bitmap.copyPixels(bitmapData, _flashRect2, _flashPoint, null, null, true);
+			_flashRect2.width = graphics.bitmap.width;
+			_flashRect2.height = graphics.bitmap.height;
 			
 			resetFrameBitmaps();
 			
@@ -946,7 +946,7 @@ class FlxSprite extends FlxObject
 		}
 		_matrix.translate(X + region.startX + Brush.origin.x, Y + region.startY + Brush.origin.y);
 		var brushBlend:BlendMode = Brush.blend;
-		cachedGraphics.bitmap.draw(bitmapData, _matrix, null, brushBlend, null, Brush.antialiasing);
+		graphics.bitmap.draw(bitmapData, _matrix, null, brushBlend, null, Brush.antialiasing);
 		resetFrameBitmaps();
 		#if FLX_RENDER_BLIT
 		calcFrame();
@@ -1013,15 +1013,15 @@ class FlxSprite extends FlxObject
 		var column:Int;
 		var rows:Int = region.height;
 		var columns:Int = region.width;
-		cachedGraphics.bitmap.lock();
+		graphics.bitmap.lock();
 		while (row < rows)
 		{
 			column = region.startX;
 			while (column < columns)
 			{
-				if (cachedGraphics.bitmap.getPixel32(column, row) == cast Color)
+				if (graphics.bitmap.getPixel32(column, row) == cast Color)
 				{
-					cachedGraphics.bitmap.setPixel32(column, row, NewColor);
+					graphics.bitmap.setPixel32(column, row, NewColor);
 					if (FetchPositions)
 					{
 						positions.push(FlxPoint.get(column, row));
@@ -1032,7 +1032,7 @@ class FlxSprite extends FlxObject
 			}
 			row++;
 		}
-		cachedGraphics.bitmap.unlock();
+		graphics.bitmap.unlock();
 		resetFrameBitmaps();
 		return positions;
 	}
@@ -1150,7 +1150,7 @@ class FlxSprite extends FlxObject
 	 */
 	private function calcFrame(RunOnCpp:Bool = false):Void
 	{
-		if (cachedGraphics == null)	
+		if (graphics == null)	
 		{
 			loadGraphic(GraphicDefault);
 		}
@@ -1171,18 +1171,18 @@ class FlxSprite extends FlxObject
 	 */
 	public function updateFrameData():Void
 	{
-		if (cachedGraphics == null)
+		if (graphics == null)
 		{
 			return;
 		}
 		
-		if ((cachedGraphics.data != null) && (region.tileWidth == 0 && region.tileHeight == 0))
+		if ((graphics.data != null) && (region.tileWidth == 0 && region.tileHeight == 0))
 		{
-			framesData = cachedGraphics.tilesheet.getTexturePackerFrames(cachedGraphics.data);
+			framesData = graphics.tilesheet.getTexturePackerFrames(graphics.data);
 		}
 		else
 		{
-			framesData = cachedGraphics.tilesheet.getSpriteSheetFrames(region, null);
+			framesData = graphics.tilesheet.getSpriteSheetFrames(region, null);
 		}
 		
 		frame = framesData.frames[0];
@@ -1265,7 +1265,7 @@ class FlxSprite extends FlxObject
 	 */
 	public inline function resetFrameBitmaps():Void
 	{
-		cachedGraphics.tilesheet.destroyBitmaps();
+		graphics.tilesheet.destroyBitmaps();
 	}
 	
 	/**
@@ -1377,7 +1377,7 @@ class FlxSprite extends FlxObject
 	 */
 	private function get_pixels():BitmapData
 	{
-		return cachedGraphics.bitmap;
+		return graphics.bitmap;
 	}
 	
 	private function set_pixels(Pixels:BitmapData):BitmapData
@@ -1387,12 +1387,12 @@ class FlxSprite extends FlxObject
 		if (key == null)
 		{
 			key = FlxG.bitmap.getUniqueKey();
-			cachedGraphics = FlxG.bitmap.add(Pixels, false, key);
-			cachedGraphics.destroyOnNoUse = true;
+			graphics = FlxG.bitmap.add(Pixels, false, key);
+			graphics.destroyOnNoUse = true;
 		}
 		else
 		{
-			cachedGraphics = FlxG.bitmap.get(key);
+			graphics = FlxG.bitmap.get(key);
 		}
 		
 		if (region == null)	
@@ -1402,13 +1402,13 @@ class FlxSprite extends FlxObject
 		
 		region.startX = 0;
 		region.startY = 0;
-		region.tileWidth = region.width = cachedGraphics.bitmap.width;
-		region.tileHeight = region.height = cachedGraphics.bitmap.height;
+		region.tileWidth = region.width = graphics.bitmap.width;
+		region.tileHeight = region.height = graphics.bitmap.height;
 		region.spacingX = 0;
 		region.spacingY = 0;
 		
-		width = frameWidth = cachedGraphics.bitmap.width;
-		height = frameHeight = cachedGraphics.bitmap.height;
+		width = frameWidth = graphics.bitmap.width;
+		height = frameHeight = graphics.bitmap.height;
 		animation.destroyAnimations();
 		
 		updateFrameData();
@@ -1523,24 +1523,24 @@ class FlxSprite extends FlxObject
 	}
 	
 	/**
-	 * Internal function for setting cachedGraphics property for this object. 
-	 * It changes cachedGraphics' useCount also for better memory tracking.
+	 * Internal function for setting graphics property for this object. 
+	 * It changes graphics' useCount also for better memory tracking.
 	 */
-	private function set_cachedGraphics(Value:CachedGraphics):CachedGraphics
+	private function set_graphics(Value:FlxGraphics):FlxGraphics
 	{
-		var oldCached:CachedGraphics = cachedGraphics;
+		var oldGraphics:FlxGraphics = graphics;
 		
-		if ((cachedGraphics != Value) && (Value != null))
+		if ((graphics != Value) && (Value != null))
 		{
 			Value.useCount++;
 		}
 		
-		if ((oldCached != null) && (oldCached != Value))
+		if ((oldGraphics != null) && (oldGraphics != Value))
 		{
-			oldCached.useCount--;
+			oldGraphics.useCount--;
 		}
 		
-		return cachedGraphics = Value;
+		return graphics = Value;
 	}
 	
 	private function set_flipX(Value:Bool):Bool

@@ -37,7 +37,7 @@ class FlxBGSprite extends FlxSprite
 				continue;
 			}
 			
-			drawItem = camera.getDrawStackItem(cachedGraphics, isColored, _blendInt);
+			drawItem = camera.getDrawStackItem(graphics, isColored, _blendInt);
 			currDrawData = drawItem.drawData;
 			currIndex = drawItem.position;
 			

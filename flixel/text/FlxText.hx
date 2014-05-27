@@ -12,12 +12,12 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.interfaces.IFlxDestroyable;
 import flixel.system.FlxAssets;
+import flixel.graphics.FlxGraphics;
 import flixel.text.FlxText.FlxTextFormat;
 import flixel.util.FlxArrayUtil;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
-import flixel.util.loaders.CachedGraphics;
 import openfl.Assets;
 
 /**
@@ -382,9 +382,9 @@ class FlxText extends FlxSprite
 	
 	override public function updateFrameData():Void
 	{
-		if (cachedGraphics != null)
+		if (graphics != null)
 		{
-			framesData = cachedGraphics.tilesheet.getSpriteSheetFrames(region);
+			framesData = graphics.tilesheet.getSpriteSheetFrames(region);
 			frame = framesData.frames[0];
 			frames = 1;
 		}
@@ -668,14 +668,14 @@ class FlxText extends FlxSprite
 		return _textField;
 	}
 	
-	override private function set_cachedGraphics(Value:CachedGraphics):CachedGraphics 
+	override private function set_graphics(Value:FlxGraphics):FlxGraphics 
 	{
-		var cached:CachedGraphics = super.set_cachedGraphics(Value);
+		var graph:FlxGraphics = super.set_graphics(Value);
 		
 		if (Value != null)
 			Value.destroyOnNoUse = true;
 		
-		return cached;
+		return graph;
 	}
 	
 	override private function updateColorTransform():Void
@@ -707,8 +707,8 @@ class FlxText extends FlxSprite
 	
 	private function regenGraphics():Void
 	{
-		var oldWidth:Float = cachedGraphics.bitmap.width;
-		var oldHeight:Float = cachedGraphics.bitmap.height;
+		var oldWidth:Float = graphics.bitmap.width;
+		var oldHeight:Float = graphics.bitmap.height;
 		
 		var newWidth:Float = _textField.width + _widthInc;
 		// Account for 2px gutter on top and bottom (that's why there is "+ 4")
@@ -724,7 +724,7 @@ class FlxText extends FlxSprite
 		{
 			// Need to generate a new buffer to store the text graphic
 			height = newHeight - _heightInc;
-			var key:String = cachedGraphics.key;
+			var key:String = graphics.key;
 			FlxG.bitmap.remove(key);
 			
 			makeGraphic(Std.int(newWidth), Std.int(newHeight), FlxColor.TRANSPARENT, false, key);
@@ -738,7 +738,7 @@ class FlxText extends FlxSprite
 		// Else just clear the old buffer before redrawing the text
 		else
 		{
-			cachedGraphics.bitmap.fillRect(_flashRect, FlxColor.TRANSPARENT);
+			graphics.bitmap.fillRect(_flashRect, FlxColor.TRANSPARENT);
 		}
 	}
 	
@@ -805,7 +805,7 @@ class FlxText extends FlxSprite
 					for (iter in 0...iterations)
 					{
 						_matrix.translate(delta, delta);
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 					}
 					
 					_matrix.translate( -shadowOffset.x * borderSize, -shadowOffset.y * borderSize);
@@ -821,21 +821,21 @@ class FlxText extends FlxSprite
 					for (iter in 0...iterations)
 					{
 						_matrix.translate(-itd, -itd);		//upper-left
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(itd, 0);			//upper-middle
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(itd, 0);			//upper-right
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(0, itd);			//middle-right
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(0, itd);			//lower-right
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(-itd, 0);			//lower-middle
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(-itd, 0);			//lower-left
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(0, -itd);			//middle-left
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(itd, 0);			//return to center
 						itd += delta;
 					} 
@@ -853,13 +853,13 @@ class FlxText extends FlxSprite
 					for (iter in 0...iterations)
 					{
 						_matrix.translate(-itd, -itd);			//upper-left
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(itd*2, 0);			//upper-right
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(0, itd*2);			//lower-right
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(-itd*2, 0);			//lower-left
-						cachedGraphics.bitmap.draw(_textField, _matrix);
+						graphics.bitmap.draw(_textField, _matrix);
 						_matrix.translate(itd, -itd);			//return to center
 						itd += delta;
 					}
@@ -873,7 +873,7 @@ class FlxText extends FlxSprite
 			}
 			
 			//Actually draw the text onto the buffer
-			cachedGraphics.bitmap.draw(_textField, _matrix);
+			graphics.bitmap.draw(_textField, _matrix);
 		}
 		
 		dirty = false;
@@ -886,13 +886,13 @@ class FlxText extends FlxSprite
 		#end
 		
 		//Finally, update the visible pixels
-		if ((framePixels == null) || (framePixels.width != cachedGraphics.bitmap.width) || (framePixels.height != cachedGraphics.bitmap.height))
+		if ((framePixels == null) || (framePixels.width != graphics.bitmap.width) || (framePixels.height != graphics.bitmap.height))
 		{
 			framePixels = FlxDestroyUtil.dispose(framePixels);
-			framePixels = new BitmapData(cachedGraphics.bitmap.width, cachedGraphics.bitmap.height, true, 0);
+			framePixels = new BitmapData(graphics.bitmap.width, graphics.bitmap.height, true, 0);
 		}
 		
-		framePixels.copyPixels(cachedGraphics.bitmap, _flashRect, _flashPointZero);
+		framePixels.copyPixels(graphics.bitmap, _flashRect, _flashPointZero);
 		
 		if (useColorTransform) 
 		{

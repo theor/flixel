@@ -16,7 +16,7 @@ import flixel.util.FlxPoint;
 import flixel.util.FlxPool.FlxPool;
 import flixel.util.FlxRandom;
 import flixel.util.FlxRect;
-import flixel.util.loaders.CachedGraphics;
+import flixel.graphics.FlxGraphics;
 import openfl.display.Tilesheet;
 
 /**
@@ -306,7 +306,7 @@ class FlxCamera extends FlxBasic
 	private static var _storageHead:DrawStackItem;
 	
 	@:noCompletion
-	public function getDrawStackItem(ObjGraphics:CachedGraphics, ObjColored:Bool, ObjBlending:Int, ObjAntialiasing:Bool = false):DrawStackItem
+	public function getDrawStackItem(ObjGraphics:FlxGraphics, ObjColored:Bool, ObjBlending:Int, ObjAntialiasing:Bool = false):DrawStackItem
 	{
 		var itemToReturn:DrawStackItem = null;
 		if (_currentStackItem.initialized == false)
@@ -999,7 +999,7 @@ class FlxCamera extends FlxBasic
 		{
 			if (width != buffer.width || height != buffer.height)
 			{
-				FlxG.bitmap.remove(screen.cachedGraphics.key);
+				FlxG.bitmap.remove(screen.graphics.key);
 				buffer = new BitmapData(width, height, true, 0);
 				screen.pixels = buffer;
 				screen.origin.set();

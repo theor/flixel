@@ -3,11 +3,11 @@ package flixel.atlas;
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
 import flixel.FlxG;
-import flixel.system.layer.frames.AtlasFrames;
+import flixel.graphics.FlxGraphics;
+import flixel.graphics.frames.AtlasFrames;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
-import flixel.util.loaders.CachedGraphics;
 import flixel.util.loaders.TexturePackerData;
 import flixel.util.loaders.TextureAtlasFrame;
 import flixel.util.loaders.TextureRegion;
@@ -188,8 +188,8 @@ class FlxAtlas
 	{
 		if (hasNodeWithName(nodeName))
 		{
-			var cached:CachedGraphics = FlxG.bitmap.add(this.atlasBitmapData, false, name);
-			var region = new TextureRegion(cached);
+			var graphics:FlxGraphics = FlxG.bitmap.add(this.atlasBitmapData, false, name);
+			var region = new TextureRegion(graphics);
 			var node:FlxNode = getNode(nodeName);
 			region.region.startX = node.x;
 			region.region.startY = node.y;
@@ -209,11 +209,11 @@ class FlxAtlas
 	 */
 	public function getAtlasFrames():AtlasFrames
 	{
-		var cached:CachedGraphics = FlxG.bitmap.add(this.atlasBitmapData, false, name);
+		var graphics:FlxGraphics = FlxG.bitmap.add(this.atlasBitmapData, false, name);
 		
-		if (cached.atlasFrames == null)
+		if (graphics.atlasFrames == null)
 		{
-			var atlasFrames:AtlasFrames = new AtlasFrames(cached);
+			var atlasFrames:AtlasFrames = new AtlasFrames(graphics);
 			var node:FlxNode;
 			for (key in nodes.keys())
 			{
@@ -228,10 +228,10 @@ class FlxAtlas
 				}
 			}
 			
-			cached.atlasFrames = atlasFrames;
+			graphics.atlasFrames = atlasFrames;
 		}
 		
-		return cached.atlasFrames;
+		return graphics.atlasFrames;
 	}
 	
 	/**

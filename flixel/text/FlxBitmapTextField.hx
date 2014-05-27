@@ -185,7 +185,7 @@ class FlxBitmapTextField extends FlxSprite
 				// TODO: make it work again
 			}
 			
-			drawItem = camera.getDrawStackItem(cachedGraphics, true, _blendInt, antialiasing);
+			drawItem = camera.getDrawStackItem(graphics, true, _blendInt, antialiasing);
 			
 			if (!camera.visible || !camera.exists || !isOnScreen(camera))
 			{
@@ -596,13 +596,13 @@ class FlxBitmapTextField extends FlxSprite
 		} 
 		else 
 		{
-			pixels.fillRect(cachedGraphics.bitmap.rect, _backgroundColor);
+			pixels.fillRect(graphics.bitmap.rect, _backgroundColor);
 		}
 		#else
 		_drawData.splice(0, _drawData.length);
 		_bgDrawData.splice(0, _bgDrawData.length);
 		
-		if (cachedGraphics == null)
+		if (graphics == null)
 		{
 			return;
 		}

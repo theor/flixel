@@ -6,7 +6,6 @@ import flash.geom.Rectangle;
 import flixel.FlxG;
 import flixel.interfaces.IFlxDestroyable;
 import flixel.util.FlxDestroyUtil;
-import flixel.util.loaders.CachedGraphics;
 import openfl.display.Tilesheet;
 
 class TileSheetExt extends Tilesheet implements IFlxDestroyable

@@ -41,9 +41,9 @@ class BitmapLogFrontEnd
 	{
 		#if !FLX_NO_DEBUG
 		clear();
-		for (cachedGraphic in FlxG.bitmap._cache)
+		for (graphic in FlxG.bitmap._cache)
 		{
-			add(cachedGraphic.bitmap, cachedGraphic.key);
+			add(graphic.bitmap, graphic.key);
 		}
 		#end
 	}

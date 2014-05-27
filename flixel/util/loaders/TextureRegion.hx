@@ -2,14 +2,15 @@ package flixel.util.loaders;
 
 import flash.display.BitmapData;
 import flixel.interfaces.IFlxDestroyable;
+import flixel.graphics.FlxGraphics;
 import flixel.system.layer.Region;
 
 class TextureRegion implements IFlxDestroyable
 {
-	public var data:CachedGraphics;
+	public var data:FlxGraphics;
 	public var region:Region;
 	
-	public function new(data:CachedGraphics, startX:Int = 0, startY:Int = 0, tileWidth:Int = 0, tileHeight:Int = 0, spacingX:Int = 0, spacingY:Int = 0, width:Int = 0, height:Int = 0) 
+	public function new(data:FlxGraphics, startX:Int = 0, startY:Int = 0, tileWidth:Int = 0, tileHeight:Int = 0, spacingX:Int = 0, spacingY:Int = 0, width:Int = 0, height:Int = 0) 
 	{ 
 		this.data = data;
 		

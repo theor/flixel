@@ -6,7 +6,7 @@ import flash.geom.Rectangle;
 import flixel.system.FlxAssets;
 import flixel.util.FlxBitmapUtil;
 import flixel.util.FlxColor;
-import flixel.util.loaders.CachedGraphics;
+import flixel.graphics.FlxGraphics;
 import flixel.util.loaders.TextureRegion;
 import openfl.Assets;
 
@@ -16,7 +16,7 @@ import openfl.Assets;
 class BitmapFrontEnd
 {
 	@:allow(flixel.system.frontEnds.BitmapLogFrontEnd)
-	private var _cache:Map<String, CachedGraphics>;
+	private var _cache:Map<String, FlxGraphics>;
 	
 	public function new()
 	{
@@ -24,16 +24,16 @@ class BitmapFrontEnd
 	}
 	
 	#if FLX_RENDER_TILE
-	public var whitePixel(get, null):CachedGraphics;
+	public var whitePixel(get, null):FlxGraphics;
 	
-	private var _whitePixel:CachedGraphics;
+	private var _whitePixel:FlxGraphics;
 	
-	private function get_whitePixel():CachedGraphics
+	private function get_whitePixel():FlxGraphics
 	{
 		if (_whitePixel == null)
 		{
 			var bd:BitmapData = new BitmapData(2, 2, true, FlxColor.WHITE);
-			_whitePixel = new CachedGraphics("whitePixel", bd, true);
+			_whitePixel = new FlxGraphics("whitePixel", bd, true);
 			_whitePixel.persist = true;
 			_whitePixel.tilesheet.addTileRect(new Rectangle(0, 0, 1, 1), new Point(0, 0));
 		}
@@ -43,7 +43,7 @@ class BitmapFrontEnd
 	
 	public function onContext():Void
 	{
-		var obj:CachedGraphics;
+		var obj:FlxGraphics;
 		
 		if (_cache != null)
 		{
@@ -60,13 +60,13 @@ class BitmapFrontEnd
 	#end
 	
 	/**
-	 * Dumps bits of all cached graphics. This restores memory, but you can't read / write pixels on those graphics anymore.
-	 * You can call onContext() method for each CachedGraphic object which will restore it again.
+	 * Dumps bits of all graphics in the cache. This restores memory, but you can't read / write pixels on those graphics anymore.
+	 * You can call onContext() method for each FlxGraphic object which will restore it again.
 	 */
 	public function dumpCache():Void
 	{
 		#if !(flash || js)
-		var obj:CachedGraphics;
+		var obj:FlxGraphics;
 		
 		if (_cache != null)
 		{
@@ -103,7 +103,7 @@ class BitmapFrontEnd
 	 * @param	Key		Force the cache to use a specific Key to index the bitmap.
 	 * @return	The BitmapData we just created.
 	 */
-	public function create(Width:Int, Height:Int, Color:Int, Unique:Bool = false, ?Key:String):CachedGraphics
+	public function create(Width:Int, Height:Int, Color:Int, Unique:Bool = false, ?Key:String):FlxGraphics
 	{
 		var key:String = Key;
 		if (key == null)
@@ -116,7 +116,7 @@ class BitmapFrontEnd
 		}
 		if (!checkCache(key))
 		{
-			_cache.set(key, new CachedGraphics(key, new BitmapData(Width, Height, true, Color)));
+			_cache.set(key, new FlxGraphics(key, new BitmapData(Width, Height, true, Color)));
 		}
 		
 		return _cache.get(key);
@@ -128,9 +128,9 @@ class BitmapFrontEnd
 	 * @param	Graphic		The image file that you want to load.
 	 * @param	Unique		Ensures that the bitmap data uses a new slot in the cache.
 	 * @param	Key			Force the cache to use a specific Key to index the bitmap.
-	 * @return	The CachedGraphics we just created.
+	 * @return	The FlxGraphics we just created.
 	 */
-	public inline function add(Graphic:Dynamic, Unique:Bool = false, ?Key:String):CachedGraphics
+	public inline function add(Graphic:Dynamic, Unique:Bool = false, ?Key:String):FlxGraphics
 	{
 		return addWithSpaces(Graphic, 0, 0, 1, 1, Unique, Key);
 	}
@@ -146,11 +146,11 @@ class BitmapFrontEnd
 	 * @param	SpacingY		Vertical spaces to insert between frames in image
 	 * @param	Unique			Ensures that the bitmap data uses a new slot in the cache.
 	 * @param	Key				Force the cache to use a specific Key to index the bitmap.
-	 * @return	The CachedGraphics we just created.
+	 * @return	The FlxGraphics we just created.
 	 */
 	
 	// TODO: think about this method and add() method
-	public function addWithSpaces(Graphic:Dynamic, FrameWidth:Int, FrameHeight:Int, SpacingX:Int = 1, SpacingY:Int = 1, Unique:Bool = false, ?Key:String):CachedGraphics
+	public function addWithSpaces(Graphic:Dynamic, FrameWidth:Int, FrameHeight:Int, SpacingX:Int = 1, SpacingY:Int = 1, Unique:Bool = false, ?Key:String):FlxGraphics
 	{
 		if (Graphic == null)
 		{
@@ -158,17 +158,17 @@ class BitmapFrontEnd
 		}
 		
 		var region:TextureRegion = null;
-		var graphic:CachedGraphics = null;
+		var graphic:FlxGraphics = null;
 		
 		var isClass:Bool = false;
 		var isBitmap:Bool = false;
 		var isRegion:Bool = false;
 		var isGraphics:Bool = false;
 		
-		if (Std.is(Graphic, CachedGraphics))
+		if (Std.is(Graphic, FlxGraphics))
 		{
 			isGraphics = true;	
-			graphic = cast(Graphic, CachedGraphics);
+			graphic = cast(Graphic, FlxGraphics);
 			
 			if (!Unique && (FrameWidth <= 0 && FrameHeight <= 0))
 			{
@@ -279,29 +279,29 @@ class BitmapFrontEnd
 				bd = bd.clone();
 			}
 			
-			var co:CachedGraphics = new CachedGraphics(key, bd);
+			var graph:FlxGraphics = new FlxGraphics(key, bd);
 			
 			if (isClass && !Unique)
 			{
-				co.assetsClass = cast Graphic;
+				graph.assetsClass = cast Graphic;
 			}
 			else if (!isClass && !isBitmap && !isRegion && !Unique)
 			{
-				co.assetsKey = cast Graphic;
+				graph.assetsKey = cast Graphic;
 			}
 			
-			_cache.set(key, co);
+			_cache.set(key, graph);
 		}
 		
 		return _cache.get(key);
 	}
 	
 	/**
-	 * Gets cached graphics object from this storage by specified key. 
-	 * @param	key	Key for CachedGraphics object (it's name)
-	 * @return	CachedGraphics with the key name, or null if there is no such object
+	 * Gets FlxGraphics object from this storage by specified key. 
+	 * @param	key	Key for FlxGraphics object (it's name)
+	 * @return	FlxGraphics with the key name, or null if there is no such object
 	 */
-	public function get(key:String):CachedGraphics
+	public function get(key:String):FlxGraphics
 	{
 		return _cache.get(key);
 	}
@@ -373,7 +373,7 @@ class BitmapFrontEnd
 	{
 		if ((key != null) && _cache.exists(key))
 		{
-			var obj:CachedGraphics = _cache.get(key);
+			var obj:FlxGraphics = _cache.get(key);
 			#if !nme
 			Assets.cache.bitmapData.remove(key);
 			#end
@@ -387,7 +387,7 @@ class BitmapFrontEnd
 	 */
 	public function clearCache():Void
 	{
-		var obj:CachedGraphics;
+		var obj:FlxGraphics;
 		
 		if (_cache == null)
 		{
@@ -415,7 +415,7 @@ class BitmapFrontEnd
 	 */
 	public function clearUnused():Void
 	{
-		var obj:CachedGraphics;
+		var obj:FlxGraphics;
 		
 		if (_cache != null)
 		{

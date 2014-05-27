@@ -19,7 +19,6 @@ import flixel.util.FlxColor;
 import flixel.util.FlxColorUtil;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
-import flixel.util.loaders.CachedGraphics;
 import flixel.util.loaders.TexturePackerData;
 import flixel.util.loaders.TextureRegion;
 import openfl.display.Tilesheet;
@@ -66,7 +65,7 @@ class FlxSpriteCenteredOrigin extends FlxSprite
 			}
 			
 		#if FLX_RENDER_TILE
-			drawItem = camera.getDrawStackItem(cachedGraphics, isColored, _blendInt, antialiasing);
+			drawItem = camera.getDrawStackItem(graphics, isColored, _blendInt, antialiasing);
 			currDrawData = drawItem.drawData;
 			currIndex = drawItem.position;
 			

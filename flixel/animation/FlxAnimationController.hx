@@ -3,10 +3,10 @@ package flixel.animation;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.interfaces.IFlxDestroyable;
-import flixel.system.layer.frames.AtlasFrames;
-import flixel.system.layer.frames.FlxFrame;
-import flixel.system.layer.frames.FlxSpriteFrames;
-import flixel.system.layer.frames.FrameCollectionType;
+import flixel.graphics.frames.AtlasFrames;
+import flixel.graphics.frames.FlxFrame;
+import flixel.graphics.frames.FlxSpriteFrames;
+import flixel.graphics.frames.FrameCollectionType;
 import flixel.util.FlxArrayUtil;
 import flixel.util.FlxRandom;
 

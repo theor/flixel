@@ -8,7 +8,7 @@ import flash.geom.Rectangle;
 import flixel.FlxG;
 import flixel.util.FlxColor;
 import flixel.system.layer.Region;
-import flixel.util.loaders.CachedGraphics;
+import flixel.graphics.FlxGraphics;
 
 /**
  * Holds information and bitmap glpyhs for a bitmap font.
@@ -45,7 +45,7 @@ class PxBitmapFont
 	private var _symbols:Array<HelperSymbol>;
 	// Prepared bitmapData with font glyphsW	
 	private var _region:Region;
-	private var cachedGraphics:CachedGraphics;
+	private var graphics:FlxGraphics;
 	
 	/**
 	 * Creates a new bitmap font using specified bitmap data and letter input.
@@ -89,16 +89,16 @@ class PxBitmapFont
 			_tileRects = [];
 			var result:BitmapData = preparePixelizerBitmapData(PxBitmapData, _tileRects);
 			var key:String = FlxG.bitmap.getUniqueKey("font");
-			setCachedGraphics(FlxG.bitmap.add(result, false, key));
+			setGraphics(FlxG.bitmap.add(result, false, key));
 			_region = new Region();
-			_region.width = cachedGraphics.bitmap.width;
-			_region.height = cachedGraphics.bitmap.height;
+			_region.width = graphics.bitmap.width;
+			_region.height = graphics.bitmap.height;
 			var currRect:Rectangle;
 			
 			#if FLX_RENDER_BLIT
 			updateGlyphData();
 			#else
-			updateGlyphData(cachedGraphics);
+			updateGlyphData(graphics);
 			#end
 		}
 		
@@ -121,12 +121,12 @@ class PxBitmapFont
 			_symbols = new Array<HelperSymbol>();
 			var result:BitmapData = prepareAngelCodeBitmapData(pBitmapData, pXMLData, _symbols);
 			var key:String = FlxG.bitmap.getUniqueKey("font");
-			setCachedGraphics(FlxG.bitmap.add(result, false, key));
+			setGraphics(FlxG.bitmap.add(result, false, key));
 			
 			#if FLX_RENDER_BLIT
 			updateGlyphData();
 			#else
-			updateGlyphData(cachedGraphics.tilesheet);
+			updateGlyphData(graphics.tilesheet);
 			#end
 		}
 		
@@ -136,7 +136,7 @@ class PxBitmapFont
 	/**
 	 * Updates and caches tile data for passed node object
 	 */
-	public function updateGlyphData(Cached:CachedGraphics = null):Void
+	public function updateGlyphData(Graphics:FlxGraphics = null):Void
 	{
 		#if FLX_RENDER_TILE
 		_glyphs = new Map<Int, PxFontSymbol>();
@@ -187,7 +187,7 @@ class PxBitmapFont
 					bd = new BitmapData(charWidth, 1, true, 0x0);
 				}
 				
-				bd.copyPixels(cachedGraphics.bitmap, rect, point, null, null, true);
+				bd.copyPixels(graphics.bitmap, rect, point, null, null, true);
 				
 				// Store glyph
 				setGlyph(symbol.charCode, bd);
@@ -195,11 +195,11 @@ class PxBitmapFont
 				#else
 				if (charString != " " && charString != "")
 				{
-					setGlyph(Cached, symbol.charCode, rect, Math.floor(point.x), Math.floor(point.y), charWidth);
+					setGlyph(Graphics, symbol.charCode, rect, Math.floor(point.x), Math.floor(point.y), charWidth);
 				}
 				else
 				{
-					setGlyph(Cached, symbol.charCode, rect, Math.floor(point.x), 1, charWidth);
+					setGlyph(Graphics, symbol.charCode, rect, Math.floor(point.x), 1, charWidth);
 				}
 				#end
 			}
@@ -213,7 +213,7 @@ class PxBitmapFont
 				// Create glyph
 				#if FLX_RENDER_BLIT
 				var bd:BitmapData = new BitmapData(Std.int(rect.width), Std.int(rect.height), true, 0x0);
-				bd.copyPixels(cachedGraphics.bitmap, rect, ZERO_POINT, null, null, true);
+				bd.copyPixels(graphics.bitmap, rect, ZERO_POINT, null, null, true);
 				
 				// Store glyph
 				setGlyph(_glyphString.charCodeAt(letterID), bd);
@@ -433,7 +433,7 @@ class PxBitmapFont
 		
 		_symbols = null;
 		_tileRects = null;
-		setCachedGraphics(null);
+		setGraphics(null);
 		_region = null;
 		_glyphs = null;
 	}
@@ -649,9 +649,9 @@ class PxBitmapFont
 	
 	private function get_pixels():BitmapData 
 	{
-		if (!cachedGraphics.isDumped)
+		if (!graphics.isDumped)
 		{
-			return cachedGraphics.bitmap;
+			return graphics.bitmap;
 		}
 		return null;
 	}
@@ -673,18 +673,18 @@ class PxBitmapFont
 		#end
 	}
 	
-	private function setCachedGraphics(value:CachedGraphics):Void
+	private function setGraphics(value:FlxGraphics):Void
 	{
-		if (cachedGraphics != null && cachedGraphics != value)
+		if (graphics != null && graphics != value)
 		{
-			cachedGraphics.useCount--;
+			graphics.useCount--;
 		}
 		
-		if (cachedGraphics != value && value != null)
+		if (graphics != value && value != null)
 		{
 			value.useCount++;
 		}
-		cachedGraphics = value;
+		graphics = value;
 	}
 	
 	/**

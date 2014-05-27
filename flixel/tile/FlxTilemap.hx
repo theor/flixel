@@ -12,7 +12,7 @@ import flixel.group.FlxGroup;
 import flixel.group.FlxTypedGroup;
 import flixel.system.FlxCollisionType;
 import flixel.system.layer.DrawStackItem;
-import flixel.system.layer.frames.FlxSpriteFrames;
+import flixel.graphics.frames.FlxSpriteFrames;
 import flixel.system.layer.Region;
 import flixel.util.FlxArrayUtil;
 import flixel.util.FlxColor;
@@ -22,7 +22,7 @@ import flixel.util.FlxPoint;
 import flixel.util.FlxRandom;
 import flixel.util.FlxRect;
 import flixel.util.FlxSpriteUtil;
-import flixel.util.loaders.CachedGraphics;
+import flixel.graphics.FlxGraphics;
 import flixel.util.loaders.TextureRegion;
 
 @:bitmap("assets/images/tile/autotiles.png")
@@ -103,7 +103,7 @@ class FlxTilemap extends FlxObject
 	 */
 	public var region(default, null):Region;
 	public var framesData(default, null):FlxSpriteFrames;
-	public var cachedGraphics(default, set):CachedGraphics;
+	public var graphics(default, set):FlxGraphics;
 	
 	/**
 	 * If these next two arrays are not null, you're telling FlxTilemap to 
@@ -278,7 +278,7 @@ class FlxTilemap extends FlxObject
 		#end
 		
 		framesData = null;
-		cachedGraphics = null;
+		graphics = null;
 		region = null;
 		
 		// need to destroy FlxCallbackPoints
@@ -436,12 +436,12 @@ class FlxTilemap extends FlxObject
 		}
 		
 		// Figure out the size of the tiles
-		cachedGraphics = FlxG.bitmap.add(TileGraphic);
+		graphics = FlxG.bitmap.add(TileGraphic);
 		_tileWidth = TileWidth;
 		
 		if (_tileWidth <= 0)
 		{
-			_tileWidth = cachedGraphics.bitmap.height;
+			_tileWidth = graphics.bitmap.height;
 		}
 		
 		_tileHeight = TileHeight;
@@ -454,8 +454,8 @@ class FlxTilemap extends FlxObject
 		if (!Std.is(TileGraphic, TextureRegion))
 		{
 			region = new Region(0, 0, _tileWidth, _tileHeight);
-			region.width = Std.int(cachedGraphics.bitmap.width / _tileWidth) * _tileWidth;
-			region.height = Std.int(cachedGraphics.bitmap.height / _tileHeight) * _tileHeight;
+			region.width = Std.int(graphics.bitmap.width / _tileWidth) * _tileWidth;
+			region.height = Std.int(graphics.bitmap.height / _tileHeight) * _tileHeight;
 		}
 		else
 		{
@@ -1424,9 +1424,9 @@ class FlxTilemap extends FlxObject
 	 */
 	public function updateFrameData():Void
 	{
-		if (cachedGraphics != null && _tileWidth >= 1 && _tileHeight >= 1)
+		if (graphics != null && _tileWidth >= 1 && _tileHeight >= 1)
 		{
-			framesData = cachedGraphics.tilesheet.getSpriteSheetFrames(region, new Point(0, 0));
+			framesData = graphics.tilesheet.getSpriteSheetFrames(region, new Point(0, 0));
 			#if FLX_RENDER_TILE
 			_rectIDs = new Array<Int>();
 			FlxArrayUtil.setLength(_rectIDs, totalTiles);
@@ -1491,7 +1491,7 @@ class FlxTilemap extends FlxObject
 		
 		if (rect != null) 
 		{
-			tileSprite.pixels.copyPixels(cachedGraphics.bitmap, rect, pt);
+			tileSprite.pixels.copyPixels(graphics.bitmap, rect, pt);
 		}
 		
 		tileSprite.dirty = true;
@@ -1550,7 +1550,7 @@ class FlxTilemap extends FlxObject
 		var hackScaleX:Float = tileScaleHack * scale.x;
 		var hackScaleY:Float = tileScaleHack * scale.y;
 		
-		var drawItem:DrawStackItem = Camera.getDrawStackItem(cachedGraphics, false, 0);
+		var drawItem:DrawStackItem = Camera.getDrawStackItem(graphics, false, 0);
 		var currDrawData:Array<Float> = drawItem.drawData;
 		var currIndex:Int = drawItem.position;
 	#end
@@ -1606,7 +1606,7 @@ class FlxTilemap extends FlxObject
 				
 				if (_flashRect != null)
 				{
-					Buffer.pixels.copyPixels(cachedGraphics.bitmap, _flashRect, _flashPoint, null, null, true);
+					Buffer.pixels.copyPixels(graphics.bitmap, _flashRect, _flashPoint, null, null, true);
 					
 					#if !FLX_NO_DEBUG
 					if (FlxG.debugger.drawDebug && !ignoreDrawDebug) 
@@ -2195,24 +2195,24 @@ class FlxTilemap extends FlxObject
 	}
 	
 	/**
-	 * Internal function for setting cachedGraphics property for this object. 
-	 * It changes cachedGraphics' useCount also for better memory tracking.
+	 * Internal function for setting graphics property for this object. 
+	 * It changes graphics' useCount also for better memory tracking.
 	 */
-	private function set_cachedGraphics(Value:CachedGraphics):CachedGraphics
+	private function set_graphics(Value:FlxGraphics):FlxGraphics
 	{
-		var oldCached:CachedGraphics = cachedGraphics;
+		var oldGraphics:FlxGraphics = graphics;
 		
-		if ((cachedGraphics != Value) && (Value != null))
+		if ((graphics != Value) && (Value != null))
 		{
 			Value.useCount++;
 		}
 		
-		if ((oldCached != null) && (oldCached != Value))
+		if ((oldGraphics != null) && (oldGraphics != Value))
 		{
-			oldCached.useCount--;
+			oldGraphics.useCount--;
 		}
 		
-		return cachedGraphics = Value;
+		return graphics = Value;
 	}
 	
 	override private function set_pixelPerfectRender(Value:Bool):Bool 
