@@ -255,4 +255,52 @@ class FlxBitmapUtil
 	{
 		return bitmapData.width * bitmapData.height * 4;
 	}
+	
+	/**
+	 * 
+	 * @param	bitmapData
+	 * @param	frameSize
+	 * @param	spacing
+	 * @param	region
+	 * @return
+	 */
+	// TODO: document this method
+	public static function addSpacing(bitmapData:BitmapData, frameSize:Point, spacing:Point, region:Rectangle = null):BitmapData
+	{
+		if (region == null)
+		{
+			region = bitmapData.rect;
+		}
+		
+		var frameWidth:Int = Std.int(frameSize.x);
+		var frameHeight:Int = Std.int(frameSize.y);
+		
+		var numHorizontalFrames:Int = Std.int(region.width / frameWidth);
+		var numVerticalFrames:Int = Std.int(region.height / frameHeight);
+		
+		var result:BitmapData = new BitmapData(
+						Std.int(region.width + (numHorizontalFrames - 1) * spacing.x), 
+						Std.int(region.height + (numVerticalFrames - 1) * spacing.y), 
+						true, 
+						FlxColor.TRANSPARENT);
+		
+		result.lock();
+		var tempRect:Rectangle = new Rectangle(0, 0, frameWidth, frameHeight);
+		var tempPoint:Point = new Point();
+		
+		for (i in 0...(numHorizontalFrames))
+		{
+			tempPoint.x = i * (frameWidth + spacing.x);
+			tempRect.x = i * frameWidth + region.x;
+			
+			for (j in 0...(numVerticalFrames))
+			{
+				tempPoint.y = j * (frameHeight + spacing.y);
+				tempRect.y = j * frameHeight + region.y;
+				result.copyPixels(bitmapData, tempRect, tempPoint);
+			}
+		}
+		result.unlock();
+		return result;
+	}
 }

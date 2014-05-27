@@ -4,6 +4,7 @@ import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flixel.system.FlxAssets;
+import flixel.util.FlxBitmapUtil;
 import flixel.util.FlxColor;
 import flixel.util.loaders.CachedGraphics;
 import flixel.util.loaders.TextureRegion;
@@ -147,6 +148,8 @@ class BitmapFrontEnd
 	 * @param	Key				Force the cache to use a specific Key to index the bitmap.
 	 * @return	The CachedGraphics we just created.
 	 */
+	
+	// TODO: think about this method and add() method
 	public function addWithSpaces(Graphic:Dynamic, FrameWidth:Int, FrameHeight:Int, SpacingX:Int = 1, SpacingY:Int = 1, Unique:Bool = false, ?Key:String):CachedGraphics
 	{
 		if (Graphic == null)
@@ -267,34 +270,11 @@ class BitmapFrontEnd
 			
 			if (FrameWidth > 0 || FrameHeight > 0)
 			{
-				var numHorizontalFrames:Int = (FrameWidth == 0) ? 1 : Std.int(bd.width / FrameWidth);
-				var numVerticalFrames:Int = (FrameHeight == 0) ? 1 : Std.int(bd.height / FrameHeight);
-				
-				FrameWidth = (FrameWidth == 0) ? bd.width : FrameWidth;
-				FrameHeight = (FrameHeight == 0) ? bd.height : FrameHeight;
-				
-				var tempBitmap:BitmapData = new BitmapData(bd.width + numHorizontalFrames * SpacingX, bd.height + numVerticalFrames * SpacingY, true, FlxColor.TRANSPARENT);
-				tempBitmap.lock();
-				var tempRect:Rectangle = new Rectangle(0, 0, FrameWidth, FrameHeight);
-				var tempPoint:Point = new Point();
-				
-				for (i in 0...numHorizontalFrames)
-				{
-					tempPoint.x = i * (FrameWidth + SpacingX);
-					tempRect.x = i * FrameWidth;
-					
-					for (j in 0...(numVerticalFrames))
-					{
-						tempPoint.y = j * (FrameHeight + SpacingY);
-						tempRect.y = j * FrameHeight;
-						tempBitmap.copyPixels(bd, tempRect, tempPoint);
-					}
-				}
-				tempBitmap.unlock();
-				bd = tempBitmap;
+				bd = FlxBitmapUtil.addSpacing(bd, 
+						new Point(FrameWidth, FrameHeight), 
+						new Point(SpacingX, SpacingY));
 			}
-			
-			if (Unique)
+			else if (Unique)
 			{
 				bd = bd.clone();
 			}
@@ -364,6 +344,29 @@ class BitmapFrontEnd
 			baseKey = ukey;
 		}
 		return baseKey;
+	}
+	
+	/**
+	 * 
+	 * @param	baseKey
+	 * @param	frameSize
+	 * @param	frameSpacing
+	 * @param	region
+	 * @return
+	 */
+	// TODO: document it
+	// TODO: use it somewhere
+	public function getKeyWithSpacings(baseKey:String, frameSize:Point, frameSpacing:Point, region:Rectangle = null):String
+	{
+		var result:String = baseKey;
+		
+		if (region != null)
+		{
+			result += "_Region:" + region.x + "_" + region.y + "_" + region.width + "_" + region.height;
+		}
+		
+		result += "_FrameSize:" + frameSize.x + "_" + frameSize.y + "_Spacing:" + frameSpacing.x + "_" + frameSpacing.y;
+		return result;
 	}
 	
 	public function remove(key:String):Void

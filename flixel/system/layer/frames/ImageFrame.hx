@@ -20,10 +20,28 @@ class ImageFrame extends FlxSpriteFrames
 		type = FrameCollectionType.IMAGE;
 	}
 	
-	// TODO: implement it
-	public static function fromFrame(source:Dynamic):ImageFrame
+	/**
+	 * 
+	 * @param	source
+	 * @return
+	 */
+	public static function fromFrame(source:FlxFrame):ImageFrame
 	{
-		return null;
+		var cached:CachedGraphics = source.parent;
+		var rect:Rectangle = source.frame;
+		
+		for (imageFrame in cached.imageFrames)
+		{
+			if (imageFrame.equals(rect))
+			{
+				return imageFrame;
+			}
+		}
+		
+		var imageFrame:ImageFrame = new ImageFrame(cached);
+		imageFrame.frame = imageFrame.addSpriteSheetFrame(rect.clone());
+		cached.imageFrames.push(imageFrame);
+		return imageFrame;
 	}
 	
 	public static function fromImage(source:Dynamic):ImageFrame

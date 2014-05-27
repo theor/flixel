@@ -73,6 +73,9 @@ class FlxAtlas
 	 * @param	key		image name
 	 * @return			added node
 	 */
+	
+	 // TODO: addWithSpacing method
+	 // TODO: generateWithSpacing method
 	public function addNode(Graphic:Dynamic, ?Key:String):FlxNode
 	{
 		var isClass:Bool = true;
@@ -177,6 +180,10 @@ class FlxAtlas
 	 * @param	nodeName	name of the node to generate TextureRegion object for
 	 * @return	Generated TextureRegion
 	 */
+	// TODO: rework this method
+	// and add bunch of other methods for generating
+	// different types of frames collections
+	// (maybe move them into FlxNode class)
 	public function getRegionFor(nodeName:String):TextureRegion
 	{
 		if (hasNodeWithName(nodeName))
@@ -196,8 +203,9 @@ class FlxAtlas
 	}
 	
 	/**
-	 * Generates TexturePackerData object for this atlas. Where each frame represents one of the inserted images
-	 * @return TexturePackerData for this atlas
+	 * Gets AtlasFrames object for this atlas.
+	 * It caches graphics of this atlas and generates AtlasFrames if it is not exist yet.
+	 * @return AtlasFrames for this atlas
 	 */
 	public function getAtlasFrames():AtlasFrames
 	{

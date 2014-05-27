@@ -103,6 +103,7 @@ class FlxSpriteFrames implements IFlxDestroyable
 		return texFrame;
 	}
 	
+	// TODO: move this method to CachedGraphics class
 	public static function resolveSource(Source:Dynamic):CachedGraphics
 	{
 		if (Source == null)
@@ -114,7 +115,7 @@ class FlxSpriteFrames implements IFlxDestroyable
 		{
 			return cast Source;
 		}
-		else if (Std.is(Source, BitmapData) || Std.is(Source, String))
+		else if (Std.is(Source, BitmapData) || Std.is(Source, String) || Std.is(Source, Class))
 		{
 			return FlxG.bitmap.add(Source);
 		}

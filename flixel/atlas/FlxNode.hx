@@ -24,6 +24,10 @@ class FlxNode implements IFlxDestroyable
 	public var height(get, null):Int;
 	public var isEmpty(get, null):Bool;
 	
+	// TODO: use these vars
+	public var contentWidth:Int = 0;
+	public var contentHeight:Int = 0;
+	
 	public function new(rect:Rectangle, filled:Bool = false, key:String = "") 
 	{
 		this.filled = filled;

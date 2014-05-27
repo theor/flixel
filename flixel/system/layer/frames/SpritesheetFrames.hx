@@ -1,11 +1,13 @@
 package flixel.system.layer.frames;
 
+import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flixel.system.layer.frames.FlxFrame;
 import flixel.system.layer.frames.FlxSpriteFrames;
 import flixel.system.layer.frames.FrameCollectionType;
 import flixel.system.layer.TileSheetExt;
+import flixel.util.FlxBitmapUtil;
 import flixel.util.FlxPoint;
 import flixel.util.loaders.CachedGraphics;
 
@@ -25,10 +27,42 @@ class SpritesheetFrames extends FlxSpriteFrames
 	private var frameSize:Point;
 	private var frameSpacing:Point;
 	
+	/**
+	 * 
+	 * @param	parent
+	 */
 	private function new(parent:CachedGraphics) 
 	{
 		super(parent);
 		type = FrameCollectionType.SPRITESHEET;
+	}
+	
+	// TODO: implement this method
+	// the source can be cached graphics, bitmapData, string, class
+	/**
+	 * 
+	 * @param	source
+	 * @param	frameSize
+	 * @param	frameSpacing
+	 * @param	region
+	 * @return
+	 */
+	public static function fromBitmapWithSpacings(source:Dynamic, frameSize:Point, frameSpacing:Point = null, region:Rectangle = null):SpritesheetFrames
+	{
+		var cached:CachedGraphics = FlxSpriteFrames.resolveSource(source);
+		
+		if (cached == null) return null;
+		
+		var key:String = FlxG.bitmap.getKeyWithSpacings(cached.key, frameSize, frameSpacing, region);
+		
+		var result:CachedGraphics = FlxG.bitmap.get(key);
+		if (result == null)
+		{
+			var bitmap:BitmapData = FlxBitmapUtil.addSpacing(cached.bitmap, frameSize, frameSpacing, region);
+			result = FlxG.bitmap.add(bitmap, false, key);
+		}
+		
+		return SpritesheetFrames.fromRectangle(result, frameSize, null, frameSpacing);
 	}
 	
 	// TODO: document everything
