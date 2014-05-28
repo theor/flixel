@@ -12,6 +12,9 @@ import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
 import flixel.graphics.FlxGraphics;
 
+/**
+ * Base class for all frame types
+ */
 class FlxFrame implements IFlxDestroyable
 {
 	public static var POINT:Point = new Point();
@@ -19,18 +22,38 @@ class FlxFrame implements IFlxDestroyable
 	public static var RECT:Rectangle = new Rectangle();
 	
 	public var name:String;
+	/**
+	 * Region of image to render
+	 */
 	public var frame:Rectangle;
 	
 	public var parent:FlxGraphics;
 	public var tileID:Int = -1;
+	/**
+	 * Rotation angle of this frame. 
+	 * Required for packed atlas images
+	 */
 	public var additionalAngle:Float = 0;
 	
+	/**
+	 * Original (uncropped) image size
+	 */
 	public var sourceSize(default, null):FlxPoint;
+	/**
+	 * Frame offset from top left corner of original image
+	 */
 	public var offset(default, null):FlxPoint;
+	/**
+	 * Helper point object for less calculations
+	 */
 	public var center(default, null):FlxPoint;
 	
 	public var type(default, null):FrameType;
 	
+	/**
+	 * Frame bitmapDatas.
+	 * Required for blit render mode and pixel perfect collision detection
+	 */
 	private var _bitmapData:BitmapData;
 	private var _hReversedBitmapData:BitmapData;
 	private var _vReversedBitmapData:BitmapData;
@@ -48,6 +71,11 @@ class FlxFrame implements IFlxDestroyable
 		type = FrameType.REGULAR;
 	}
 	
+	/**
+	 * Draws frame on specified BitmapData object (all underlying pixels become unvisible).
+	 * @param	bmd	BitmapData object to draw this frame on. If bmd is null or doesn't have the same size as frame then new BitmapData created
+	 * @return	Modified or newly created BitmapData with frame image on it
+	 */
 	public function paintOnBitmap(bmd:BitmapData = null):BitmapData
 	{
 		var result:BitmapData = null;
@@ -84,6 +112,9 @@ class FlxFrame implements IFlxDestroyable
 		return result;
 	}
 	
+	/**
+	 * Generates BitmapData for this frame object
+	 */
 	public function getBitmap():BitmapData
 	{
 		if (_bitmapData != null)
@@ -96,6 +127,9 @@ class FlxFrame implements IFlxDestroyable
 		return _bitmapData;
 	}
 	
+	/**
+	 * Generates horizontally reversed BitmapData for this frame object
+	 */
 	public function getHReversedBitmap():BitmapData
 	{
 		if (_hReversedBitmapData != null)
@@ -113,6 +147,9 @@ class FlxFrame implements IFlxDestroyable
 		return _hReversedBitmapData;
 	}
 	
+	/**
+	 * Generates vertically reversed BitmapData for this frame object
+	 */
 	public function getVReversedBitmap():BitmapData
 	{
 		if (_vReversedBitmapData != null)
@@ -130,6 +167,9 @@ class FlxFrame implements IFlxDestroyable
 		return _vReversedBitmapData;
 	}
 	
+	/**
+	 * Generates horizontally and vertically reversed BitmapData for this frame object
+	 */
 	public function getHVReversedBitmap():BitmapData
 	{
 		if (_hvReversedBitmapData != null)
@@ -147,6 +187,17 @@ class FlxFrame implements IFlxDestroyable
 		return _hvReversedBitmapData;
 	}
 	
+	/**
+	 * Frees memory taken by frame BitmapDatas
+	 */
+	public function destroyBitmaps():Void
+	{
+		_bitmapData = FlxDestroyUtil.dispose(_bitmapData);
+		_hReversedBitmapData = FlxDestroyUtil.dispose(_hReversedBitmapData);
+		_vReversedBitmapData = FlxDestroyUtil.dispose(_vReversedBitmapData);
+		_hvReversedBitmapData = FlxDestroyUtil.dispose(_hvReversedBitmapData);
+	}
+	
 	public function destroy():Void
 	{
 		name = null;
@@ -158,13 +209,5 @@ class FlxFrame implements IFlxDestroyable
 		center = FlxDestroyUtil.put(center);
 		
 		destroyBitmaps();
-	}
-	
-	public function destroyBitmaps():Void
-	{
-		_bitmapData = FlxDestroyUtil.dispose(_bitmapData);
-		_hReversedBitmapData = FlxDestroyUtil.dispose(_hReversedBitmapData);
-		_vReversedBitmapData = FlxDestroyUtil.dispose(_vReversedBitmapData);
-		_hvReversedBitmapData = FlxDestroyUtil.dispose(_hvReversedBitmapData);
 	}
 }

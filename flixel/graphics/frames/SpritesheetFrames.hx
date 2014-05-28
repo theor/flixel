@@ -45,8 +45,6 @@ class SpritesheetFrames extends FlxFramesCollection
 		type = FrameCollectionType.SPRITESHEET;
 	}
 	
-	// TODO: rename FlxFramesCollection to FlxFrameCollection
-	
 	/**
 	 * Gets source bitmapdata, generates new bitmapdata with spaces between frames (if there is no such bitmapdata in the cache already) 
 	 * and creates SpritesheetFrames collection

@@ -257,14 +257,13 @@ class FlxBitmapUtil
 	}
 	
 	/**
-	 * 
-	 * @param	bitmapData
-	 * @param	frameSize
-	 * @param	spacing
-	 * @param	region
-	 * @return
+	 * Gets image without spaces between tiles and generates new one with spaces.
+	 * @param	bitmapData	original image without spaces between tiles.
+	 * @param	frameSize	the size of tile in spritesheet.
+	 * @param	spacing		spaces between tiles to add.
+	 * @param	region		region of image to use as a source graphics for spritesheet. Default value is null, which means that whole image will be used.
+	 * @return	Image for spritesheet with inserted spaces between tiles.
 	 */
-	// TODO: document this method
 	public static function addSpacing(bitmapData:BitmapData, frameSize:Point, spacing:Point, region:Rectangle = null):BitmapData
 	{
 		if (region == null)

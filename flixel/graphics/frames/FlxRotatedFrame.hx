@@ -4,6 +4,9 @@ import flash.display.BitmapData;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
 
+/**
+ * Rotated frame. It uses more math for rendering, that's why it has been moved in separate class 
+ */
 class FlxRotatedFrame extends FlxFrame
 {
 	public function new(parent:FlxGraphics) 

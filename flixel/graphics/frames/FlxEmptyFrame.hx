@@ -7,8 +7,8 @@ import flixel.system.layer.TileSheetExt;
 import flixel.util.FlxColor;
 
 /**
- * ...
- * @author Zaphod
+ * Empty frame, doing a lot less stuff than regular frame.
+ * Usefull for tilemaps (and possibly other classes, which have similar rendering methods)
  */
 class FlxEmptyFrame extends FlxFrame
 {

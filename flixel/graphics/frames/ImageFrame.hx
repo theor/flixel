@@ -7,11 +7,19 @@ import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
 import flixel.graphics.FlxGraphics;
 
+/**
+ * Single-frame collection.
+ * Could be useful for non-animated sprites
+ */
 class ImageFrame extends FlxFramesCollection
 {
 	public static var POINT:Point = new Point();
 	public static var RECT:Rectangle = new Rectangle();
 	
+	/**
+	 * Single frame of this frame collection.
+	 * Added this var for faster access, so you don't need to type something like: imageFrame.frames[0]
+	 */
 	public var frame:FlxFrame;
 	
 	private function new(parent:FlxGraphics) 
@@ -21,9 +29,9 @@ class ImageFrame extends FlxFramesCollection
 	}
 	
 	/**
-	 * 
-	 * @param	source
-	 * @return
+	 * Generates ImageFrame object for specified FlxFrame
+	 * @param	source	FlxFrame to generate ImageFrame from
+	 * @return	Created ImageFrame object
 	 */
 	public static function fromFrame(source:FlxFrame):ImageFrame
 	{
@@ -44,11 +52,22 @@ class ImageFrame extends FlxFramesCollection
 		return imageFrame;
 	}
 	
+	/**
+	 * Creates ImageFrame object for the whole image
+	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphics, FlxFrame or FlxFrameCollection
+	 * @return	Newly created ImageFrame object for specified graphics
+	 */
 	public static function fromImage(source:Dynamic):ImageFrame
 	{
 		return fromRectangle(source, null);
 	}
 	
+	/**
+	 * Creates ImageFrame object for specified region of image
+	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphics, FlxFrame or FlxFrameCollection
+	 * @param	region	region of image to create ImageFrame for
+	 * @return	Newly created ImageFrame object for specified region of image
+	 */
 	public static function fromRectangle(source:Dynamic, region:Rectangle = null):ImageFrame
 	{
 		var graphics:FlxGraphics = FlxGraphics.resolveSource(source);
@@ -99,6 +118,9 @@ class ImageFrame extends FlxFramesCollection
 		return imageFrame;
 	}
 	
+	/**
+	 * ImageFrame comparison method. For internal use.
+	 */
 	public function equals(rect:Rectangle = null):Bool
 	{
 		return (rect.equals(frame.frame));
