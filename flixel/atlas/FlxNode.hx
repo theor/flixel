@@ -4,6 +4,7 @@ import flash.geom.Point;
 import flash.geom.Rectangle;
 import flixel.interfaces.IFlxDestroyable;
 
+// TODO: continue from here...
 /**
  * Atlas Node holds BitmapData and it's position on Atlas
  * @author Zaphod

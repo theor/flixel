@@ -73,7 +73,7 @@ class FlxImage extends FlxObject
 	 * Rendering variables.
 	 */
 	public var region(default, null):Region;
-	public var framesData(default, null):FlxFramesCollection;
+	public var frames(default, null):FlxFramesCollection;
 	public var graphics(default, set):FlxGraphics;
 	/**
 	 * Set alpha to a number between 0 and 1 to change the opacity of the sprite.
@@ -213,7 +213,7 @@ class FlxImage extends FlxObject
 		blend = null;
 		frame = null;
 		
-		framesData = null;
+		frames = null;
 		graphics = null;
 		region = null;
 	}
@@ -967,15 +967,15 @@ class FlxImage extends FlxObject
 		
 		if ((graphics.data != null) && (region.tileWidth == 0 && region.tileHeight == 0))
 		{
-			framesData = graphics.tilesheet.getTexturePackerFrames(graphics.data);
+			frames = graphics.tilesheet.getTexturePackerFrames(graphics.data);
 		}
 		else
 		{
-			framesData = graphics.tilesheet.getSpriteSheetFrames(region, null);
+			frames = graphics.tilesheet.getSpriteSheetFrames(region, null);
 		}
 		
-		frame = framesData.frames[0];
-		frames = framesData.frames.length;
+		frame = frames.frames[0];
+		frames = frames.frames.length;
 		resetSizeFromFrame();
 	}
 	
@@ -1204,9 +1204,9 @@ class FlxImage extends FlxObject
 			resetFrameSize();
 			dirty = true;
 		}
-		else if (framesData != null && framesData.frames != null && framesData.frames.length > 0)
+		else if (frames != null && frames.frames != null && frames.frames.length > 0)
 		{
-			frame = framesData.frames[0];
+			frame = frames.frames[0];
 			dirty = true;
 		}
 		return frame;

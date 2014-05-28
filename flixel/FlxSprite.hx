@@ -75,18 +75,16 @@ class FlxSprite extends FlxObject
 	 */
 	public var frameHeight(default, null):Int = 0;
 	
-	// TODO: rename this var to numFrames
 	/**
 	 * The total number of frames in this image.  WARNING: assumes each row in the sprite sheet is full!
 	 */
-	public var frames(default, null):Int = 0;
+	public var numFrames(default, null):Int = 0;
 	/**
 	 * Rendering variables.
 	 */
-	// TODO: remove this property
+	// TODO: remove this "region" property
 	public var region(default, null):Region;
-	// TODO: rename this var to just frames
-	public var framesData(default, null):FlxFramesCollection;
+	public var frames(default, null):FlxFramesCollection;
 	public var graphics(default, set):FlxGraphics;
 	/**
 	 * The minimum angle (out of 360°) for which a new baked rotation exists. Example: 90 means there 
@@ -246,7 +244,7 @@ class FlxSprite extends FlxObject
 		blend = null;
 		frame = null;
 		
-		framesData = null;
+		frames = null;
 		graphics = null;
 		region = null;
 	}
@@ -1183,15 +1181,15 @@ class FlxSprite extends FlxObject
 		
 		if ((graphics.data != null) && (region.tileWidth == 0 && region.tileHeight == 0))
 		{
-			framesData = graphics.tilesheet.getTexturePackerFrames(graphics.data);
+			frames = graphics.tilesheet.getTexturePackerFrames(graphics.data);
 		}
 		else
 		{
-			framesData = graphics.tilesheet.getSpriteSheetFrames(region, null);
+			frames = graphics.tilesheet.getSpriteSheetFrames(region, null);
 		}
 		
-		frame = framesData.frames[0];
-		frames = framesData.frames.length;
+		frame = frames.frames[0];
+		numFrames = frames.frames.length;
 		resetSizeFromFrame();
 	}
 	
@@ -1434,9 +1432,9 @@ class FlxSprite extends FlxObject
 			resetFrameSize();
 			dirty = true;
 		}
-		else if (framesData != null && framesData.frames != null && framesData.frames.length > 0)
+		else if (frames != null && frames.frames != null && numFrames > 0)
 		{
-			frame = framesData.frames[0];
+			frame = frames.frames[0];
 			dirty = true;
 		}
 		return frame;

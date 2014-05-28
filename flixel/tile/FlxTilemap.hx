@@ -101,10 +101,9 @@ class FlxTilemap extends FlxObject
 	/**
 	 * Rendering variables.
 	 */
-	// TODO: remove this property
+	// TODO: remove this "region" property
 	public var region(default, null):Region;
-	// TODO: rename this var just to frames
-	public var framesData(default, null):FlxFramesCollection;
+	public var frames(default, null):FlxFramesCollection;
 	public var graphics(default, set):FlxGraphics;
 	
 	/**
@@ -279,7 +278,7 @@ class FlxTilemap extends FlxObject
 		_rectIDs = null;
 		#end
 		
-		framesData = null;
+		frames = null;
 		graphics = null;
 		region = null;
 		
@@ -1428,7 +1427,7 @@ class FlxTilemap extends FlxObject
 	{
 		if (graphics != null && _tileWidth >= 1 && _tileHeight >= 1)
 		{
-			framesData = graphics.tilesheet.getSpriteSheetFrames(region, new Point(0, 0));
+			frames = graphics.tilesheet.getSpriteSheetFrames(region, new Point(0, 0));
 			#if FLX_RENDER_TILE
 			_rectIDs = new Array<Int>();
 			FlxArrayUtil.setLength(_rectIDs, totalTiles);
@@ -2097,7 +2096,7 @@ class FlxTilemap extends FlxObject
 		}
 		_rects[Index] = (new Rectangle(rx + region.startX, ry + region.startY, _tileWidth, _tileHeight));
 		#else
-		_rectIDs[Index] = framesData.frames[_data[Index] - _startingIndex].tileID;
+		_rectIDs[Index] = frames.frames[_data[Index] - _startingIndex].tileID;
 		#end
 	}
 	

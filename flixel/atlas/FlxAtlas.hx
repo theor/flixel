@@ -15,6 +15,7 @@ import flixel.atlas.FlxNode;
 import flixel.system.FlxAssets;
 import flixel.system.frontEnds.BitmapFrontEnd;
 
+// TODO: continue from here...
 /**
  * Atlas class
  * @author Zaphod

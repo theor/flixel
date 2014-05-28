@@ -384,9 +384,9 @@ class FlxText extends FlxSprite
 	{
 		if (graphics != null)
 		{
-			framesData = graphics.tilesheet.getSpriteSheetFrames(region);
-			frame = framesData.frames[0];
-			frames = 1;
+			frames = graphics.tilesheet.getSpriteSheetFrames(region);
+			frame = frames.frames[0];
+			numFrames = 1;
 		}
 	}
 	
