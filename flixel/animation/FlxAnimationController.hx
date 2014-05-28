@@ -3,10 +3,7 @@ package flixel.animation;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.interfaces.IFlxDestroyable;
-import flixel.graphics.frames.AtlasFrames;
 import flixel.graphics.frames.FlxFrame;
-import flixel.graphics.frames.FlxFramesCollection;
-import flixel.graphics.frames.FrameCollectionType;
 import flixel.util.FlxArrayUtil;
 import flixel.util.FlxRandom;
 
@@ -247,7 +244,7 @@ class FlxAnimationController implements IFlxDestroyable
 	 */
 	public function addByNames(Name:String, FrameNames:Array<String>, FrameRate:Int = 30, Looped:Bool = true):Void
 	{
-		if (_sprite.framesData != null && _sprite.framesData.type == FrameCollectionType.ATLAS)
+		if (_sprite.framesData != null)
 		{
 			var indices:Array<Int> = new Array<Int>();
 			byNamesHelper(indices, FrameNames); // finds frames and appends them to the blank array
@@ -277,7 +274,7 @@ class FlxAnimationController implements IFlxDestroyable
 			return;
 		}
 		
-		if (_sprite.framesData != null && _sprite.framesData.type == FrameCollectionType.ATLAS)
+		if (_sprite.framesData != null)
 		{
 			byNamesHelper(anim._frames, FrameNames); // finds frames and appends them to the existing array
 		}
@@ -294,7 +291,7 @@ class FlxAnimationController implements IFlxDestroyable
 	 */
 	public function addByStringIndices(Name:String, Prefix:String, Indices:Array<String>, Postfix:String, FrameRate:Int = 30, Looped:Bool = true):Void
 	{
-		if (_sprite.framesData != null && _sprite.framesData.type == FrameCollectionType.ATLAS)
+		if (_sprite.framesData != null)
 		{
 			var frameIndices:Array<Int> = new Array<Int>();
 			byStringIndicesHelper(frameIndices, Prefix, Indices, Postfix); // finds frames and appends them to the blank array
@@ -326,7 +323,7 @@ class FlxAnimationController implements IFlxDestroyable
 			return;
 		}
 		
-		if (_sprite.framesData != null && _sprite.framesData.type == FrameCollectionType.ATLAS)
+		if (_sprite.framesData != null)
 		{
 			byStringIndicesHelper(anim._frames, Prefix, Indices, Postfix); // finds frames and appends them to the existing array
 		}
@@ -343,7 +340,7 @@ class FlxAnimationController implements IFlxDestroyable
 	 */
 	public function addByIndices(Name:String, Prefix:String, Indices:Array<Int>, Postfix:String, FrameRate:Int = 30, Looped:Bool = true):Void
 	{
-		if (_sprite.framesData != null && _sprite.framesData.type == FrameCollectionType.ATLAS)
+		if (_sprite.framesData != null)
 		{
 			var frameIndices:Array<Int> = new Array<Int>();
 			byIndicesHelper(frameIndices, Prefix, Indices, Postfix); // finds frames and appends them to the blank array
@@ -375,7 +372,7 @@ class FlxAnimationController implements IFlxDestroyable
 			return;
 		}
 		
-		if (_sprite.framesData != null && _sprite.framesData.type == FrameCollectionType.ATLAS)
+		if (_sprite.framesData != null)
 		{
 			byIndicesHelper(anim._frames, Prefix, Indices, Postfix); // finds frames and appends them to the existing array
 		}
@@ -416,7 +413,7 @@ class FlxAnimationController implements IFlxDestroyable
 	*/
 	public function addByPrefix(Name:String, Prefix:String, FrameRate:Int = 30, Looped:Bool = true):Void
 	{
-		if (_sprite.framesData != null && _sprite.framesData.type == FrameCollectionType.ATLAS)
+		if (_sprite.framesData != null)
 		{
 			var animFrames:Array<FlxFrame> = new Array<FlxFrame>();
 			findByPrefix(animFrames, Prefix); // adds valid frames to animFrames
@@ -452,7 +449,7 @@ class FlxAnimationController implements IFlxDestroyable
 			return;
 		}
 		
-		if (_sprite.framesData != null && _sprite.framesData.type == FrameCollectionType.ATLAS)
+		if (_sprite.framesData != null)
 		{
 			var animFrames:Array<FlxFrame> = new Array<FlxFrame>();
 			findByPrefix(animFrames, Prefix); // adds valid frames to animFrames

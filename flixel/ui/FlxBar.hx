@@ -1133,7 +1133,7 @@ class FlxBar extends FlxSprite
 	#end
 	
 	override public function updateFrameData():Void 
-	{	
+	{
 	#if FLX_RENDER_TILE
 		if (graphics == null || _frontGraphics == null)
 		{

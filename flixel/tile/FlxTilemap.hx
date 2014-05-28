@@ -101,6 +101,7 @@ class FlxTilemap extends FlxObject
 	/**
 	 * Rendering variables.
 	 */
+	// TODO: remove this property
 	public var region(default, null):Region;
 	// TODO: rename this var just to frames
 	public var framesData(default, null):FlxFramesCollection;
