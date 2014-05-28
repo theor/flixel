@@ -5,7 +5,7 @@ import flixel.FlxSprite;
 import flixel.interfaces.IFlxDestroyable;
 import flixel.graphics.frames.AtlasFrames;
 import flixel.graphics.frames.FlxFrame;
-import flixel.graphics.frames.FlxSpriteFrames;
+import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.FrameCollectionType;
 import flixel.util.FlxArrayUtil;
 import flixel.util.FlxRandom;

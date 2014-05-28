@@ -7,7 +7,7 @@ import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
 import flixel.graphics.FlxGraphics;
 
-class ImageFrame extends FlxSpriteFrames
+class ImageFrame extends FlxFramesCollection
 {
 	public static var POINT:Point = new Point();
 	public static var RECT:Rectangle = new Rectangle();

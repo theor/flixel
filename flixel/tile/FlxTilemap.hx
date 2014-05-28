@@ -12,7 +12,7 @@ import flixel.group.FlxGroup;
 import flixel.group.FlxTypedGroup;
 import flixel.system.FlxCollisionType;
 import flixel.system.layer.DrawStackItem;
-import flixel.graphics.frames.FlxSpriteFrames;
+import flixel.graphics.frames.FlxFramesCollection;
 import flixel.system.layer.Region;
 import flixel.util.FlxArrayUtil;
 import flixel.util.FlxColor;
@@ -102,7 +102,8 @@ class FlxTilemap extends FlxObject
 	 * Rendering variables.
 	 */
 	public var region(default, null):Region;
-	public var framesData(default, null):FlxSpriteFrames;
+	// TODO: rename this var just to frames
+	public var framesData(default, null):FlxFramesCollection;
 	public var graphics(default, set):FlxGraphics;
 	
 	/**

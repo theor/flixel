@@ -12,7 +12,7 @@ import flixel.FlxG;
 import flixel.system.FlxAssets;
 import flixel.system.layer.DrawStackItem;
 import flixel.system.layer.frames.FlxFrame;
-import flixel.system.layer.frames.FlxSpriteFrames;
+import flixel.system.layer.frames.FlxFramesCollection;
 import flixel.system.layer.Region;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;

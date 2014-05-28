@@ -12,7 +12,7 @@ import flixel.FlxG;
 import flixel.graphics.FlxGraphics;
 import flixel.system.layer.DrawStackItem;
 import flixel.system.layer.frames.FlxFrame;
-import flixel.system.layer.frames.FlxSpriteFrames;
+import flixel.system.layer.frames.FlxFramesCollection;
 import flixel.system.layer.frames.FrameType;
 import flixel.system.layer.Region;
 import flixel.util.FlxAngle;
@@ -73,7 +73,7 @@ class FlxImage extends FlxObject
 	 * Rendering variables.
 	 */
 	public var region(default, null):Region;
-	public var framesData(default, null):FlxSpriteFrames;
+	public var framesData(default, null):FlxFramesCollection;
 	public var graphics(default, set):FlxGraphics;
 	/**
 	 * Set alpha to a number between 0 and 1 to change the opacity of the sprite.

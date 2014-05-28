@@ -29,9 +29,7 @@ class TileSheetExt extends Tilesheet implements IFlxDestroyable
 			newSheet.addTileRect(old.tileOrder[i]);
 		}
 		
-		old.tileOrder = null;
 		FlxDestroyUtil.destroy(old);
-		
 		return newSheet;
 	}
 	

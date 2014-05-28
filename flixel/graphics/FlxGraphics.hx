@@ -5,7 +5,7 @@ import flixel.FlxG;
 import flixel.system.FlxAssets;
 import flixel.graphics.frames.AtlasFrames;
 import flixel.graphics.frames.FlxFrame;
-import flixel.graphics.frames.FlxSpriteFrames;
+import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.ImageFrame;
 import flixel.graphics.frames.SpritesheetFrames;
 import flixel.system.layer.TileSheetExt;
@@ -22,6 +22,10 @@ class FlxGraphics
 	 */
 	public var bitmap:BitmapData;
 	
+	/**
+	 * The size of cached BitmapData.
+	 * Added for faster access/typing
+	 */
 	public var width(default, null):Int = 0;
 	
 	public var height(default, null):Int = 0;
@@ -36,49 +40,86 @@ class FlxGraphics
 	public var assetsClass:Class<BitmapData>;
 	
 	/**
-	 * Whether this cached object should stay in cache after state changes or not.
+	 * Whether this graphics object should stay in cache after state changes or not.
 	 */
 	public var persist:Bool = false;
 	/**
 	 * Whether we should destroy this FlxGraphics object when useCount become zero.
-	 * Default is false.
+	 * Default is true.
 	 */
 	public var destroyOnNoUse(get, set):Bool;
 	
 	/**
-	 * Whether the BitmapData of this cached object has been dumped or not.
+	 * Whether the BitmapData of this graphics object has been dumped or not.
 	 */
 	public var isDumped(default, null):Bool = false;
 	/**
-	 * Whether the BitmapData of this cached object can be dumped for decreased memory usage.
+	 * Whether the BitmapData of this graphics object can be dumped for decreased memory usage,
+	 * but may cause some issues (when you need direct access to pixels of this graphics.
+	 * If the graphics is dumped then you should call undump() and have total access to pixels.
 	 */
 	public var canBeDumped(get, never):Bool;
 	
+	#if FLX_RENDER_TILE
+	/**
+	 * Tilesheet for this graphics object. It is used only for FLX_RENDER_TILE mode
+	 */
 	public var tilesheet(get, null):TileSheetExt;
+	#end
 	
 	/**
 	 * Usage counter for this FlxGraphics object.
 	 */
 	public var useCount(get, set):Int;
 	
-	// TODO: use these vars (somehow)
+	/**
+	 * ImageFrame object for the whole bitmap
+	 */
 	public var imageFrame(get, null):ImageFrame;
 	
+	/**
+	 * Atlas frames for this graphics.
+	 * You should fill it yourself with one of the AtlasFrames static methods
+	 * (like texturePackerJSON(), texturePackerXML(), sparrow(), libGDX()).
+	 */
 	public var atlasFrames:AtlasFrames;
 	
+	/**
+	 * Collection of all ImageFrame objects created for this graphics
+	 */
 	public var imageFrames:Array<ImageFrame>;
 	
+	/**
+	 * Collection of all SpritesheetFrame objects for this graphics
+	 */
 	public var spritesheetFrames:Array<SpritesheetFrames>;
 	
+	/**
+	 * Internal var holding ImageFrame for the whole bitmap of this graphics.
+	 * Use public imageFrame var to access/generate it.
+	 */
 	private var _imageFrame:ImageFrame;
 	
+	#if FLX_RENDER_TILE
+	/**
+	 * Internal var holding Tilesheet for bitmap of this graphics.
+	 * It is used only in FLX_RENDER_TILE mode
+	 */
 	private var _tilesheet:TileSheetExt;
+	#end
 	
 	private var _useCount:Int = 0;
 	
 	private var _destroyOnNoUse:Bool = true;
 	
-	public function new(Key:String, Bitmap:BitmapData, Persist:Bool = false)
+	/**
+	 * FlxGraphics constructor
+	 * @param	Key			key string for this graphics object, with which you can get it from bitmap cache
+	 * @param	Bitmap		BitmapData for this graphics object
+	 * @param	Persist		Whether or not this graphics stay in the cache after reseting cache. Default value is false which means that this graphics will be destroyed at the cache reset.
+	 */
+	@:allow(flixel.system.frontEnds.BitmapFrontEnd)
+	private function new(Key:String, Bitmap:BitmapData, Persist:Bool = false)
 	{
 		key = Key;
 		bitmap = Bitmap;
@@ -92,14 +133,12 @@ class FlxGraphics
 	}
 	
 	/**
-	 * Dumps bits of bitmapdata = less memory, but you can't read / write pixels on it anymore
-	 * (but you can call onContext() method which will restore it again)
+	 * Dumps bits of bitmapdata == less memory, but you can't read/write pixels on it anymore
+	 * (but you can call onContext() (or undump()) method which will restore it again)
 	 */
-	// TODO: dump() and undump() should be available only
-	// on openfl (i.e. add #if !nme compiler conditional)
 	public function dump():Void
 	{
-		#if (FLX_RENDER_TILE && !flash)
+		#if (FLX_RENDER_TILE && !flash && !nme)
 		if (canBeDumped)
 		{
 			bitmap.dumpBits();
@@ -113,7 +152,7 @@ class FlxGraphics
 	 */
 	public function undump():Void
 	{
-		#if FLX_RENDER_TILE
+		#if (FLX_RENDER_TILE && !flash && !nme)
 		if (isDumped)
 		{
 			var newBitmap:BitmapData = getBitmapFromSystem();
@@ -124,9 +163,6 @@ class FlxGraphics
 				if (_tilesheet != null)
 				{
 					_tilesheet = TileSheetExt.rebuildFromOld(_tilesheet, this);
-					
-					// TODO: "regen" frames (set their tilesheets)
-					
 				}
 			}
 			
@@ -145,37 +181,63 @@ class FlxGraphics
 		if (isDumped)
 		{
 			undump();	// restore everything
-			dump();	// and dump bitmapdata again
+			dump();		// and dump bitmapdata again
 		}
 	}
 	
+	/**
+	 * Trying to free the memory as much as possible
+	 */
 	public function destroy():Void
 	{
-		_tilesheet = FlxDestroyUtil.destroy(_tilesheet);
 		bitmap = FlxDestroyUtil.dispose(bitmap);
+		#if FLX_RENDER_TILE
+		_tilesheet = FlxDestroyUtil.destroy(_tilesheet);
+		#end
 		key = null;
 		assetsKey = null;
 		assetsClass = null;
 		
-		// TODO: destroy all frames and their collections
-		// do it here or in TilesheetExt
+		_imageFrame = null;	// no need to dispose _imageFrame since it exists in imageFrames
+		
+		for (frame in imageFrames)
+		{
+			FlxDestroyUtil.destroy(frame);
+		}
+		
+		FlxDestroyUtil.destroy(atlasFrames);
+		
+		for (frame in spritesheetFrames)
+		{
+			FlxDestroyUtil.destroy(frame);
+		}
 	}
 	
+	#if FLX_RENDER_TILE
+	/**
+	 * Tilesheet getter. Generates new one (and regenerates) if there is no tilesheet for this graphics yet.
+	 */
 	private function get_tilesheet():TileSheetExt
 	{
 		if (_tilesheet == null)
 		{
-			if (isDumped)
-			{
-				onContext();
-			}
+			var dumped:Bool = isDumped;
+			
+			if (dumped)	undump();
 			
 			_tilesheet = new TileSheetExt(bitmap);
+			
+			if (dumped)	dump();
 		}
 		
 		return _tilesheet;
 	}
+	#end
 	
+	/**
+	 * Gets BitmapData for this graphics object from OpenFl.
+	 * This method is used for undumping graphics.
+	 */
 	private function getBitmapFromSystem():BitmapData
 	{
 		var newBitmap:BitmapData = null;
@@ -236,6 +298,11 @@ class FlxGraphics
 		return _imageFrame;
 	}
 	
+	/**
+	 * Gets FlxGraphics object for specified Source object
+	 * @param	Source	You can specify FlxGraphics, BitmapData, String (asset path), Class<Dynamic>, FlxFramesCollection or FlxFrame as a source
+	 * @return	graphics object for specified source
+	 */
 	public static function resolveSource(Source:Dynamic):FlxGraphics
 	{
 		if (Source == null)
@@ -250,6 +317,14 @@ class FlxGraphics
 		else if (Std.is(Source, BitmapData) || Std.is(Source, String) || Std.is(Source, Class))
 		{
 			return FlxG.bitmap.add(Source);
+		}
+		else if (Std.is(Source, FlxFramesCollection))
+		{
+			return cast(Source, FlxFramesCollection).parent;
+		}
+		else if (Std.is(Source, FlxFrame))
+		{
+			return cast(Source, FlxFrame).parent;
 		}
 		
 		return null;

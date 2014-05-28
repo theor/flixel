@@ -6,39 +6,31 @@ import haxe.xml.Fast;
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
 import flixel.graphics.frames.FlxFrame;
-import flixel.graphics.frames.FlxSpriteFrames;
+import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.FrameCollectionType;
 import flixel.system.layer.TileSheetExt;
 import flixel.graphics.FlxGraphics;
 import haxe.Json;
 
 /**
- * ...
- * @author Zaphod
+ * Atlas frames collection. It makes possible to use texture atlases in flixel. 
+ * Plus it contains few packer parser methods for most commonly used atlas formats.
  */
-class AtlasFrames extends FlxSpriteFrames
+class AtlasFrames extends FlxFramesCollection
 {
 	@:allow(flixel.atlas.FlxAtlas)
 	private function new(parent:FlxGraphics) 
 	{
 		super(parent);
 		type = FrameCollectionType.ATLAS;
-		framesHash = new Map<String, FlxFrame>();
 	}
 	
-	override public function addAtlasFrame(frame:Rectangle, sourceSize:FlxPoint, offset:FlxPoint, name:String = null, angle:Float = 0):FlxFrame 
-	{
-		var frame:FlxFrame = super.addAtlasFrame(frame, sourceSize, offset, name, angle);
-		
-		if (frame.name != null)
-		{
-			framesHash.set(frame.name, frame);
-		}
-		
-		return frame;
-	}
-	
-	// Description - contents of JSON file: Assets.getText(description)
+	/**
+	 * Parsing method for TexturePacker atlases in json format
+	 * @param	Source			the image source (can be FlxGraphics, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
+	 * @param	Description		contents of json file with atlas description. You can get it with Assets.getText(path/to/description.json)
+	 * @return	Newly created AtlasFrames collection
+	 */
 	public static function texturePackerJSON(Source:Dynamic, Description:String):AtlasFrames
 	{
 		var graphics:FlxGraphics = FlxGraphics.resolveSource(Source);
@@ -78,7 +70,12 @@ class AtlasFrames extends FlxSpriteFrames
 		return frames;
 	}
 	
-	// Description - contents of description file: Assets.getText(description)
+	/**
+	 * Parsing method for LibGDX atlases
+	 * @param	Source			the image source (can be FlxGraphics, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
+	 * @param	Description		contents of the file with atlas description. You can get it with Assets.getText(path/to/description/file)
+	 * @return	Newly created AtlasFrames collection
+	 */
 	public static function libGDX(Source:Dynamic, Description:String):AtlasFrames
 	{
 		var graphics:FlxGraphics = FlxGraphics.resolveSource(Source);
@@ -155,6 +152,9 @@ class AtlasFrames extends FlxSpriteFrames
 		return frames;
 	}
 	
+	/**
+	 * Internal method for LibGDX atlas parsing
+	 */
 	private static function getDimensions(line:String, size:Array<Int>):Array<Int>
 	{
 		var colonPosition:Int = line.indexOf(":");
@@ -166,7 +166,12 @@ class AtlasFrames extends FlxSpriteFrames
 		return size;
 	}
 	
-	// Description - contents of XML file: Assets.getText(description)
+	/**
+	 * Parsing method for Sparrow texture atlases
+	 * @param	Source			the image source (can be FlxGraphics, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
+	 * @param	Description		contents of xml file with atlas description. You can get it with Assets.getText(path/to/description.xml)
+	 * @return	Newly created AtlasFrames collection
+	 */
 	public static function sparrow(Source:Dynamic, Description:String):AtlasFrames
 	{
 		var graphics:FlxGraphics = FlxGraphics.resolveSource(Source);
@@ -208,6 +213,13 @@ class AtlasFrames extends FlxSpriteFrames
 		return frames;
 	}
 	
+	/**
+	 * Parsing method for TexturePacker atlases in xml format
+	 * (trimmed images aren't supported yet for this type of atlas)
+	 * @param	Source			the image source (can be FlxGraphics, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
+	 * @param	Description		contents of xml file with atlas description. You can get it with Assets.getText(path/to/description.xml)
+	 * @return	Newly created AtlasFrames collection
+	 */
 	public static function texturePackerXML(Source:Dynamic, Description:String):AtlasFrames
 	{
 		var graphics:FlxGraphics = FlxGraphics.resolveSource(Source);

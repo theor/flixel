@@ -1,7 +1,8 @@
 package flixel.graphics.frames;
 
 import flash.display.BitmapData;
-import flixel.system.layer.frames.FlxFrame;
+import flixel.graphics.FlxGraphics;
+import flixel.graphics.frames.FlxFrame;
 import flixel.system.layer.TileSheetExt;
 import flixel.util.FlxColor;
 
@@ -11,9 +12,9 @@ import flixel.util.FlxColor;
  */
 class FlxEmptyFrame extends FlxFrame
 {
-	public function new(tileSheet:TileSheetExt) 
+	public function new(parent:FlxGraphics) 
 	{
-		super(tileSheet);
+		super(parent);
 		type = FrameType.EMPTY;
 		#if FLX_RENDER_TILE
 		tileID = -1;

@@ -3,6 +3,9 @@ package flixel.system.frontEnds;
 import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import flixel.graphics.frames.FlxFrame;
+import flixel.graphics.frames.FlxFramesCollection;
+import flixel.graphics.frames.ImageFrame;
 import flixel.system.FlxAssets;
 import flixel.util.FlxBitmapUtil;
 import flixel.util.FlxColor;
@@ -24,23 +27,33 @@ class BitmapFrontEnd
 	}
 	
 	#if FLX_RENDER_TILE
-	public var whitePixel(get, null):FlxGraphics;
+	/**
+	 * Helper FlxFrame object. Containing only one frame.
+	 * Useful for drawing colored rectangles of all sizes in FLX_RENDER_TILE mode
+	 */
+	public var whitePixel(get, null):FlxFrame;
 	
-	private var _whitePixel:FlxGraphics;
+	private var _whitePixel:FlxFrame;
 	
-	private function get_whitePixel():FlxGraphics
+	private function get_whitePixel():FlxFrame
 	{
 		if (_whitePixel == null)
 		{
 			var bd:BitmapData = new BitmapData(2, 2, true, FlxColor.WHITE);
-			_whitePixel = new FlxGraphics("whitePixel", bd, true);
-			_whitePixel.persist = true;
-			_whitePixel.tilesheet.addTileRect(new Rectangle(0, 0, 1, 1), new Point(0, 0));
+			var graphics:FlxGraphics = new FlxGraphics("whitePixel", bd, true);
+			graphics.persist = true;
+			_whitePixel = ImageFrame.fromRectangle(graphics, new Rectangle(0, 0, 1, 1)).frame;
+			// TODO: make changes to classes which use _whitePixel (FlxBitmapTextField)
+			// _whitePixel.tilesheet.addTileRect(new Rectangle(0, 0, 1, 1), new Point(0, 0));
 		}
 		
 		return _whitePixel;
 	}
 	
+	/**
+	 * New context handler.
+	 * Regenerates tilesheets for all dumped graphics objects in the cache
+	 */
 	public function onContext():Void
 	{
 		var obj:FlxGraphics;
@@ -60,8 +73,8 @@ class BitmapFrontEnd
 	#end
 	
 	/**
-	 * Dumps bits of all graphics in the cache. This restores memory, but you can't read / write pixels on those graphics anymore.
-	 * You can call onContext() method for each FlxGraphic object which will restore it again.
+	 * Dumps bits of all graphics in the cache. This frees some memory, but you can't read/write pixels on those graphics anymore.
+	 * You can call undump() method for each FlxGraphic (or undumpCache()) object which will restore it again.
 	 */
 	public function dumpCache():Void
 	{
@@ -83,6 +96,28 @@ class BitmapFrontEnd
 	}
 	
 	/**
+	 * Restores graphics of all dumped objects in the cache.
+	 */
+	public function undumpCache():Void
+	{
+		#if !(flash || js)
+		var obj:FlxGraphics;
+		
+		if (_cache != null)
+		{
+			for (key in _cache.keys())
+			{
+				obj = _cache.get(key);
+				if (obj != null && obj.isDumped)
+				{
+					obj.undump();
+				}
+			}
+		}
+		#end
+	}
+	
+	/**
 	 * Check the local bitmap cache to see if a bitmap with this key has been loaded already.
 	 * 
 	 * @param	Key		The string key identifying the bitmap.
@@ -94,11 +129,11 @@ class BitmapFrontEnd
 	}
 	
 	/**
-	 * Generates a new BitmapData object (a colored square) and caches it.
+	 * Generates a new BitmapData object (a colored rectangle) and caches it.
 	 * 
-	 * @param	Width	How wide the square should be.
-	 * @param	Height	How high the square should be.
-	 * @param	Color	What color the square should be (0xAARRGGBB)
+	 * @param	Width	How wide the rectangle should be.
+	 * @param	Height	How high the rectangle should be.
+	 * @param	Color	What color the rectangle should be (0xAARRGGBB)
 	 * @param	Unique	Ensures that the bitmap data uses a new slot in the cache.
 	 * @param	Key		Force the cache to use a specific Key to index the bitmap.
 	 * @return	The BitmapData we just created.
@@ -130,50 +165,34 @@ class BitmapFrontEnd
 	 * @param	Key			Force the cache to use a specific Key to index the bitmap.
 	 * @return	The FlxGraphics we just created.
 	 */
-	public inline function add(Graphic:Dynamic, Unique:Bool = false, ?Key:String):FlxGraphics
-	{
-		return addWithSpaces(Graphic, 0, 0, 1, 1, Unique, Key);
-	}
-	
-	/**
-	 * Loads a bitmap from a file, inserts spaces between frames and caches it.
-	 * Could be useful for native targets to remove possible glitches.
-	 * 
-	 * @param	Graphic			The image file that you want to load.
-	 * @param	FrameWidth		The width of frames in image
-	 * @param	FrameHeight		The height of frames in image
-	 * @param	SpacingX		Horizontal spaces to insert between frames in image
-	 * @param	SpacingY		Vertical spaces to insert between frames in image
-	 * @param	Unique			Ensures that the bitmap data uses a new slot in the cache.
-	 * @param	Key				Force the cache to use a specific Key to index the bitmap.
-	 * @return	The FlxGraphics we just created.
-	 */
-	
-	// TODO: think about this method and add() method
-	public function addWithSpaces(Graphic:Dynamic, FrameWidth:Int, FrameHeight:Int, SpacingX:Int = 1, SpacingY:Int = 1, Unique:Bool = false, ?Key:String):FlxGraphics
+	public function add(Graphic:Dynamic, Unique:Bool = false, ?Key:String):FlxGraphics
 	{
 		if (Graphic == null)
 		{
 			return null;
 		}
 		
-		var region:TextureRegion = null;
-		var graphic:FlxGraphics = null;
-		
+		var graphics:FlxGraphics = null;
 		var isClass:Bool = false;
 		var isBitmap:Bool = false;
-		var isRegion:Bool = false;
 		var isGraphics:Bool = false;
+		var isFrameCollection:Bool = false;
+		var isFrame:Bool = false;
 		
 		if (Std.is(Graphic, FlxGraphics))
 		{
 			isGraphics = true;	
-			graphic = cast(Graphic, FlxGraphics);
-			
-			if (!Unique && (FrameWidth <= 0 && FrameHeight <= 0))
-			{
-				return graphic;
-			}
+			graphics = cast(Graphic, FlxGraphics);
+		}
+		else if (Std.is(Graphic, FlxFramesCollection))
+		{
+			isFrameCollection = true;
+			graphics = cast(Graphic, FlxFramesCollection).parent;
+		}
+		else if (Std.is(Graphic, FlxFrame))
+		{
+			isFrameCollection = true;
+			graphics = cast(Graphic, FlxFrame).parent;
 		}
 		else if (Std.is(Graphic, Class))
 		{
@@ -182,11 +201,6 @@ class BitmapFrontEnd
 		else if (Std.is(Graphic, BitmapData))
 		{
 			isBitmap = true;
-		}
-		else if (Std.is(Graphic, TextureRegion))
-		{
-			isRegion = true;
-			region = cast(Graphic, TextureRegion);
 		}
 		else if (Std.is(Graphic, String))
 		{
@@ -197,11 +211,9 @@ class BitmapFrontEnd
 			return null;
 		}
 		
-		var additionalKey:String = "";
-		
-		if (FrameWidth > 0 || FrameHeight > 0)
+		if (graphics != null && !Unique)
 		{
-			additionalKey = "FrameSize:" + FrameWidth + "_" + FrameHeight + "_Spacing:" + SpacingX + "_" + SpacingY;
+			return graphics;
 		}
 		
 		var key:String = Key;
@@ -222,20 +234,14 @@ class BitmapFrontEnd
 					}
 				}
 			}
-			else if (isRegion)
+			else if (isGraphics || isFrameCollection || isFrame)
 			{
-				key = region.data.key;
+				key = graphics.key; 
 			}
-			else if (isGraphics)
+			else // Graphic is String
 			{
-				key = graphic.key; 
+				key = Graphic;	
 			}
-			else
-			{
-				key = Graphic;
-			}
-			
-			key += additionalKey;
 			
 			if (Unique)
 			{
@@ -255,26 +261,16 @@ class BitmapFrontEnd
 			{
 				bd = cast Graphic;
 			}
-			else if (isRegion)
+			else if (isGraphics || isFrameCollection || isFrame)
 			{
-				bd = region.data.bitmap;
+				bd = graphics.bitmap;
 			}
-			else if (isGraphics)
-			{
-				bd = graphic.bitmap;
-			}
-			else
+			else	// Graphic is String
 			{
 				bd = FlxAssets.getBitmapData(Graphic);
 			}
 			
-			if (FrameWidth > 0 || FrameHeight > 0)
-			{
-				bd = FlxBitmapUtil.addSpacing(bd, 
-						new Point(FrameWidth, FrameHeight), 
-						new Point(SpacingX, SpacingY));
-			}
-			else if (Unique)
+			if (Unique)
 			{
 				bd = bd.clone();
 			}
@@ -285,7 +281,7 @@ class BitmapFrontEnd
 			{
 				graph.assetsClass = cast Graphic;
 			}
-			else if (!isClass && !isBitmap && !isRegion && !Unique)
+			else if (!isClass && !isBitmap && !isFrameCollection && !isFrame && !Unique)
 			{
 				graph.assetsKey = cast Graphic;
 			}
@@ -347,15 +343,15 @@ class BitmapFrontEnd
 	}
 	
 	/**
+	 * Generates key from provided base key and information about tile size and offsets in spritesheet 
+	 * and the region of image to use as spritesheet graphics source.
 	 * 
-	 * @param	baseKey
-	 * @param	frameSize
-	 * @param	frameSpacing
-	 * @param	region
-	 * @return
+	 * @param	baseKey			Beginning of the key. Usually it is the key for original spritesheet graphics (like "assets/tile.png") 
+	 * @param	frameSize		the size of tile in spritesheet
+	 * @param	frameSpacing	offsets between tiles in offsets
+	 * @param	region			region of image to use as spritesheet graphics source
+	 * @return	Generated key for spritesheet with inserted spaces between tiles
 	 */
-	// TODO: document it
-	// TODO: use it somewhere
 	public function getKeyWithSpacings(baseKey:String, frameSize:Point, frameSpacing:Point, region:Rectangle = null):String
 	{
 		var result:String = baseKey;
@@ -369,6 +365,10 @@ class BitmapFrontEnd
 		return result;
 	}
 	
+	/**
+	 * Totally removes FlxGraphics object with specified key.
+	 * @param	key	the key for cached FlxGraphics object.
+	 */
 	public function remove(key:String):Void
 	{
 		if ((key != null) && _cache.exists(key))
@@ -383,7 +383,8 @@ class BitmapFrontEnd
 	}
 	
 	/**
-	 * Dumps the cache's image references.
+	 * Clears image cache (and destroys those images).
+	 * Graphics object will be removed and destroyed only if it shouldn't persist in the cache
 	 */
 	public function clearCache():Void
 	{

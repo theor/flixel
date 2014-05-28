@@ -9,9 +9,10 @@ import flash.geom.Rectangle;
 import flixel.animation.FlxAnimationController;
 import flixel.FlxBasic;
 import flixel.FlxG;
+import flixel.graphics.frames.FlxFramesCollection;
 import flixel.system.layer.DrawStackItem;
 import flixel.graphics.frames.FlxFrame;
-import flixel.graphics.frames.FlxSpriteFrames;
+import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.FrameType;
 import flixel.system.layer.Region;
 import flixel.util.FlxAngle;
@@ -73,6 +74,8 @@ class FlxSprite extends FlxObject
 	 * The height of the actual graphic or image being displayed (not necessarily the game object/bounding box).
 	 */
 	public var frameHeight(default, null):Int = 0;
+	
+	// TODO: rename this var to numFrames
 	/**
 	 * The total number of frames in this image.  WARNING: assumes each row in the sprite sheet is full!
 	 */
@@ -81,7 +84,8 @@ class FlxSprite extends FlxObject
 	 * Rendering variables.
 	 */
 	public var region(default, null):Region;
-	public var framesData(default, null):FlxSpriteFrames;
+	// TODO: rename this var to just frames
+	public var framesData(default, null):FlxFramesCollection;
 	public var graphics(default, set):FlxGraphics;
 	/**
 	 * The minimum angle (out of 360°) for which a new baked rotation exists. Example: 90 means there 

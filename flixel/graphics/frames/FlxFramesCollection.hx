@@ -8,12 +8,30 @@ import flixel.system.layer.TileSheetExt;
 import flixel.util.FlxPoint;
 import flixel.graphics.FlxGraphics;
 
-class FlxSpriteFrames implements IFlxDestroyable
+/**
+ * Base class for all frame collections
+ */
+class FlxFramesCollection implements IFlxDestroyable
 {
 	public var frames:Array<FlxFrame>;
+	
+	/**
+	 * Hash of frames for this frame collection.
+	 * Used only in AtlasFrames and FontFrames (not implemented yet), 
+	 * but you can try to use it for other types of collections
+	 * (give names to your frames)
+	 */
 	public var framesHash:Map<String, FlxFrame>;
+	
+	/**
+	 * Graphics object this frames belongs to.
+	 */
 	public var parent:FlxGraphics;
 	
+	/**
+	 * Type of this frame collection.
+	 * Used for faster type detection (less casting)
+	 */
 	public var type(default, null):FrameCollectionType;
 	
 	public function new(parent:FlxGraphics)
@@ -35,10 +53,15 @@ class FlxSpriteFrames implements IFlxDestroyable
 	// todo: add tiles only with centered origin 
 	// (this will require to change some of the rendering methods)
 	
-	// todo: add empty frame
-	public function addEmptyFrame(size:Rectangle):FlxFrame
+	/**
+	 * Add empty frame into this frame collection. 
+	 * An emty frame is doing nothing for all the time
+	 * @param	size	dimensions of the frame to add
+	 * @return	Newly added empty frame
+	 */
+	public function addEmptyFrame(size:Rectangle):FlxEmptyFrame
 	{
-		var frame:FlxFrame = new FlxFrame(parent);	
+		var frame:FlxEmptyFrame = new FlxEmptyFrame(parent);	
 		frame.frame = size;
 		frame.sourceSize.set(size.width, size.height);
 		frames.push(frame);
@@ -46,7 +69,9 @@ class FlxSpriteFrames implements IFlxDestroyable
 	}
 	
 	/**
-	 * Adds new FlxFrame to this TileSheetData object
+	 * Adds new regular (not rotated) FlxFrame to this frame collection
+	 * @param	region	region of image which new frame will display
+	 * @return	newly created FlxFrame object for specified region of image
 	 */
 	public function addSpriteSheetFrame(region:Rectangle):FlxFrame
 	{
@@ -63,8 +88,14 @@ class FlxSpriteFrames implements IFlxDestroyable
 	}
 	
 	/**
-	 * Parses frame TexturePacker data object and returns it
-	 */
+	  * Adds new frame to this frame collection. This method runs additional check, and can add rotated frames (from texture atlases).
+	  * @param	frame			region of image
+	  * @param	sourceSize		original size of packed image (if image had been cropped, then original size will be bigger than frame size)
+	  * @param	offset			how frame region is located on original frame image (offset from top left corner of original image)
+	  * @param	name			name for this frame (name of packed image file)
+	  * @param	angle			rotation of packed image (can be 0, 90, -90).
+	  * @return	Newly created and added frame object.
+	  */
 	public function addAtlasFrame(frame:Rectangle, sourceSize:FlxPoint, offset:FlxPoint, name:String = null, angle:Float = 0):FlxFrame
 	{
 		var texFrame:FlxFrame = null;
@@ -100,6 +131,12 @@ class FlxSpriteFrames implements IFlxDestroyable
 		#end
 		
 		frames.push(texFrame);
+		
+		if (name != null)
+		{
+			framesHash.set(name, texFrame);
+		}
+		
 		return texFrame;
 	}
 }
