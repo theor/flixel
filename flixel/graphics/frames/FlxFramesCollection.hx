@@ -5,6 +5,7 @@ import flash.geom.Point;
 import flash.geom.Rectangle;
 import flixel.interfaces.IFlxDestroyable;
 import flixel.system.layer.TileSheetExt;
+import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
 import flixel.graphics.FlxGraphics;
 
@@ -44,7 +45,7 @@ class FlxFramesCollection implements IFlxDestroyable
 	
 	public function destroy():Void
 	{
-		frames = null;
+		frames = FlxDestroyUtil.destroyArray(frames);
 		framesHash = null;
 		parent = null;
 		type = null;

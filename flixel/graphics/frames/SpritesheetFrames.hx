@@ -75,8 +75,6 @@ class SpritesheetFrames extends FlxFramesCollection
 		return SpritesheetFrames.fromRectangle(result, frameSize, null, frameSpacing);
 	}
 	
-	// TODO: document everything
-	
 	/**
 	 * Generates spritesheet frame collection from provided frame. Can be usefull for spritesheets packed into atlases.
 	 * It can generate spritesheets from rotated and cropped frames also, which is important for devices with small amount of memory.

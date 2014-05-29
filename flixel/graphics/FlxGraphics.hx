@@ -200,17 +200,9 @@ class FlxGraphics
 		
 		_imageFrame = null;	// no need to dispose _imageFrame since it exists in imageFrames
 		
-		for (frame in imageFrames)
-		{
-			FlxDestroyUtil.destroy(frame);
-		}
-		
-		FlxDestroyUtil.destroy(atlasFrames);
-		
-		for (frame in spritesheetFrames)
-		{
-			FlxDestroyUtil.destroy(frame);
-		}
+		imageFrames = FlxDestroyUtil.destroyArray(imageFrames);
+		spritesheetFrames = FlxDestroyUtil.destroyArray(spritesheetFrames);
+		atlasFrames = FlxDestroyUtil.destroy(atlasFrames);
 	}
 	
 	#if FLX_RENDER_TILE

@@ -1,10 +1,14 @@
 package flixel.atlas;
 
 import flash.display.BitmapData;
+import flash.geom.Point;
 import flash.geom.Rectangle;
 import flixel.FlxG;
 import flixel.graphics.FlxGraphics;
 import flixel.graphics.frames.AtlasFrames;
+import flixel.graphics.frames.SpritesheetFrames;
+import flixel.interfaces.IFlxDestroyable;
+import flixel.util.FlxBitmapUtil;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
@@ -15,38 +19,52 @@ import flixel.atlas.FlxNode;
 import flixel.system.FlxAssets;
 import flixel.system.frontEnds.BitmapFrontEnd;
 
-// TODO: continue from here...
+// TODO: generate json file for atlas
+
 /**
- * Atlas class
- * @author Zaphod
+ * Class for packing multiple images in big one and generating frame data for each of them 
+ * so you can easily load regions of atlas in sprites and tilemaps as a source of graphics
  */
-class FlxAtlas
+class FlxAtlas implements IFlxDestroyable
 {	
 	/**
 	 * Root node of atlas
 	 */
 	public var root:FlxNode;
 	
+	/**
+	 * Name of this atlas, used as a key in bitmap cache
+	 */
 	public var name:String;
 	
 	public var nodes:Map<String, FlxNode>;
+	
+	/**
+	 * BitmapData of this atlas, combines all images in big one
+	 */
 	public var atlasBitmapData:BitmapData;
 	
 	/**
-	 * Offsets between nodes in atlas
+	 * Offsets between nodes on x axis
 	 */
 	public var borderX(default, null):Int;
+	/**
+	 * Offsets between nodes on y axis
+	 */
 	public var borderY(default, null):Int;
 	
 	/**
 	 * Total width of atlas
 	 */
-	public var width(get, null):Int;
+	public var width(default, null):Int;
 	/**
 	 * Total height of atlas
 	 */
-	public var height(get, null):Int;
+	public var height(default, null):Int;
 	
+	/**
+	 * Internal storage for building atlas from queue
+	 */
 	private var _tempStorage:Array<TempAtlasObj>;
 	
 	/**
@@ -61,71 +79,39 @@ class FlxAtlas
 		nodes = new Map<String, FlxNode>();
 		this.name = name;
 		
-		root = new FlxNode(new Rectangle(0, 0, width, height));
+		root = new FlxNode(new Rectangle(0, 0, width, height), this);
 		atlasBitmapData = new BitmapData(width, height, true, FlxColor.TRANSPARENT);
 		
+		this.width = width;
+		this.height = height;
 		this.borderX = borderX;
 		this.borderY = borderY;
 	}
 	
 	/**
 	 * Simply adds new node to atlas.
-	 * @param	data	image to store
-	 * @param	key		image name
-	 * @return			added node
+	 * @param	Graphic	Image to store. Could be BitmapData, String (key from OpenFl asset cache) or Class<Dynamic>.
+	 * @param	Key		Image name, optional. You can ommit it if you pass String or Class<Dynamic> as Graphic source
+	 * @return			Newly created and added node, or null if there is no place for it.
 	 */
-	
-	 // TODO: addWithSpacing method
-	 // TODO: generateWithSpacing method
 	public function addNode(Graphic:Dynamic, ?Key:String):FlxNode
 	{
-		var isClass:Bool = true;
-		var isBitmapData:Bool = true;
-		if (Std.is(Graphic, Class))
-		{
-			isClass = true;
-			isBitmapData = false;
-		}
-		else if (Std.is(Graphic, BitmapData) && (Key != null))
-		{
-			isClass = false;
-			isBitmapData = true;
-		}
-		else if (Std.is(Graphic, String))
-		{
-			isClass = false;
-			isBitmapData = false;
-		}
-		else
-		{
-			return null;
-		}
+		var key:String = getKeyForGraphic(Graphic, Key);
 		
-		var key:String = Key;
-		var data:BitmapData = null;
-		if (isClass)
-		{
-			key = Type.getClassName(cast(Graphic, Class<Dynamic>));
-			data = Type.createInstance(cast(Graphic, Class<Dynamic>), []).bitmapData;
-		}
-		else if (isBitmapData)
-		{
-			key = Key;
-			data = cast Graphic;
-		}
-		else
-		{
-			key = Graphic;
-			data = FlxAssets.getBitmapData(Graphic);
-		}
+		if (key == null) return null;
 		
 		if (hasNodeWithName(key) == true)
 		{
 			return nodes.get(key);
 		}
 		
+		var data:BitmapData = getBitmapForGraphic(Graphic);
+		
+		if (data == null)	return null;
+		
 		if (root.canPlace(data.width, data.height) == false)
 		{
+			// There is no place for image
 			return null;
 		}
 		
@@ -145,19 +131,19 @@ class FlxAtlas
 			
 			if (dw > dh) // divide horizontally
 			{
-				firstChild = new FlxNode(new Rectangle(nodeToInsert.x, nodeToInsert.y, insertWidth, nodeToInsert.height));
-				secondChild = new FlxNode(new Rectangle(nodeToInsert.x + insertWidth, nodeToInsert.y, nodeToInsert.width - insertWidth, nodeToInsert.height));
+				firstChild = new FlxNode(new Rectangle(nodeToInsert.x, nodeToInsert.y, insertWidth, nodeToInsert.height), this);
+				secondChild = new FlxNode(new Rectangle(nodeToInsert.x + insertWidth, nodeToInsert.y, nodeToInsert.width - insertWidth, nodeToInsert.height), this);
 				
-				firstGrandChild = new FlxNode(new Rectangle(firstChild.x, firstChild.y, insertWidth, insertHeight), true, key);
-				secondGrandChild = new FlxNode(new Rectangle(firstChild.x, firstChild.y + insertHeight, insertWidth, firstChild.height - insertHeight));
+				firstGrandChild = new FlxNode(new Rectangle(firstChild.x, firstChild.y, insertWidth, insertHeight), this, true, key);
+				secondGrandChild = new FlxNode(new Rectangle(firstChild.x, firstChild.y + insertHeight, insertWidth, firstChild.height - insertHeight), this);
 			}
 			else // divide vertically
 			{
-				firstChild = new FlxNode(new Rectangle(nodeToInsert.x, nodeToInsert.y, nodeToInsert.width, insertHeight));
-				secondChild = new FlxNode(new Rectangle(nodeToInsert.x, nodeToInsert.y + insertHeight, nodeToInsert.width, nodeToInsert.height - insertHeight));
+				firstChild = new FlxNode(new Rectangle(nodeToInsert.x, nodeToInsert.y, nodeToInsert.width, insertHeight), this);
+				secondChild = new FlxNode(new Rectangle(nodeToInsert.x, nodeToInsert.y + insertHeight, nodeToInsert.width, nodeToInsert.height - insertHeight), this);
 				
-				firstGrandChild = new FlxNode(new Rectangle(firstChild.x, firstChild.y, insertWidth, insertHeight), true, key);
-				secondGrandChild = new FlxNode(new Rectangle(firstChild.x + insertWidth, firstChild.y, firstChild.width - insertWidth, insertHeight));
+				firstGrandChild = new FlxNode(new Rectangle(firstChild.x, firstChild.y, insertWidth, insertHeight), this, true, key);
+				secondGrandChild = new FlxNode(new Rectangle(firstChild.x + insertWidth, firstChild.y, firstChild.width - insertWidth, insertHeight), this);
 			}
 			
 			firstChild.left = firstGrandChild;
@@ -177,30 +163,92 @@ class FlxAtlas
 	}
 	
 	/**
-	 * Generates TextureRegion object for node with specified name
-	 * @param	nodeName	name of the node to generate TextureRegion object for
-	 * @return	Generated TextureRegion
+	 * Generates new bitmapdata with spaces between tiles, adds this bitmapdata to this atlas, 
+	 * generates SpritesheetFrames object for added node and returns it. Could be usefull for tilemaps.
+	 * 
+	 * @param	Graphic			Source image for node, where spaces will be inserted (could be BitmapData, String or Class<Dynamic>).
+	 * @param	?Key			Optional key for image
+	 * @param	frameSize		The size of tile in spritesheet
+	 * @param	frameSpacing	Offsets to add in spritesheet between tiles
+	 * @param	region			Region of source image to use as a source graphic
+	 * @return	Generated SpritesheetFrames for added node
 	 */
-	// TODO: rework this method
-	// and add bunch of other methods for generating
-	// different types of frames collections
-	// (maybe move them into FlxNode class)
-	public function getRegionFor(nodeName:String):TextureRegion
+	public function addNodeWithSpacings(Graphic:Dynamic, ?Key:String, frameSize:Point, frameSpacing:Point, region:Rectangle = null):SpritesheetFrames
 	{
-		if (hasNodeWithName(nodeName))
+		var key:String = getKeyForGraphic(Graphic, Key);
+		
+		if (key == null) return null;
+		
+		key = FlxG.bitmap.getKeyWithSpacings(key, frameSize, frameSpacing, region);
+		
+		if (hasNodeWithName(key) == true)
 		{
-			var graphics:FlxGraphics = FlxG.bitmap.add(this.atlasBitmapData, false, name);
-			var region = new TextureRegion(graphics);
-			var node:FlxNode = getNode(nodeName);
-			region.region.startX = node.x;
-			region.region.startY = node.y;
-			region.region.width = (node.width == width) ? width : node.width - borderX;
-			region.region.height = (node.height == height) ? height : node.height - borderY;
-			
-			return region;
+			return nodes.get(key).getSpritesheetFrames(frameSize, frameSpacing);
 		}
 		
-		return null;
+		var data:BitmapData = getBitmapForGraphic(Graphic);
+		var nodeData:BitmapData = FlxBitmapUtil.addSpacing(data, frameSize, frameSpacing, region);
+		var node:FlxNode = addNode(nodeData, key);
+		
+		if (node == null) return null;
+		
+		return node.getSpritesheetFrames(frameSize, frameSpacing);
+	}
+	
+	/**
+	 * Internal method for getting key for image
+	 * 
+	 * @param	Graphic	Image source to get key for. Could be BitmapData, Class<Dynamic> or String
+	 * @param	?Key	Optional key. If it's not null then this string will be returned as a key
+	 * @return	The key for provided graphic
+	 */
+	private function getKeyForGraphic(Graphic:Dynamic, ?Key:String):String
+	{
+		var key:String = null;
+		
+		if (Key != null)
+		{
+			return Key;
+		}
+		
+		if (Std.is(Graphic, Class))
+		{
+			key = Type.getClassName(cast(Graphic, Class<Dynamic>));
+		}
+		else if (Std.is(Graphic, BitmapData))
+		{
+			// try to search in bitmap cache
+			key = FlxG.bitmap.getCacheKeyFor(cast Graphic);
+		}
+		else if (Std.is(Graphic, String))
+		{
+			key = cast Graphic;
+		}
+		
+		return key;
+	}
+	
+	/**
+	 * Internal method for resolving Graphic object to BitmapData
+	 */
+	private function getBitmapForGraphic(Graphic:Dynamic):BitmapData
+	{
+		var data:BitmapData = null;
+		
+		if (Std.is(Graphic, BitmapData))
+		{
+			data = cast Graphic;
+		}
+		else if (Std.is(Graphic, Class))
+		{
+			data = Type.createInstance(cast(Graphic, Class<Dynamic>), []).bitmapData;
+		}
+		else if (Std.is(Graphic, String))
+		{
+			data = FlxAssets.getBitmapData(Graphic);
+		}
+		
+		return data;
 	}
 	
 	/**
@@ -212,24 +260,25 @@ class FlxAtlas
 	{
 		var graphics:FlxGraphics = FlxG.bitmap.add(this.atlasBitmapData, false, name);
 		
+		var atlasFrames:AtlasFrames = null;
 		if (graphics.atlasFrames == null)
 		{
-			var atlasFrames:AtlasFrames = new AtlasFrames(graphics);
-			var node:FlxNode;
-			for (key in nodes.keys())
+			graphics.atlasFrames = atlasFrames = new AtlasFrames(graphics);
+		}
+		
+		var node:FlxNode;
+		for (key in nodes.keys())
+		{
+			node = nodes.get(key);
+			// if the node is filled and AtlasFrames does not contain image of the node, then we should add it
+			if (node.filled && !atlasFrames.framesHash.exists(key))
 			{
-				node = nodes.get(key);
-				if (node.filled)
-				{
-					var frame:Rectangle = new Rectangle(node.x, node.y, node.width - borderX, node.height - borderY);
-					var sourceSize:FlxPoint = FlxPoint.get(node.width - borderX, node.height - borderY);
-					var offset:FlxPoint = FlxPoint.get(0, 0);
-					
-					atlasFrames.addAtlasFrame(frame, sourceSize, offset, node.key, 0); 
-				}
+				var frame:Rectangle = new Rectangle(node.x, node.y, node.width - borderX, node.height - borderY);
+				var sourceSize:FlxPoint = FlxPoint.get(node.width - borderX, node.height - borderY);
+				var offset:FlxPoint = FlxPoint.get(0, 0);
+				
+				atlasFrames.addAtlasFrame(frame, sourceSize, offset, node.key, 0); 
 			}
-			
-			graphics.atlasFrames = atlasFrames;
 		}
 		
 		return graphics.atlasFrames;
@@ -261,7 +310,8 @@ class FlxAtlas
 	}
 	
 	/**
-	 * Optimized version of method for adding multiple nodes to atlas. Uses less atlas' area
+	 * Optimized version of method for adding multiple nodes to atlas. 
+	 * Uses less atlas' area (it sorts images by the size before adding them to atlas)
 	 * @param	bitmaps		BitmapData's to insert
 	 * @param	keys		Names of these bitmapData's
 	 * @return				true if ALL nodes were added successfully.
@@ -284,7 +334,7 @@ class FlxAtlas
 		var index:Int;
 		for (i in 0...(numBitmaps))
 		{
-			index = indexOf(bitmaps, sortedBitmaps[i]);
+			index = bitmaps.indexOf(sortedBitmaps[i]);
 			node = addNode(sortedBitmaps[i], keys[index]);
 			if (node == null)
 			{
@@ -295,19 +345,9 @@ class FlxAtlas
 		return result;
 	}
 	
-	private function indexOf(bitmaps:Array<BitmapData>, bmd:BitmapData):Int
-	{
-		for (i in 0...(bitmaps.length))
-		{
-			if (bitmaps[i] == bmd)
-			{
-				return i;
-			}
-		}
-		
-		return -1;
-	}
-	
+	/**
+	 * Internal method for sorting bitmaps
+	 */
 	private function bitmapSorter(bmd1:BitmapData, bmd2:BitmapData):Int
 	{
 		if (bmd2.width == bmd1.width)
@@ -335,32 +375,39 @@ class FlxAtlas
 	}
 	
 	/**
-	 * Creates new "queue" for adding new nodes
+	 * Creates new "queue" for adding new nodes.
+	 * This method should be used with addToQueue() and generateFromQueue() methods:
+	 * - first, you create queue, like atlas.createQueue();
+	 * - second, you add several bitmaps in queue: atlas.addToQueue(bmd1, "key1").addToQueue(bmd2, "key2");
+	 * - third, you actually bake those bitmaps on atlas: atlas.generateFromQueue();
 	 */
-	public function createQueue():Void
+	public function createQueue():FlxAtlas
 	{
+		if (_tempStorage != null)	_tempStorage = null;
 		_tempStorage = new Array<TempAtlasObj>();
+		return this;
 	}
 	
 	/**
 	 * Adds new object to queue for later creation of new node
-	 * @param	data	bitmapData to hold
-	 * @param	key		"name" of bitmapData
+	 * @param	data	BitmapData to bake on atlas
+	 * @param	key		"name" of BitmapData. You'll use it as a key for accessing created node.
 	 */
-	public function addToQueue(data:BitmapData, key:String):Void
+	public function addToQueue(data:BitmapData, key:String):FlxAtlas
 	{
 		if (_tempStorage == null)
 		{
 			_tempStorage = new Array<TempAtlasObj>();
 		}
 		
-		_tempStorage.push({bmd: data, keyStr: key});
+		_tempStorage.push({ bmd: data, keyStr: key });
+		return this;
 	}
 	
 	/**
 	 * Adds all objects in "queue" to existing atlas. Doesn't erase any node
 	 */
-	public function generateAtlasFromQueue():Void
+	public function generateFromQueue():FlxAtlas
 	{
 		if (_tempStorage != null)
 		{
@@ -374,10 +421,13 @@ class FlxAtlas
 			addNodes(bitmaps, keys);
 			_tempStorage = null;
 		}
+		
+		return this;
 	}
 	
 	/**
-	 * Destroys atlas. Use only if you want to clear memory and don't need this atlas anymore
+	 * Destroys atlas. Use only if you want to clear memory and don't need this atlas anymore, 
+	 * since it disposes atlasBitmapData and removes it from cache
 	 */
 	public function destroy():Void
 	{
@@ -398,8 +448,11 @@ class FlxAtlas
 		var rootHeight:Int = root.height;
 		deleteSubtree(root);
 		
-		root = new FlxNode(new Rectangle(0, 0, rootWidth, rootHeight));
+		root = new FlxNode(new Rectangle(0, 0, rootWidth, rootHeight), this);
 		atlasBitmapData.fillRect(root.rect, FlxColor.TRANSPARENT);
+		
+		var graphics:FlxGraphics = FlxG.bitmap.get(name);
+		graphics.atlasFrames = FlxDestroyUtil.destroy(graphics.atlasFrames);
 		nodes = new Map<String, FlxNode>();
 	}
 	
