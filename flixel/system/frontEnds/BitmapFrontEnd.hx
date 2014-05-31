@@ -42,7 +42,7 @@ class BitmapFrontEnd
 			var bd:BitmapData = new BitmapData(2, 2, true, FlxColor.WHITE);
 			var graphics:FlxGraphics = new FlxGraphics("whitePixel", bd, true);
 			graphics.persist = true;
-			_whitePixel = ImageFrame.fromRectangle(graphics, new Rectangle(0, 0, 1, 1)).frame;
+			_whitePixel = ImageFrame.fromRectangle(graphics, new Rectangle(0, 0, 2, 2)).frame;
 			// TODO: make changes to classes which use _whitePixel (FlxBitmapTextField)
 			// _whitePixel.tilesheet.addTileRect(new Rectangle(0, 0, 1, 1), new Point(0, 0));
 		}
