@@ -9,7 +9,7 @@ import flixel.graphics.frames.FlxFrame;
 import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.FrameCollectionType;
 import flixel.system.layer.TileSheetExt;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 import haxe.Json;
 
 /**
@@ -19,7 +19,7 @@ import haxe.Json;
 class AtlasFrames extends FlxFramesCollection
 {
 	@:allow(flixel.atlas.FlxAtlas)
-	private function new(parent:FlxGraphics) 
+	private function new(parent:FlxGraphic) 
 	{
 		super(parent);
 		type = FrameCollectionType.ATLAS;
@@ -27,13 +27,13 @@ class AtlasFrames extends FlxFramesCollection
 	
 	/**
 	 * Parsing method for TexturePacker atlases in json format
-	 * @param	Source			the image source (can be FlxGraphics, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
+	 * @param	Source			the image source (can be FlxGraphic, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
 	 * @param	Description		contents of json file with atlas description. You can get it with Assets.getText(path/to/description.json)
 	 * @return	Newly created AtlasFrames collection
 	 */
 	public static function texturePackerJSON(Source:Dynamic, Description:String):AtlasFrames
 	{
-		var graphics:FlxGraphics = FlxGraphics.resolveSource(Source);
+		var graphics:FlxGraphic = FlxGraphic.resolveSource(Source);
 		
 		// No need to parse data again
 		if (graphics.atlasFrames != null)
@@ -72,13 +72,13 @@ class AtlasFrames extends FlxFramesCollection
 	
 	/**
 	 * Parsing method for LibGDX atlases
-	 * @param	Source			the image source (can be FlxGraphics, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
+	 * @param	Source			the image source (can be FlxGraphic, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
 	 * @param	Description		contents of the file with atlas description. You can get it with Assets.getText(path/to/description/file)
 	 * @return	Newly created AtlasFrames collection
 	 */
 	public static function libGDX(Source:Dynamic, Description:String):AtlasFrames
 	{
-		var graphics:FlxGraphics = FlxGraphics.resolveSource(Source);
+		var graphics:FlxGraphic = FlxGraphic.resolveSource(Source);
 		
 		// No need to parse data again
 		if (graphics.atlasFrames != null)
@@ -168,13 +168,13 @@ class AtlasFrames extends FlxFramesCollection
 	
 	/**
 	 * Parsing method for Sparrow texture atlases
-	 * @param	Source			the image source (can be FlxGraphics, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
+	 * @param	Source			the image source (can be FlxGraphic, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
 	 * @param	Description		contents of xml file with atlas description. You can get it with Assets.getText(path/to/description.xml)
 	 * @return	Newly created AtlasFrames collection
 	 */
 	public static function sparrow(Source:Dynamic, Description:String):AtlasFrames
 	{
-		var graphics:FlxGraphics = FlxGraphics.resolveSource(Source);
+		var graphics:FlxGraphic = FlxGraphic.resolveSource(Source);
 		
 		// No need to parse data again
 		if (graphics.atlasFrames != null)
@@ -216,13 +216,13 @@ class AtlasFrames extends FlxFramesCollection
 	/**
 	 * Parsing method for TexturePacker atlases in xml format
 	 * (trimmed images aren't supported yet for this type of atlas)
-	 * @param	Source			the image source (can be FlxGraphics, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
+	 * @param	Source			the image source (can be FlxGraphic, String, Class<Dynamic>, BitmapData, FlxFrame or FlxFramesCollection)
 	 * @param	Description		contents of xml file with atlas description. You can get it with Assets.getText(path/to/description.xml)
 	 * @return	Newly created AtlasFrames collection
 	 */
 	public static function texturePackerXML(Source:Dynamic, Description:String):AtlasFrames
 	{
-		var graphics:FlxGraphics = FlxGraphics.resolveSource(Source);
+		var graphics:FlxGraphic = FlxGraphic.resolveSource(Source);
 		
 		// No need to parse data again
 		if (graphics.atlasFrames != null)

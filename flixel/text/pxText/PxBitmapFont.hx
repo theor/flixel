@@ -8,7 +8,7 @@ import flash.geom.Rectangle;
 import flixel.FlxG;
 import flixel.util.FlxColor;
 import flixel.system.layer.Region;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 
 /**
  * Holds information and bitmap glpyhs for a bitmap font.
@@ -45,7 +45,7 @@ class PxBitmapFont
 	private var _symbols:Array<HelperSymbol>;
 	// Prepared bitmapData with font glyphsW	
 	private var _region:Region;
-	private var graphics:FlxGraphics;
+	private var graphics:FlxGraphic;
 	
 	/**
 	 * Creates a new bitmap font using specified bitmap data and letter input.
@@ -136,7 +136,7 @@ class PxBitmapFont
 	/**
 	 * Updates and caches tile data for passed node object
 	 */
-	public function updateGlyphData(Graphics:FlxGraphics = null):Void
+	public function updateGlyphData(Graphics:FlxGraphic = null):Void
 	{
 		#if FLX_RENDER_TILE
 		_glyphs = new Map<Int, PxFontSymbol>();
@@ -673,7 +673,7 @@ class PxBitmapFont
 		#end
 	}
 	
-	private function setGraphics(value:FlxGraphics):Void
+	private function setGraphics(value:FlxGraphic):Void
 	{
 		if (graphics != null && graphics != value)
 		{

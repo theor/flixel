@@ -15,7 +15,7 @@ import flixel.util.FlxGradient;
 import flixel.util.FlxPoint;
 import flixel.system.layer.Region;
 import flixel.system.layer.DrawStackItem;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 
 /**
  * FlxBar is a quick and easy way to create a graphical bar which can
@@ -116,7 +116,7 @@ class FlxBar extends FlxSprite
 	
 	private var _framesPosition:String;
 	
-	private var _frontGraphics:FlxGraphics;
+	private var _frontGraphics:FlxGraphic;
 	private var _frontRegion:Region;
 	#end
 	
@@ -611,8 +611,8 @@ class FlxBar extends FlxSprite
 	 */
 	public function createImageBar(empty:Dynamic = null, fill:Dynamic = null, emptyBackground:Int = 0xff000000, fillBackground:Int = 0xff00ff00):Void
 	{
-		var emptyGraphics:FlxGraphics = FlxG.bitmap.add(empty);
-		var filledGraphics:FlxGraphics = FlxG.bitmap.add(fill);
+		var emptyGraphics:FlxGraphic = FlxG.bitmap.add(empty);
+		var filledGraphics:FlxGraphic = FlxG.bitmap.add(fill);
 		
 		var emptyBitmapData:BitmapData = (emptyGraphics != null) ? emptyGraphics.bitmap : null; 
 		var fillBitmapData:BitmapData = (filledGraphics != null) ? filledGraphics.bitmap : null;
@@ -1226,11 +1226,11 @@ class FlxBar extends FlxSprite
 	}
 	
 	#if FLX_RENDER_TILE
-	private inline function setGraphics(value:FlxGraphics):Void
+	private inline function setGraphics(value:FlxGraphic):Void
 	{
 		graphics = value;
 	}
-	private function setFrontGraphics(value:FlxGraphics):Void
+	private function setFrontGraphics(value:FlxGraphic):Void
 	{
 		if (_frontGraphics != null && _frontGraphics != value)
 		{

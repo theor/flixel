@@ -9,7 +9,7 @@ import flixel.graphics.frames.ImageFrame;
 import flixel.system.FlxAssets;
 import flixel.util.FlxBitmapUtil;
 import flixel.util.FlxColor;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 import flixel.util.loaders.TextureRegion;
 import openfl.Assets;
 
@@ -19,7 +19,7 @@ import openfl.Assets;
 class BitmapFrontEnd
 {
 	@:allow(flixel.system.frontEnds.BitmapLogFrontEnd)
-	private var _cache:Map<String, FlxGraphics>;
+	private var _cache:Map<String, FlxGraphic>;
 	
 	public function new()
 	{
@@ -40,7 +40,7 @@ class BitmapFrontEnd
 		if (_whitePixel == null)
 		{
 			var bd:BitmapData = new BitmapData(2, 2, true, FlxColor.WHITE);
-			var graphics:FlxGraphics = new FlxGraphics("whitePixel", bd, true);
+			var graphics:FlxGraphic = new FlxGraphic("whitePixel", bd, true);
 			graphics.persist = true;
 			_whitePixel = ImageFrame.fromRectangle(graphics, new Rectangle(0, 0, 2, 2)).frame;
 			// TODO: make changes to classes which use _whitePixel (FlxBitmapTextField)
@@ -56,7 +56,7 @@ class BitmapFrontEnd
 	 */
 	public function onContext():Void
 	{
-		var obj:FlxGraphics;
+		var obj:FlxGraphic;
 		
 		if (_cache != null)
 		{
@@ -79,7 +79,7 @@ class BitmapFrontEnd
 	public function dumpCache():Void
 	{
 		#if !(flash || js)
-		var obj:FlxGraphics;
+		var obj:FlxGraphic;
 		
 		if (_cache != null)
 		{
@@ -101,7 +101,7 @@ class BitmapFrontEnd
 	public function undumpCache():Void
 	{
 		#if !(flash || js)
-		var obj:FlxGraphics;
+		var obj:FlxGraphic;
 		
 		if (_cache != null)
 		{
@@ -138,7 +138,7 @@ class BitmapFrontEnd
 	 * @param	Key		Force the cache to use a specific Key to index the bitmap.
 	 * @return	The BitmapData we just created.
 	 */
-	public function create(Width:Int, Height:Int, Color:Int, Unique:Bool = false, ?Key:String):FlxGraphics
+	public function create(Width:Int, Height:Int, Color:Int, Unique:Bool = false, ?Key:String):FlxGraphic
 	{
 		var key:String = Key;
 		if (key == null)
@@ -151,7 +151,7 @@ class BitmapFrontEnd
 		}
 		if (!checkCache(key))
 		{
-			_cache.set(key, new FlxGraphics(key, new BitmapData(Width, Height, true, Color)));
+			_cache.set(key, new FlxGraphic(key, new BitmapData(Width, Height, true, Color)));
 		}
 		
 		return _cache.get(key);
@@ -163,26 +163,26 @@ class BitmapFrontEnd
 	 * @param	Graphic		The image file that you want to load.
 	 * @param	Unique		Ensures that the bitmap data uses a new slot in the cache.
 	 * @param	Key			Force the cache to use a specific Key to index the bitmap.
-	 * @return	The FlxGraphics we just created.
+	 * @return	The FlxGraphic we just created.
 	 */
-	public function add(Graphic:Dynamic, Unique:Bool = false, ?Key:String):FlxGraphics
+	public function add(Graphic:Dynamic, Unique:Bool = false, ?Key:String):FlxGraphic
 	{
 		if (Graphic == null)
 		{
 			return null;
 		}
 		
-		var graphics:FlxGraphics = null;
+		var graphics:FlxGraphic = null;
 		var isClass:Bool = false;
 		var isBitmap:Bool = false;
 		var isGraphics:Bool = false;
 		var isFrameCollection:Bool = false;
 		var isFrame:Bool = false;
 		
-		if (Std.is(Graphic, FlxGraphics))
+		if (Std.is(Graphic, FlxGraphic))
 		{
 			isGraphics = true;	
-			graphics = cast(Graphic, FlxGraphics);
+			graphics = cast(Graphic, FlxGraphic);
 		}
 		else if (Std.is(Graphic, FlxFramesCollection))
 		{
@@ -275,7 +275,7 @@ class BitmapFrontEnd
 				bd = bd.clone();
 			}
 			
-			var graph:FlxGraphics = new FlxGraphics(key, bd);
+			var graph:FlxGraphic = new FlxGraphic(key, bd);
 			
 			if (isClass && !Unique)
 			{
@@ -293,11 +293,11 @@ class BitmapFrontEnd
 	}
 	
 	/**
-	 * Gets FlxGraphics object from this storage by specified key. 
-	 * @param	key	Key for FlxGraphics object (it's name)
-	 * @return	FlxGraphics with the key name, or null if there is no such object
+	 * Gets FlxGraphic object from this storage by specified key. 
+	 * @param	key	Key for FlxGraphic object (it's name)
+	 * @return	FlxGraphic with the key name, or null if there is no such object
 	 */
-	public function get(key:String):FlxGraphics
+	public function get(key:String):FlxGraphic
 	{
 		return _cache.get(key);
 	}
@@ -366,14 +366,14 @@ class BitmapFrontEnd
 	}
 	
 	/**
-	 * Totally removes FlxGraphics object with specified key.
-	 * @param	key	the key for cached FlxGraphics object.
+	 * Totally removes FlxGraphic object with specified key.
+	 * @param	key	the key for cached FlxGraphic object.
 	 */
 	public function remove(key:String):Void
 	{
 		if ((key != null) && _cache.exists(key))
 		{
-			var obj:FlxGraphics = _cache.get(key);
+			var obj:FlxGraphic = _cache.get(key);
 			#if !nme
 			Assets.cache.bitmapData.remove(key);
 			#end
@@ -388,7 +388,7 @@ class BitmapFrontEnd
 	 */
 	public function clearCache():Void
 	{
-		var obj:FlxGraphics;
+		var obj:FlxGraphic;
 		
 		if (_cache == null)
 		{
@@ -416,7 +416,7 @@ class BitmapFrontEnd
 	 */
 	public function clearUnused():Void
 	{
-		var obj:FlxGraphics;
+		var obj:FlxGraphic;
 		
 		if (_cache != null)
 		{

@@ -12,7 +12,7 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.interfaces.IFlxDestroyable;
 import flixel.system.FlxAssets;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 import flixel.text.FlxText.FlxTextFormat;
 import flixel.util.FlxArrayUtil;
 import flixel.util.FlxColor;
@@ -668,9 +668,9 @@ class FlxText extends FlxSprite
 		return _textField;
 	}
 	
-	override private function set_graphics(Value:FlxGraphics):FlxGraphics 
+	override private function set_graphics(Value:FlxGraphic):FlxGraphic 
 	{
-		var graph:FlxGraphics = super.set_graphics(Value);
+		var graph:FlxGraphic = super.set_graphics(Value);
 		
 		if (Value != null)
 			Value.destroyOnNoUse = true;

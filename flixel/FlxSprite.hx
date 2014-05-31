@@ -21,7 +21,7 @@ import flixel.util.FlxColorUtil;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxMath;
 import flixel.util.FlxPoint;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 import flixel.util.loaders.TexturePackerData;
 import flixel.util.loaders.TextureRegion;
 import openfl.display.Tilesheet;
@@ -85,7 +85,7 @@ class FlxSprite extends FlxObject
 	// TODO: remove this "region" property
 	public var region(default, null):Region;
 	public var frames(default, null):FlxFramesCollection;
-	public var graphics(default, set):FlxGraphics;
+	public var graphics(default, set):FlxGraphic;
 	/**
 	 * The minimum angle (out of 360°) for which a new baked rotation exists. Example: 90 means there 
 	 * are 4 baked rotations in the spritesheet. 0 if this sprite does not have any baked rotations.
@@ -517,7 +517,7 @@ class FlxSprite extends FlxObject
 	{
 		bakedRotationAngle = 0;
 		
-		if (Std.is(Data, FlxGraphics))
+		if (Std.is(Data, FlxGraphic))
 		{
 			graphics = cast Data;
 			if (graphics.data == null)
@@ -1529,9 +1529,9 @@ class FlxSprite extends FlxObject
 	 * Internal function for setting graphics property for this object. 
 	 * It changes graphics' useCount also for better memory tracking.
 	 */
-	private function set_graphics(Value:FlxGraphics):FlxGraphics
+	private function set_graphics(Value:FlxGraphic):FlxGraphic
 	{
-		var oldGraphics:FlxGraphics = graphics;
+		var oldGraphics:FlxGraphic = graphics;
 		
 		if ((graphics != Value) && (Value != null))
 		{

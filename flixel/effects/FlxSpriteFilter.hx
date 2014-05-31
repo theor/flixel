@@ -9,7 +9,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.system.layer.Region;
 import flixel.text.FlxText;
-import flixel.system.layer.FlxGraphics;
+import flixel.system.layer.FlxGraphic;
 import flixel.util.loaders.TextureRegion;
 
 /**
@@ -32,7 +32,7 @@ class FlxSpriteFilter
 	 * Stores a copy of pixels before any bitmap filter is applied, this is necessary for native targets where bitmap filters only show when applied 
 	 * directly to pixels, so a backup is needed to clear filters when removeFilter() is called or when filters are reapplied during calcFrame().
 	 */
-	public var backupGraphics:FlxGraphics;
+	public var backupGraphics:FlxGraphic;
 	
 	public var backupRegion:Region;
 	
@@ -138,7 +138,7 @@ class FlxSpriteFilter
 		sprite.x -= Std.int(widthInc / 2);
 		sprite.y -= Std.int(heightInc / 2);
 		
-		var graphics:FlxGraphics = FlxG.bitmap.add(pixels);
+		var graphics:FlxGraphic = FlxG.bitmap.add(pixels);
 		var textureReg:TextureRegion = new TextureRegion(graphics, 0, 0, width, height, 1, 1, pixels.width, pixels.height);
 		sprite.loadGraphic(textureReg, sprite.frames > 1, width, height);
 	}

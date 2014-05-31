@@ -7,7 +7,7 @@ import flixel.interfaces.IFlxDestroyable;
 import flixel.system.layer.TileSheetExt;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 
 /**
  * Base class for all frame collections
@@ -27,7 +27,7 @@ class FlxFramesCollection implements IFlxDestroyable
 	/**
 	 * Graphics object this frames belongs to.
 	 */
-	public var parent:FlxGraphics;
+	public var parent:FlxGraphic;
 	
 	/**
 	 * Type of this frame collection.
@@ -35,7 +35,7 @@ class FlxFramesCollection implements IFlxDestroyable
 	 */
 	public var type(default, null):FrameCollectionType;
 	
-	public function new(parent:FlxGraphics)
+	public function new(parent:FlxGraphic)
 	{
 		this.parent = parent;
 		frames = [];

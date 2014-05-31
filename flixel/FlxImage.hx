@@ -9,7 +9,7 @@ import flash.geom.Rectangle;
 import flixel.animation.FlxAnimationController;
 import flixel.FlxBasic;
 import flixel.FlxG;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 import flixel.system.layer.DrawStackItem;
 import flixel.system.layer.frames.FlxFrame;
 import flixel.system.layer.frames.FlxFramesCollection;
@@ -74,7 +74,7 @@ class FlxImage extends FlxObject
 	 */
 	public var region(default, null):Region;
 	public var frames(default, null):FlxFramesCollection;
-	public var graphics(default, set):FlxGraphics;
+	public var graphics(default, set):FlxGraphic;
 	/**
 	 * Set alpha to a number between 0 and 1 to change the opacity of the sprite.
 	 */
@@ -1289,9 +1289,9 @@ class FlxImage extends FlxObject
 	 * Internal function for setting graphics property for this object. 
 	 * It changes graphics' useCount also for better memory tracking.
 	 */
-	private function set_graphics(Value:FlxGraphics):FlxGraphics
+	private function set_graphics(Value:FlxGraphic):FlxGraphic
 	{
-		var oldGraphics:FlxGraphics = graphics;
+		var oldGraphics:FlxGraphic = graphics;
 		
 		if ((graphics != Value) && (Value != null))
 		{

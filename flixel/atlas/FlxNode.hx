@@ -2,7 +2,7 @@ package flixel.atlas;
 
 import flash.geom.Point;
 import flash.geom.Rectangle;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.ImageFrame;
 import flixel.graphics.frames.SpritesheetFrames;
 import flixel.interfaces.IFlxDestroyable;
@@ -127,7 +127,7 @@ class FlxNode implements IFlxDestroyable
 	 */
 	public function getSpritesheetFrames(frameSize:Point, frameSpacing:Point = null, region:Rectangle = null):SpritesheetFrames
 	{
-		var graphics:FlxGraphics = FlxG.bitmap.add(atlas.atlasBitmapData, false, atlas.name);
+		var graphics:FlxGraphic = FlxG.bitmap.add(atlas.atlasBitmapData, false, atlas.name);
 		
 		if (region == null)
 		{
@@ -143,7 +143,7 @@ class FlxNode implements IFlxDestroyable
 	 */
 	public function getImageFrame():ImageFrame
 	{
-		var graphics:FlxGraphics = FlxG.bitmap.add(atlas.atlasBitmapData, false, atlas.name);
+		var graphics:FlxGraphic = FlxG.bitmap.add(atlas.atlasBitmapData, false, atlas.name);
 		return ImageFrame.fromRectangle(graphics, contentRect);
 	}
 	

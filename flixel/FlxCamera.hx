@@ -16,7 +16,7 @@ import flixel.util.FlxPoint;
 import flixel.util.FlxPool.FlxPool;
 import flixel.util.FlxRandom;
 import flixel.util.FlxRect;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 import openfl.display.Tilesheet;
 
 /**
@@ -306,7 +306,7 @@ class FlxCamera extends FlxBasic
 	private static var _storageHead:DrawStackItem;
 	
 	@:noCompletion
-	public function getDrawStackItem(ObjGraphics:FlxGraphics, ObjColored:Bool, ObjBlending:Int, ObjAntialiasing:Bool = false):DrawStackItem
+	public function getDrawStackItem(ObjGraphics:FlxGraphic, ObjColored:Bool, ObjBlending:Int, ObjAntialiasing:Bool = false):DrawStackItem
 	{
 		var itemToReturn:DrawStackItem = null;
 		if (_currentStackItem.initialized == false)

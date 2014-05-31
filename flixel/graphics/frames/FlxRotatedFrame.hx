@@ -9,7 +9,7 @@ import flixel.util.FlxColor;
  */
 class FlxRotatedFrame extends FlxFrame
 {
-	public function new(parent:FlxGraphics) 
+	public function new(parent:FlxGraphic) 
 	{
 		super(parent);
 		

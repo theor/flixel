@@ -10,7 +10,7 @@ import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 
 /**
  * Base class for all frame types
@@ -27,7 +27,7 @@ class FlxFrame implements IFlxDestroyable
 	 */
 	public var frame:Rectangle;
 	
-	public var parent:FlxGraphics;
+	public var parent:FlxGraphic;
 	public var tileID:Int = -1;
 	/**
 	 * Rotation angle of this frame. 
@@ -59,7 +59,7 @@ class FlxFrame implements IFlxDestroyable
 	private var _vReversedBitmapData:BitmapData;
 	private var _hvReversedBitmapData:BitmapData;
 	
-	public function new(parent:FlxGraphics)
+	public function new(parent:FlxGraphic)
 	{
 		this.parent = parent;
 		additionalAngle = 0;

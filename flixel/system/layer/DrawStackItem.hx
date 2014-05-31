@@ -1,10 +1,10 @@
 package flixel.system.layer;
 
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 
 class DrawStackItem
 {
-	public var graphics:FlxGraphics;
+	public var graphics:FlxGraphic;
 	public var drawData:Array<Float>;
 	public var position:Int = 0;
 	public var next:DrawStackItem;

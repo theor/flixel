@@ -4,7 +4,7 @@ import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flixel.FlxG;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.AtlasFrames;
 import flixel.graphics.frames.SpritesheetFrames;
 import flixel.interfaces.IFlxDestroyable;
@@ -258,7 +258,7 @@ class FlxAtlas implements IFlxDestroyable
 	 */
 	public function getAtlasFrames():AtlasFrames
 	{
-		var graphics:FlxGraphics = FlxG.bitmap.add(this.atlasBitmapData, false, name);
+		var graphics:FlxGraphic = FlxG.bitmap.add(this.atlasBitmapData, false, name);
 		
 		var atlasFrames:AtlasFrames = null;
 		if (graphics.atlasFrames == null)
@@ -451,7 +451,7 @@ class FlxAtlas implements IFlxDestroyable
 		root = new FlxNode(new Rectangle(0, 0, rootWidth, rootHeight), this);
 		atlasBitmapData.fillRect(root.rect, FlxColor.TRANSPARENT);
 		
-		var graphics:FlxGraphics = FlxG.bitmap.get(name);
+		var graphics:FlxGraphic = FlxG.bitmap.get(name);
 		graphics.atlasFrames = FlxDestroyUtil.destroy(graphics.atlasFrames);
 		nodes = new Map<String, FlxNode>();
 	}

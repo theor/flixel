@@ -5,7 +5,7 @@ import flash.geom.Rectangle;
 import flixel.system.layer.TileSheetExt;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxPoint;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 
 /**
  * Single-frame collection.
@@ -22,7 +22,7 @@ class ImageFrame extends FlxFramesCollection
 	 */
 	public var frame:FlxFrame;
 	
-	private function new(parent:FlxGraphics) 
+	private function new(parent:FlxGraphic) 
 	{
 		super(parent);
 		type = FrameCollectionType.IMAGE;
@@ -35,7 +35,7 @@ class ImageFrame extends FlxFramesCollection
 	 */
 	public static function fromFrame(source:FlxFrame):ImageFrame
 	{
-		var graphics:FlxGraphics = source.parent;
+		var graphics:FlxGraphic = source.parent;
 		var rect:Rectangle = source.frame;
 		
 		for (imageFrame in graphics.imageFrames)
@@ -54,7 +54,7 @@ class ImageFrame extends FlxFramesCollection
 	
 	/**
 	 * Creates ImageFrame object for the whole image
-	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphics, FlxFrame or FlxFrameCollection
+	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphic, FlxFrame or FlxFrameCollection
 	 * @return	Newly created ImageFrame object for specified graphics
 	 */
 	public static function fromImage(source:Dynamic):ImageFrame
@@ -64,13 +64,13 @@ class ImageFrame extends FlxFramesCollection
 	
 	/**
 	 * Creates ImageFrame object for specified region of image
-	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphics, FlxFrame or FlxFrameCollection
+	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphic, FlxFrame or FlxFrameCollection
 	 * @param	region	region of image to create ImageFrame for
 	 * @return	Newly created ImageFrame object for specified region of image
 	 */
 	public static function fromRectangle(source:Dynamic, region:Rectangle = null):ImageFrame
 	{
-		var graphics:FlxGraphics = FlxGraphics.resolveSource(source);
+		var graphics:FlxGraphic = FlxGraphic.resolveSource(source);
 		// find ImageFrame, if there is one already
 		var imageFrame:ImageFrame = null;
 		

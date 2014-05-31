@@ -9,7 +9,7 @@ import flixel.graphics.frames.FrameCollectionType;
 import flixel.system.layer.TileSheetExt;
 import flixel.util.FlxBitmapUtil;
 import flixel.util.FlxPoint;
-import flixel.graphics.FlxGraphics;
+import flixel.graphics.FlxGraphic;
 
 /**
  * Spritesheet frame collection. It is used for tilemaps and animated sprites. 
@@ -39,7 +39,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	private var frameSpacing:Point;
 	
-	private function new(parent:FlxGraphics) 
+	private function new(parent:FlxGraphic) 
 	{
 		super(parent);
 		type = FrameCollectionType.SPRITESHEET;
@@ -49,7 +49,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	 * Gets source bitmapdata, generates new bitmapdata with spaces between frames (if there is no such bitmapdata in the cache already) 
 	 * and creates SpritesheetFrames collection
 	 * @param	source			the source of graphics for frame collection 
-	 * 							(can be String, Class<Dynamic>, BitmapData, FlxGraphics, FlxFrame or FlxFramesCollection)
+	 * 							(can be String, Class<Dynamic>, BitmapData, FlxGraphic, FlxFrame or FlxFramesCollection)
 	 * @param	frameSize		the size of tiles in spritesheet
 	 * @param	frameSpacing	desired offsets between frames in spritesheet
 	 * 							(this method takes spritesheet bitmap without offsets between frames and adds them).
@@ -59,13 +59,13 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	public static function fromBitmapWithSpacings(source:Dynamic, frameSize:Point, frameSpacing:Point, region:Rectangle = null):SpritesheetFrames
 	{
-		var graphics:FlxGraphics = FlxGraphics.resolveSource(source);
+		var graphics:FlxGraphic = FlxGraphic.resolveSource(source);
 		
 		if (graphics == null) return null;
 		
 		var key:String = FlxG.bitmap.getKeyWithSpacings(graphics.key, frameSize, frameSpacing, region);
 		
-		var result:FlxGraphics = FlxG.bitmap.get(key);
+		var result:FlxGraphic = FlxG.bitmap.get(key);
 		if (result == null)
 		{
 			var bitmap:BitmapData = FlxBitmapUtil.addSpacing(graphics.bitmap, frameSize, frameSpacing, region);
@@ -85,7 +85,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	public static function fromFrame(frame:FlxFrame, frameSize:Point, frameSpacing:Point = null):SpritesheetFrames
 	{
-		var graphics:FlxGraphics = frame.parent;
+		var graphics:FlxGraphic = frame.parent;
 		
 		// find SpritesheetFrames object, if there is one already
 		var spritesheetFrames:SpritesheetFrames = null;
@@ -221,7 +221,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	/**
 	 * Generates spritesheet frame collection from provided region of image.
 	 * @param	source			source graphics for spritesheet.
-	 * 							It can be BitmapData, Class<Dynamic>, String, FlxGraphics, FlxFrame or FlxFramesCollection
+	 * 							It can be BitmapData, Class<Dynamic>, String, FlxGraphic, FlxFrame or FlxFramesCollection
 	 * @param	frameSize		the size of tiles in spritesheet
 	 * @param	region			region of image to use for spritesheet generation. Default value is null,
 	 * 							which means that whole image will be used for it.
@@ -230,7 +230,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	public static function fromRectangle(source:Dynamic, frameSize:Point, region:Rectangle = null, frameSpacing:Point = null):SpritesheetFrames
 	{
-		var graphics:FlxGraphics = FlxGraphics.resolveSource(source);
+		var graphics:FlxGraphic = FlxGraphic.resolveSource(source);
 		
 		// find SpritesheetFrames object, if there is one already
 		var spritesheetFrames:SpritesheetFrames = null;
