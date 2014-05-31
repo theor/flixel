@@ -122,19 +122,19 @@ class FlxNode implements IFlxDestroyable
 	 * Generates SpritesheetFrames object for this node
 	 * @param	frameSize		The size of tile in spritesheet
 	 * @param	frameSpacing	Offsets between tiles in spritesheet
-	 * @param	region			Region of node to use as a source of graphics. Default value is null, which means that the whole node will be used for it.
+	 * @param	region			Region of node to use as a source of graphic. Default value is null, which means that the whole node will be used for it.
 	 * @return	Created SpritesheetFrames object for this node
 	 */
 	public function getSpritesheetFrames(frameSize:Point, frameSpacing:Point = null, region:Rectangle = null):SpritesheetFrames
 	{
-		var graphics:FlxGraphic = FlxG.bitmap.add(atlas.atlasBitmapData, false, atlas.name);
+		var graphic:FlxGraphic = FlxG.bitmap.add(atlas.atlasBitmapData, false, atlas.name);
 		
 		if (region == null)
 		{
 			region = contentRect;
 		}
 		
-		return SpritesheetFrames.fromRectangle(graphics, frameSize, region, frameSpacing);
+		return SpritesheetFrames.fromRectangle(graphic, frameSize, region, frameSpacing);
 	}
 	
 	/**
@@ -143,8 +143,8 @@ class FlxNode implements IFlxDestroyable
 	 */
 	public function getImageFrame():ImageFrame
 	{
-		var graphics:FlxGraphic = FlxG.bitmap.add(atlas.atlasBitmapData, false, atlas.name);
-		return ImageFrame.fromRectangle(graphics, contentRect);
+		var graphic:FlxGraphic = FlxG.bitmap.add(atlas.atlasBitmapData, false, atlas.name);
+		return ImageFrame.fromRectangle(graphic, contentRect);
 	}
 	
 	private inline function get_isEmpty():Bool

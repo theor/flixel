@@ -104,7 +104,7 @@ class FlxTilemap extends FlxObject
 	// TODO: remove this "region" property
 	public var region(default, null):Region;
 	public var frames(default, null):FlxFramesCollection;
-	public var graphics(default, set):FlxGraphic;
+	public var graphic(default, set):FlxGraphic;
 	
 	/**
 	 * If these next two arrays are not null, you're telling FlxTilemap to 
@@ -279,7 +279,7 @@ class FlxTilemap extends FlxObject
 		#end
 		
 		frames = null;
-		graphics = null;
+		graphic = null;
 		region = null;
 		
 		// need to destroy FlxCallbackPoints
@@ -437,12 +437,12 @@ class FlxTilemap extends FlxObject
 		}
 		
 		// Figure out the size of the tiles
-		graphics = FlxG.bitmap.add(TileGraphic);
+		graphic = FlxG.bitmap.add(TileGraphic);
 		_tileWidth = TileWidth;
 		
 		if (_tileWidth <= 0)
 		{
-			_tileWidth = graphics.bitmap.height;
+			_tileWidth = graphic.bitmap.height;
 		}
 		
 		_tileHeight = TileHeight;
@@ -455,8 +455,8 @@ class FlxTilemap extends FlxObject
 		if (!Std.is(TileGraphic, TextureRegion))
 		{
 			region = new Region(0, 0, _tileWidth, _tileHeight);
-			region.width = Std.int(graphics.bitmap.width / _tileWidth) * _tileWidth;
-			region.height = Std.int(graphics.bitmap.height / _tileHeight) * _tileHeight;
+			region.width = Std.int(graphic.bitmap.width / _tileWidth) * _tileWidth;
+			region.height = Std.int(graphic.bitmap.height / _tileHeight) * _tileHeight;
 		}
 		else
 		{
@@ -1425,9 +1425,9 @@ class FlxTilemap extends FlxObject
 	 */
 	public function updateFrameData():Void
 	{
-		if (graphics != null && _tileWidth >= 1 && _tileHeight >= 1)
+		if (graphic != null && _tileWidth >= 1 && _tileHeight >= 1)
 		{
-			frames = graphics.tilesheet.getSpriteSheetFrames(region, new Point(0, 0));
+			frames = graphic.tilesheet.getSpriteSheetFrames(region, new Point(0, 0));
 			#if FLX_RENDER_TILE
 			_rectIDs = new Array<Int>();
 			FlxArrayUtil.setLength(_rectIDs, totalTiles);
@@ -1492,7 +1492,7 @@ class FlxTilemap extends FlxObject
 		
 		if (rect != null) 
 		{
-			tileSprite.pixels.copyPixels(graphics.bitmap, rect, pt);
+			tileSprite.pixels.copyPixels(graphic.bitmap, rect, pt);
 		}
 		
 		tileSprite.dirty = true;
@@ -1551,7 +1551,7 @@ class FlxTilemap extends FlxObject
 		var hackScaleX:Float = tileScaleHack * scale.x;
 		var hackScaleY:Float = tileScaleHack * scale.y;
 		
-		var drawItem:DrawStackItem = Camera.getDrawStackItem(graphics, false, 0);
+		var drawItem:DrawStackItem = Camera.getDrawStackItem(graphic, false, 0);
 		var currDrawData:Array<Float> = drawItem.drawData;
 		var currIndex:Int = drawItem.position;
 	#end
@@ -1607,7 +1607,7 @@ class FlxTilemap extends FlxObject
 				
 				if (_flashRect != null)
 				{
-					Buffer.pixels.copyPixels(graphics.bitmap, _flashRect, _flashPoint, null, null, true);
+					Buffer.pixels.copyPixels(graphic.bitmap, _flashRect, _flashPoint, null, null, true);
 					
 					#if !FLX_NO_DEBUG
 					if (FlxG.debugger.drawDebug && !ignoreDrawDebug) 
@@ -2196,24 +2196,24 @@ class FlxTilemap extends FlxObject
 	}
 	
 	/**
-	 * Internal function for setting graphics property for this object. 
+	 * Internal function for setting graphic property for this object. 
 	 * It changes graphics' useCount also for better memory tracking.
 	 */
-	private function set_graphics(Value:FlxGraphic):FlxGraphic
+	private function set_graphic(Value:FlxGraphic):FlxGraphic
 	{
-		var oldGraphics:FlxGraphic = graphics;
+		var oldGraphic:FlxGraphic = graphic;
 		
-		if ((graphics != Value) && (Value != null))
+		if ((graphic != Value) && (Value != null))
 		{
 			Value.useCount++;
 		}
 		
-		if ((oldGraphics != null) && (oldGraphics != Value))
+		if ((oldGraphic != null) && (oldGraphic != Value))
 		{
-			oldGraphics.useCount--;
+			oldGraphic.useCount--;
 		}
 		
-		return graphics = Value;
+		return graphic = Value;
 	}
 	
 	override private function set_pixelPerfectRender(Value:Bool):Bool 

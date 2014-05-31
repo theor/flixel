@@ -32,7 +32,7 @@ class FlxSpriteFilter
 	 * Stores a copy of pixels before any bitmap filter is applied, this is necessary for native targets where bitmap filters only show when applied 
 	 * directly to pixels, so a backup is needed to clear filters when removeFilter() is called or when filters are reapplied during calcFrame().
 	 */
-	public var backupGraphics:FlxGraphic;
+	public var backupGraphic:FlxGraphic;
 	
 	public var backupRegion:Region;
 	
@@ -67,12 +67,12 @@ class FlxSpriteFilter
 		}
 		
 		sprite = Sprite;
-		backupGraphics = sprite.graphics;
+		backupGraphic = sprite.graphic;
 		backupRegion = sprite.region;
 		
 		filters = [];
 		
-		if (backupGraphics.data != null && (backupRegion.tileWidth == 0 && backupRegion.tileHeight == 0))
+		if (backupGraphic.data != null && (backupRegion.tileWidth == 0 && backupRegion.tileHeight == 0))
 		{
 			throw "FlxSprites with full atlas animation aren't supported";
 		}
@@ -106,7 +106,7 @@ class FlxSpriteFilter
 	{
 		filters = null;
 		sprite = null;
-		backupGraphics = null;
+		backupGraphic = null;
 		backupRegion = null;
 		pixels = null;
 	}
@@ -138,8 +138,8 @@ class FlxSpriteFilter
 		sprite.x -= Std.int(widthInc / 2);
 		sprite.y -= Std.int(heightInc / 2);
 		
-		var graphics:FlxGraphic = FlxG.bitmap.add(pixels);
-		var textureReg:TextureRegion = new TextureRegion(graphics, 0, 0, width, height, 1, 1, pixels.width, pixels.height);
+		var graphic:FlxGraphic = FlxG.bitmap.add(pixels);
+		var textureReg:TextureRegion = new TextureRegion(graphic, 0, 0, width, height, 1, 1, pixels.width, pixels.height);
 		sprite.loadGraphic(textureReg, sprite.frames > 1, width, height);
 	}
 	
@@ -170,14 +170,14 @@ class FlxSpriteFilter
 				helperRect.y = j * (backupRegion.tileHeight + backupRegion.spacingY);
 				helperPoint.y = j * (height + 1) + frameOffsetY;
 				
-				pixels.copyPixels(backupGraphics.bitmap, helperRect, helperPoint);
+				pixels.copyPixels(backupGraphic.bitmap, helperRect, helperPoint);
 			}
 		}
 		pixels.unlock();
 	}
 	
 	/**
-	 * Adds a filter to this sprite, the sprite becomes unique and won't share its graphics with other sprites.
+	 * Adds a filter to this sprite, the sprite becomes unique and won't share its graphic with other sprites.
 	 * Note that for effects like outer glow, or drop shadow, updating the sprite clipping
 	 * area may be required, use widthInc or heightInc to increase the sprite area.
 	 * 
@@ -233,7 +233,7 @@ class FlxSpriteFilter
 	
 	/**
 	 * Removes all filters from the sprite, additionally you may call loadGraphic() after removing
-	 * the filters to reuse cached graphics/bitmaps and stop this sprite from being unique.
+	 * the filters to reuse cached graphic/bitmaps and stop this sprite from being unique.
 	 */
 	public function removeAllFilters(regenPixels:Bool = true):Void
 	{

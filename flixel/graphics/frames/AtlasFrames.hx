@@ -33,15 +33,15 @@ class AtlasFrames extends FlxFramesCollection
 	 */
 	public static function texturePackerJSON(Source:Dynamic, Description:String):AtlasFrames
 	{
-		var graphics:FlxGraphic = FlxGraphic.resolveSource(Source);
+		var graphic:FlxGraphic = FlxGraphic.resolveSource(Source);
 		
 		// No need to parse data again
-		if (graphics.atlasFrames != null)
-			return graphics.atlasFrames;
+		if (graphic.atlasFrames != null)
+			return graphic.atlasFrames;
 		
-		if ((graphics == null) || (Description == null)) return null;
+		if ((graphic == null) || (Description == null)) return null;
 		
-		var frames:AtlasFrames = new AtlasFrames(graphics);
+		var frames:AtlasFrames = new AtlasFrames(graphic);
 		var data:Dynamic = Json.parse(Description);
 		
 		for (frame in Lambda.array(data.frames))
@@ -66,7 +66,7 @@ class AtlasFrames extends FlxFramesCollection
 			frames.addAtlasFrame(frameRect, sourceSize, offset, name, angle);
 		}
 		
-		graphics.atlasFrames = frames;
+		graphic.atlasFrames = frames;
 		return frames;
 	}
 	
@@ -78,15 +78,15 @@ class AtlasFrames extends FlxFramesCollection
 	 */
 	public static function libGDX(Source:Dynamic, Description:String):AtlasFrames
 	{
-		var graphics:FlxGraphic = FlxGraphic.resolveSource(Source);
+		var graphic:FlxGraphic = FlxGraphic.resolveSource(Source);
 		
 		// No need to parse data again
-		if (graphics.atlasFrames != null)
-			return graphics.atlasFrames;
+		if (graphic.atlasFrames != null)
+			return graphic.atlasFrames;
 		
-		if ((graphics == null) || (Description == null)) return null;
+		if ((graphic == null) || (Description == null)) return null;
 		
-		var frames:AtlasFrames = new AtlasFrames(graphics);
+		var frames:AtlasFrames = new AtlasFrames(graphic);
 		
 		var pack:String = StringTools.trim(Description);
 		var lines:Array<String> = pack.split("\n");
@@ -148,7 +148,7 @@ class AtlasFrames extends FlxFramesCollection
 			frames.addAtlasFrame(rect, sourceSize, offset, name, angle);
 		}
 		
-		graphics.atlasFrames = frames;
+		graphic.atlasFrames = frames;
 		return frames;
 	}
 	
@@ -174,15 +174,15 @@ class AtlasFrames extends FlxFramesCollection
 	 */
 	public static function sparrow(Source:Dynamic, Description:String):AtlasFrames
 	{
-		var graphics:FlxGraphic = FlxGraphic.resolveSource(Source);
+		var graphic:FlxGraphic = FlxGraphic.resolveSource(Source);
 		
 		// No need to parse data again
-		if (graphics.atlasFrames != null)
-			return graphics.atlasFrames;
+		if (graphic.atlasFrames != null)
+			return graphic.atlasFrames;
 		
-		if ((graphics == null) || (Description == null)) return null;
+		if ((graphic == null) || (Description == null)) return null;
 		
-		var frames:AtlasFrames = new AtlasFrames(graphics);
+		var frames:AtlasFrames = new AtlasFrames(graphic);
 		
 		var data:Fast = new haxe.xml.Fast(Xml.parse(Description).firstElement());
 		
@@ -209,7 +209,7 @@ class AtlasFrames extends FlxFramesCollection
 			frames.addAtlasFrame(rect, sourceSize, offset, name, angle);
 		}
 		
-		graphics.atlasFrames = frames;
+		graphic.atlasFrames = frames;
 		return frames;
 	}
 	
@@ -222,15 +222,15 @@ class AtlasFrames extends FlxFramesCollection
 	 */
 	public static function texturePackerXML(Source:Dynamic, Description:String):AtlasFrames
 	{
-		var graphics:FlxGraphic = FlxGraphic.resolveSource(Source);
+		var graphic:FlxGraphic = FlxGraphic.resolveSource(Source);
 		
 		// No need to parse data again
-		if (graphics.atlasFrames != null)
-			return graphics.atlasFrames;
+		if (graphic.atlasFrames != null)
+			return graphic.atlasFrames;
 		
-		if ((graphics == null) || (Description == null)) return null;
+		if ((graphic == null) || (Description == null)) return null;
 		
-		var frames:AtlasFrames = new AtlasFrames(graphics);
+		var frames:AtlasFrames = new AtlasFrames(graphic);
 		
 		var xml = Xml.parse(Description);
 		var root = xml.firstElement();
@@ -255,7 +255,7 @@ class AtlasFrames extends FlxFramesCollection
 			frames.addAtlasFrame(rect, sourceSize, offset, name, angle);
 		}
 		
-		graphics.atlasFrames = frames;
+		graphic.atlasFrames = frames;
 		return frames;
 	}
 }

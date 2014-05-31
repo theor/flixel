@@ -40,9 +40,9 @@ class BitmapFrontEnd
 		if (_whitePixel == null)
 		{
 			var bd:BitmapData = new BitmapData(2, 2, true, FlxColor.WHITE);
-			var graphics:FlxGraphic = new FlxGraphic("whitePixel", bd, true);
-			graphics.persist = true;
-			_whitePixel = ImageFrame.fromRectangle(graphics, new Rectangle(0, 0, 2, 2)).frame;
+			var graphic:FlxGraphic = new FlxGraphic("whitePixel", bd, true);
+			graphic.persist = true;
+			_whitePixel = ImageFrame.fromRectangle(graphic, new Rectangle(0, 0, 2, 2)).frame;
 			// TODO: make changes to classes which use _whitePixel (FlxBitmapTextField)
 			// _whitePixel.tilesheet.addTileRect(new Rectangle(0, 0, 1, 1), new Point(0, 0));
 		}
@@ -172,27 +172,27 @@ class BitmapFrontEnd
 			return null;
 		}
 		
-		var graphics:FlxGraphic = null;
+		var graphic:FlxGraphic = null;
 		var isClass:Bool = false;
 		var isBitmap:Bool = false;
-		var isGraphics:Bool = false;
+		var isGraphic:Bool = false;
 		var isFrameCollection:Bool = false;
 		var isFrame:Bool = false;
 		
 		if (Std.is(Graphic, FlxGraphic))
 		{
-			isGraphics = true;	
-			graphics = cast(Graphic, FlxGraphic);
+			isGraphic = true;	
+			graphic = cast(Graphic, FlxGraphic);
 		}
 		else if (Std.is(Graphic, FlxFramesCollection))
 		{
 			isFrameCollection = true;
-			graphics = cast(Graphic, FlxFramesCollection).parent;
+			graphic = cast(Graphic, FlxFramesCollection).parent;
 		}
 		else if (Std.is(Graphic, FlxFrame))
 		{
 			isFrameCollection = true;
-			graphics = cast(Graphic, FlxFrame).parent;
+			graphic = cast(Graphic, FlxFrame).parent;
 		}
 		else if (Std.is(Graphic, Class))
 		{
@@ -211,9 +211,9 @@ class BitmapFrontEnd
 			return null;
 		}
 		
-		if (graphics != null && !Unique)
+		if (graphic != null && !Unique)
 		{
-			return graphics;
+			return graphic;
 		}
 		
 		var key:String = Key;
@@ -234,9 +234,9 @@ class BitmapFrontEnd
 					}
 				}
 			}
-			else if (isGraphics || isFrameCollection || isFrame)
+			else if (isGraphic || isFrameCollection || isFrame)
 			{
-				key = graphics.key; 
+				key = graphic.key; 
 			}
 			else // Graphic is String
 			{
@@ -261,9 +261,9 @@ class BitmapFrontEnd
 			{
 				bd = cast Graphic;
 			}
-			else if (isGraphics || isFrameCollection || isFrame)
+			else if (isGraphic || isFrameCollection || isFrame)
 			{
-				bd = graphics.bitmap;
+				bd = graphic.bitmap;
 			}
 			else	// Graphic is String
 			{

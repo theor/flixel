@@ -48,7 +48,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	/**
 	 * Gets source bitmapdata, generates new bitmapdata with spaces between frames (if there is no such bitmapdata in the cache already) 
 	 * and creates SpritesheetFrames collection
-	 * @param	source			the source of graphics for frame collection 
+	 * @param	source			the source of graphic for frame collection 
 	 * 							(can be String, Class<Dynamic>, BitmapData, FlxGraphic, FlxFrame or FlxFramesCollection)
 	 * @param	frameSize		the size of tiles in spritesheet
 	 * @param	frameSpacing	desired offsets between frames in spritesheet
@@ -59,16 +59,16 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	public static function fromBitmapWithSpacings(source:Dynamic, frameSize:Point, frameSpacing:Point, region:Rectangle = null):SpritesheetFrames
 	{
-		var graphics:FlxGraphic = FlxGraphic.resolveSource(source);
+		var graphic:FlxGraphic = FlxGraphic.resolveSource(source);
 		
-		if (graphics == null) return null;
+		if (graphic == null) return null;
 		
-		var key:String = FlxG.bitmap.getKeyWithSpacings(graphics.key, frameSize, frameSpacing, region);
+		var key:String = FlxG.bitmap.getKeyWithSpacings(graphic.key, frameSize, frameSpacing, region);
 		
 		var result:FlxGraphic = FlxG.bitmap.get(key);
 		if (result == null)
 		{
-			var bitmap:BitmapData = FlxBitmapUtil.addSpacing(graphics.bitmap, frameSize, frameSpacing, region);
+			var bitmap:BitmapData = FlxBitmapUtil.addSpacing(graphic.bitmap, frameSize, frameSpacing, region);
 			result = FlxG.bitmap.add(bitmap, false, key);
 		}
 		
@@ -85,12 +85,12 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	public static function fromFrame(frame:FlxFrame, frameSize:Point, frameSpacing:Point = null):SpritesheetFrames
 	{
-		var graphics:FlxGraphic = frame.parent;
+		var graphic:FlxGraphic = frame.parent;
 		
 		// find SpritesheetFrames object, if there is one already
 		var spritesheetFrames:SpritesheetFrames = null;
 		
-		for (sheet in graphics.spritesheetFrames)
+		for (sheet in graphic.spritesheetFrames)
 		{
 			if (sheet.equals(frameSize, null, frame, frameSpacing))
 			{
@@ -99,7 +99,7 @@ class SpritesheetFrames extends FlxFramesCollection
 		}
 		
 		// or create it, if there is no such object
-		spritesheetFrames = new SpritesheetFrames(graphics);
+		spritesheetFrames = new SpritesheetFrames(graphic);
 		
 		if (frameSpacing == null)
 		{
@@ -212,7 +212,7 @@ class SpritesheetFrames extends FlxFramesCollection
 			}
 		}
 		
-		graphics.spritesheetFrames.push(spritesheetFrames);
+		graphic.spritesheetFrames.push(spritesheetFrames);
 		return spritesheetFrames;
 	}
 	
@@ -220,7 +220,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	
 	/**
 	 * Generates spritesheet frame collection from provided region of image.
-	 * @param	source			source graphics for spritesheet.
+	 * @param	source			source graphic for spritesheet.
 	 * 							It can be BitmapData, Class<Dynamic>, String, FlxGraphic, FlxFrame or FlxFramesCollection
 	 * @param	frameSize		the size of tiles in spritesheet
 	 * @param	region			region of image to use for spritesheet generation. Default value is null,
@@ -230,12 +230,12 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	public static function fromRectangle(source:Dynamic, frameSize:Point, region:Rectangle = null, frameSpacing:Point = null):SpritesheetFrames
 	{
-		var graphics:FlxGraphic = FlxGraphic.resolveSource(source);
+		var graphic:FlxGraphic = FlxGraphic.resolveSource(source);
 		
 		// find SpritesheetFrames object, if there is one already
 		var spritesheetFrames:SpritesheetFrames = null;
 		
-		for (sheet in graphics.spritesheetFrames)
+		for (sheet in graphic.spritesheetFrames)
 		{
 			if (sheet.equals(frameSize, region, null, frameSpacing))
 			{
@@ -244,22 +244,22 @@ class SpritesheetFrames extends FlxFramesCollection
 		}
 		
 		// or create it, if there is no such object
-		spritesheetFrames = new SpritesheetFrames(graphics);
+		spritesheetFrames = new SpritesheetFrames(graphic);
 		
 		if (region == null)
 		{
-			region = graphics.bitmap.rect;
+			region = graphic.bitmap.rect;
 		}
 		else
 		{
 			if (region.width == 0)
 			{
-				region.width = graphics.width - region.x;
+				region.width = graphic.width - region.x;
 			}
 			
 			if (region.height == 0)
 			{
-				region.height = graphics.height - region.y;
+				region.height = graphic.height - region.y;
 			}
 		}
 		
@@ -311,7 +311,7 @@ class SpritesheetFrames extends FlxFramesCollection
 			}
 		}
 		
-		graphics.spritesheetFrames.push(spritesheetFrames);
+		graphic.spritesheetFrames.push(spritesheetFrames);
 		return spritesheetFrames;
 	}
 	

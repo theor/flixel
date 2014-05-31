@@ -25,7 +25,7 @@ class FlxFramesCollection implements IFlxDestroyable
 	public var framesHash:Map<String, FlxFrame>;
 	
 	/**
-	 * Graphics object this frames belongs to.
+	 * Graphic object this frames belongs to.
 	 */
 	public var parent:FlxGraphic;
 	

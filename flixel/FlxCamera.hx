@@ -306,19 +306,19 @@ class FlxCamera extends FlxBasic
 	private static var _storageHead:DrawStackItem;
 	
 	@:noCompletion
-	public function getDrawStackItem(ObjGraphics:FlxGraphic, ObjColored:Bool, ObjBlending:Int, ObjAntialiasing:Bool = false):DrawStackItem
+	public function getDrawStackItem(ObjGraphic:FlxGraphic, ObjColored:Bool, ObjBlending:Int, ObjAntialiasing:Bool = false):DrawStackItem
 	{
 		var itemToReturn:DrawStackItem = null;
 		if (_currentStackItem.initialized == false)
 		{
 			_headOfDrawStack = _currentStackItem;
-			_currentStackItem.graphics = ObjGraphics;
+			_currentStackItem.graphic = ObjGraphic;
 			_currentStackItem.antialiasing = ObjAntialiasing;
 			_currentStackItem.colored = ObjColored;
 			_currentStackItem.blending = ObjBlending;
 			itemToReturn = _currentStackItem;
 		}
-		else if (_currentStackItem.graphics == ObjGraphics 
+		else if (_currentStackItem.graphic == ObjGraphic 
 			&& _currentStackItem.colored == ObjColored 
 			&& _currentStackItem.blending == ObjBlending 
 			&& _currentStackItem.antialiasing == ObjAntialiasing)
@@ -341,7 +341,7 @@ class FlxCamera extends FlxBasic
 				newItem = new DrawStackItem();
 			}
 			
-			newItem.graphics = ObjGraphics;
+			newItem.graphic = ObjGraphic;
 			newItem.antialiasing = ObjAntialiasing;
 			newItem.colored = ObjColored;
 			newItem.blending = ObjBlending;
@@ -398,7 +398,7 @@ class FlxCamera extends FlxBasic
 					tempFlags |= Tilesheet.TILE_RGB;
 				}
 				tempFlags |= currItem.blending;
-				currItem.graphics.tilesheet.drawTiles(canvas.graphics, data, (antialiasing || currItem.antialiasing), tempFlags, position);
+				currItem.graphic.tilesheet.drawTiles(canvas.graphics, data, (antialiasing || currItem.antialiasing), tempFlags, position);
 				TileSheetExt._DRAWCALLS++;
 			}
 			currItem = currItem.next;
@@ -999,7 +999,7 @@ class FlxCamera extends FlxBasic
 		{
 			if (width != buffer.width || height != buffer.height)
 			{
-				FlxG.bitmap.remove(screen.graphics.key);
+				FlxG.bitmap.remove(screen.graphic.key);
 				buffer = new BitmapData(width, height, true, 0);
 				screen.pixels = buffer;
 				screen.origin.set();

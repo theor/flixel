@@ -116,7 +116,7 @@ class FlxBar extends FlxSprite
 	
 	private var _framesPosition:String;
 	
-	private var _frontGraphics:FlxGraphic;
+	private var _frontGraphic:FlxGraphic;
 	private var _frontRegion:Region;
 	#end
 	
@@ -467,15 +467,15 @@ class FlxBar extends FlxSprite
 		filledBarRect = new Rectangle(0, 0, filledBar.width, filledBar.height);
 		emptyBarRect = new Rectangle(0, 0, emptyBar.width, emptyBar.height);
 		#else
-		setGraphics(FlxG.bitmap.get(emptyKey));
-		setFrontGraphics(FlxG.bitmap.get(filledKey));
+		setGraphic(FlxG.bitmap.get(emptyKey));
+		setFrontGraphic(FlxG.bitmap.get(filledKey));
 		
 		region = new Region();
-		region.width = graphics.bitmap.width;
-		region.height = graphics.bitmap.height;
+		region.width = graphic.bitmap.width;
+		region.height = graphic.bitmap.height;
 		_frontRegion = new Region();
-		_frontRegion.width = _frontGraphics.bitmap.width;
-		_frontRegion.height = _frontGraphics.bitmap.height;
+		_frontRegion.width = _frontGraphic.bitmap.width;
+		_frontRegion.height = _frontGraphic.bitmap.height;
 		updateFrameData();
 		#end
 	}
@@ -586,15 +586,15 @@ class FlxBar extends FlxSprite
 		emptyBarRect = new Rectangle(0, 0, emptyBar.width, emptyBar.height);
 		filledBarRect = new Rectangle(0, 0, filledBar.width, filledBar.height);
 		#else
-		setGraphics(FlxG.bitmap.get(emptyKey));
-		setFrontGraphics(FlxG.bitmap.get(filledKey));
+		setGraphic(FlxG.bitmap.get(emptyKey));
+		setFrontGraphic(FlxG.bitmap.get(filledKey));
 		
 		region = new Region();
-		region.width = graphics.bitmap.width;
-		region.height = graphics.bitmap.height;
+		region.width = graphic.bitmap.width;
+		region.height = graphic.bitmap.height;
 		_frontRegion = new Region();
-		_frontRegion.width = _frontGraphics.bitmap.width;
-		_frontRegion.height = _frontGraphics.bitmap.height;
+		_frontRegion.width = _frontGraphic.bitmap.width;
+		_frontRegion.height = _frontGraphic.bitmap.height;
 		updateFrameData();
 		#end
 	}
@@ -611,11 +611,11 @@ class FlxBar extends FlxSprite
 	 */
 	public function createImageBar(empty:Dynamic = null, fill:Dynamic = null, emptyBackground:Int = 0xff000000, fillBackground:Int = 0xff00ff00):Void
 	{
-		var emptyGraphics:FlxGraphic = FlxG.bitmap.add(empty);
-		var filledGraphics:FlxGraphic = FlxG.bitmap.add(fill);
+		var emptyGraphic:FlxGraphic = FlxG.bitmap.add(empty);
+		var filledGraphic:FlxGraphic = FlxG.bitmap.add(fill);
 		
-		var emptyBitmapData:BitmapData = (emptyGraphics != null) ? emptyGraphics.bitmap : null; 
-		var fillBitmapData:BitmapData = (filledGraphics != null) ? filledGraphics.bitmap : null;
+		var emptyBitmapData:BitmapData = (emptyGraphic != null) ? emptyGraphic.bitmap : null; 
+		var fillBitmapData:BitmapData = (filledGraphic != null) ? filledGraphic.bitmap : null;
 		
 	#if FLX_RENDER_TILE
 		var emptyKey:String = "";
@@ -775,15 +775,15 @@ class FlxBar extends FlxSprite
 		#if FLX_RENDER_BLIT
 		canvas = new BitmapData(barWidth, barHeight, true, 0x0);
 		#else
-		setGraphics(FlxG.bitmap.get(emptyKey));
-		setFrontGraphics(FlxG.bitmap.get(filledKey));
+		setGraphic(FlxG.bitmap.get(emptyKey));
+		setFrontGraphic(FlxG.bitmap.get(filledKey));
 		
 		region = new Region();
-		region.width = graphics.bitmap.width;
-		region.height = graphics.bitmap.height;
+		region.width = graphic.bitmap.width;
+		region.height = graphic.bitmap.height;
 		_frontRegion = new Region();
-		_frontRegion.width = _frontGraphics.bitmap.width;
-		_frontRegion.height = _frontGraphics.bitmap.height;
+		_frontRegion.width = _frontGraphic.bitmap.width;
+		_frontRegion.height = _frontGraphic.bitmap.height;
 		updateFrameData();
 		#end
 		
@@ -995,7 +995,7 @@ class FlxBar extends FlxSprite
 	#if FLX_RENDER_TILE
 	override public function draw():Void 
 	{
-		if (_frontGraphics == null || graphics == null)
+		if (_frontGraphic == null || graphic == null)
 		{
 			return;
 		}
@@ -1012,7 +1012,7 @@ class FlxBar extends FlxSprite
 			{
 				continue;
 			}
-			drawItem = camera.getDrawStackItem(graphics, isColored, _blendInt, antialiasing);
+			drawItem = camera.getDrawStackItem(graphic, isColored, _blendInt, antialiasing);
 			
 			currDrawData = drawItem.drawData;
 			currIndex = drawItem.position;
@@ -1072,7 +1072,7 @@ class FlxBar extends FlxSprite
 			drawItem.position = currIndex;
 			
 			// Draw filled bar
-			drawItem = camera.getDrawStackItem(_frontGraphics, isColored, _blendInt, antialiasing);
+			drawItem = camera.getDrawStackItem(_frontGraphic, isColored, _blendInt, antialiasing);
 			
 			currDrawData = drawItem.drawData;
 			currIndex = drawItem.position;
@@ -1135,7 +1135,7 @@ class FlxBar extends FlxSprite
 	override public function updateFrameData():Void 
 	{
 	#if FLX_RENDER_TILE
-		if (graphics == null || _frontGraphics == null)
+		if (graphic == null || _frontGraphic == null)
 		{
 			return;
 		}
@@ -1143,7 +1143,7 @@ class FlxBar extends FlxSprite
 		_halfWidth = 0.5 * barWidth;
 		_halfHeight = 0.5 * barHeight;
 		
-		_emptyBarFrameID = graphics.tilesheet.addTileRect(new Rectangle(0, 0, barWidth, barHeight), new Point(0.5 * barWidth, 0.5 * barHeight));
+		_emptyBarFrameID = graphic.tilesheet.addTileRect(new Rectangle(0, 0, barWidth, barHeight), new Point(0.5 * barWidth, 0.5 * barHeight));
 		_filledBarFrames = [];
 		
 		var frameRelativePosition:Float;
@@ -1220,28 +1220,28 @@ class FlxBar extends FlxSprite
 				_filledBarFrames.push(0);
 			}
 			
-			_filledBarFrames.push(_frontGraphics.tilesheet.addTileRect(new Rectangle(frameX, frameY, frameWidth, frameHeight), new Point(0.5 * frameWidth, 0.5 * frameHeight)));
+			_filledBarFrames.push(_frontGraphic.tilesheet.addTileRect(new Rectangle(frameX, frameY, frameWidth, frameHeight), new Point(0.5 * frameWidth, 0.5 * frameHeight)));
 		}
 	#end
 	}
 	
 	#if FLX_RENDER_TILE
-	private inline function setGraphics(value:FlxGraphic):Void
+	private inline function setGraphic(value:FlxGraphic):Void
 	{
-		graphics = value;
+		graphic = value;
 	}
-	private function setFrontGraphics(value:FlxGraphic):Void
+	private function setFrontGraphic(value:FlxGraphic):Void
 	{
-		if (_frontGraphics != null && _frontGraphics != value)
+		if (_frontGraphic != null && _frontGraphic != value)
 		{
-			_frontGraphics.useCount--;
+			_frontGraphic.useCount--;
 		}
 		
-		if (_frontGraphics != value && value != null)
+		if (_frontGraphic != value && value != null)
 		{
 			value.useCount++;
 		}
-		_frontGraphics = value;
+		_frontGraphic = value;
 	}
 	#end
 	

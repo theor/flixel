@@ -4,7 +4,7 @@ import flixel.graphics.FlxGraphic;
 
 class DrawStackItem
 {
-	public var graphics:FlxGraphic;
+	public var graphic:FlxGraphic;
 	public var drawData:Array<Float>;
 	public var position:Int = 0;
 	public var next:DrawStackItem;
@@ -23,7 +23,7 @@ class DrawStackItem
 	
 	public inline function reset():Void
 	{
-		graphics = null;
+		graphic = null;
 		initialized = false;
 		antialiasing = false;
 		position = 0;
@@ -31,7 +31,7 @@ class DrawStackItem
 	
 	public inline function dispose():Void
 	{
-		graphics = null;
+		graphic = null;
 		drawData = null;
 		next = null;
 	}

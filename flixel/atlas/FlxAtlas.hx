@@ -23,7 +23,7 @@ import flixel.system.frontEnds.BitmapFrontEnd;
 
 /**
  * Class for packing multiple images in big one and generating frame data for each of them 
- * so you can easily load regions of atlas in sprites and tilemaps as a source of graphics
+ * so you can easily load regions of atlas in sprites and tilemaps as a source of graphic
  */
 class FlxAtlas implements IFlxDestroyable
 {	
@@ -253,17 +253,17 @@ class FlxAtlas implements IFlxDestroyable
 	
 	/**
 	 * Gets AtlasFrames object for this atlas.
-	 * It caches graphics of this atlas and generates AtlasFrames if it is not exist yet.
+	 * It caches graphic of this atlas and generates AtlasFrames if it is not exist yet.
 	 * @return AtlasFrames for this atlas
 	 */
 	public function getAtlasFrames():AtlasFrames
 	{
-		var graphics:FlxGraphic = FlxG.bitmap.add(this.atlasBitmapData, false, name);
+		var graphic:FlxGraphic = FlxG.bitmap.add(this.atlasBitmapData, false, name);
 		
 		var atlasFrames:AtlasFrames = null;
-		if (graphics.atlasFrames == null)
+		if (graphic.atlasFrames == null)
 		{
-			graphics.atlasFrames = atlasFrames = new AtlasFrames(graphics);
+			graphic.atlasFrames = atlasFrames = new AtlasFrames(graphic);
 		}
 		
 		var node:FlxNode;
@@ -281,7 +281,7 @@ class FlxAtlas implements IFlxDestroyable
 			}
 		}
 		
-		return graphics.atlasFrames;
+		return graphic.atlasFrames;
 	}
 	
 	/**
@@ -451,8 +451,8 @@ class FlxAtlas implements IFlxDestroyable
 		root = new FlxNode(new Rectangle(0, 0, rootWidth, rootHeight), this);
 		atlasBitmapData.fillRect(root.rect, FlxColor.TRANSPARENT);
 		
-		var graphics:FlxGraphic = FlxG.bitmap.get(name);
-		graphics.atlasFrames = FlxDestroyUtil.destroy(graphics.atlasFrames);
+		var graphic:FlxGraphic = FlxG.bitmap.get(name);
+		graphic.atlasFrames = FlxDestroyUtil.destroy(graphic.atlasFrames);
 		nodes = new Map<String, FlxNode>();
 	}
 	

@@ -35,10 +35,10 @@ class ImageFrame extends FlxFramesCollection
 	 */
 	public static function fromFrame(source:FlxFrame):ImageFrame
 	{
-		var graphics:FlxGraphic = source.parent;
+		var graphic:FlxGraphic = source.parent;
 		var rect:Rectangle = source.frame;
 		
-		for (imageFrame in graphics.imageFrames)
+		for (imageFrame in graphic.imageFrames)
 		{
 			if (imageFrame.equals(rect))
 			{
@@ -46,16 +46,16 @@ class ImageFrame extends FlxFramesCollection
 			}
 		}
 		
-		var imageFrame:ImageFrame = new ImageFrame(graphics);
+		var imageFrame:ImageFrame = new ImageFrame(graphic);
 		imageFrame.frame = imageFrame.addSpriteSheetFrame(rect.clone());
-		graphics.imageFrames.push(imageFrame);
+		graphic.imageFrames.push(imageFrame);
 		return imageFrame;
 	}
 	
 	/**
 	 * Creates ImageFrame object for the whole image
 	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphic, FlxFrame or FlxFrameCollection
-	 * @return	Newly created ImageFrame object for specified graphics
+	 * @return	Newly created ImageFrame object for specified graphic
 	 */
 	public static function fromImage(source:Dynamic):ImageFrame
 	{
@@ -70,7 +70,7 @@ class ImageFrame extends FlxFramesCollection
 	 */
 	public static function fromRectangle(source:Dynamic, region:Rectangle = null):ImageFrame
 	{
-		var graphics:FlxGraphic = FlxGraphic.resolveSource(source);
+		var graphic:FlxGraphic = FlxGraphic.resolveSource(source);
 		// find ImageFrame, if there is one already
 		var imageFrame:ImageFrame = null;
 		
@@ -80,11 +80,11 @@ class ImageFrame extends FlxFramesCollection
 		{
 			checkRegion = RECT;
 			checkRegion.x = checkRegion.y = 0;
-			checkRegion.width = graphics.width;
-			checkRegion.height = graphics.height;
+			checkRegion.width = graphic.width;
+			checkRegion.height = graphic.height;
 		}
 		
-		for (imageFrame in graphics.imageFrames)
+		for (imageFrame in graphic.imageFrames)
 		{
 			if (imageFrame.equals(checkRegion))
 			{
@@ -93,28 +93,28 @@ class ImageFrame extends FlxFramesCollection
 		}
 		
 		// or create it, if there is no such object
-		imageFrame = new ImageFrame(graphics);
+		imageFrame = new ImageFrame(graphic);
 		
 		if (region == null)
 		{
-			region = new Rectangle(0, 0, graphics.width, graphics.height);
+			region = new Rectangle(0, 0, graphic.width, graphic.height);
 		}
 		else
 		{
 			if (region.width == 0)
 			{
-				region.width = graphics.width - region.x;
+				region.width = graphic.width - region.x;
 			}
 			
 			if (region.height == 0)
 			{
-				region.height = graphics.height - region.y;
+				region.height = graphic.height - region.y;
 			}
 		}
 		
 		imageFrame.frame = imageFrame.addSpriteSheetFrame(region);
 		
-		graphics.imageFrames.push(imageFrame);
+		graphic.imageFrames.push(imageFrame);
 		return imageFrame;
 	}
 	

@@ -65,7 +65,7 @@ class FlxSpriteCenteredOrigin extends FlxSprite
 			}
 			
 		#if FLX_RENDER_TILE
-			drawItem = camera.getDrawStackItem(graphics, isColored, _blendInt, antialiasing);
+			drawItem = camera.getDrawStackItem(graphic, isColored, _blendInt, antialiasing);
 			currDrawData = drawItem.drawData;
 			currIndex = drawItem.position;
 			

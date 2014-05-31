@@ -40,7 +40,7 @@ class FlxGraphic
 	public var assetsClass:Class<BitmapData>;
 	
 	/**
-	 * Whether this graphics object should stay in cache after state changes or not.
+	 * Whether this graphic object should stay in cache after state changes or not.
 	 */
 	public var persist:Bool = false;
 	/**
@@ -50,19 +50,19 @@ class FlxGraphic
 	public var destroyOnNoUse(get, set):Bool;
 	
 	/**
-	 * Whether the BitmapData of this graphics object has been dumped or not.
+	 * Whether the BitmapData of this graphic object has been dumped or not.
 	 */
 	public var isDumped(default, null):Bool = false;
 	/**
-	 * Whether the BitmapData of this graphics object can be dumped for decreased memory usage,
-	 * but may cause some issues (when you need direct access to pixels of this graphics.
-	 * If the graphics is dumped then you should call undump() and have total access to pixels.
+	 * Whether the BitmapData of this graphic object can be dumped for decreased memory usage,
+	 * but may cause some issues (when you need direct access to pixels of this graphic.
+	 * If the graphic is dumped then you should call undump() and have total access to pixels.
 	 */
 	public var canBeDumped(get, never):Bool;
 	
 	#if FLX_RENDER_TILE
 	/**
-	 * Tilesheet for this graphics object. It is used only for FLX_RENDER_TILE mode
+	 * Tilesheet for this graphic object. It is used only for FLX_RENDER_TILE mode
 	 */
 	public var tilesheet(get, null):TileSheetExt;
 	#end
@@ -78,31 +78,31 @@ class FlxGraphic
 	public var imageFrame(get, null):ImageFrame;
 	
 	/**
-	 * Atlas frames for this graphics.
+	 * Atlas frames for this graphic.
 	 * You should fill it yourself with one of the AtlasFrames static methods
 	 * (like texturePackerJSON(), texturePackerXML(), sparrow(), libGDX()).
 	 */
 	public var atlasFrames:AtlasFrames;
 	
 	/**
-	 * Collection of all ImageFrame objects created for this graphics
+	 * Collection of all ImageFrame objects created for this graphic
 	 */
 	public var imageFrames:Array<ImageFrame>;
 	
 	/**
-	 * Collection of all SpritesheetFrame objects for this graphics
+	 * Collection of all SpritesheetFrame objects for this graphic
 	 */
 	public var spritesheetFrames:Array<SpritesheetFrames>;
 	
 	/**
-	 * Internal var holding ImageFrame for the whole bitmap of this graphics.
+	 * Internal var holding ImageFrame for the whole bitmap of this graphic.
 	 * Use public imageFrame var to access/generate it.
 	 */
 	private var _imageFrame:ImageFrame;
 	
 	#if FLX_RENDER_TILE
 	/**
-	 * Internal var holding Tilesheet for bitmap of this graphics.
+	 * Internal var holding Tilesheet for bitmap of this graphic.
 	 * It is used only in FLX_RENDER_TILE mode
 	 */
 	private var _tilesheet:TileSheetExt;
@@ -114,9 +114,9 @@ class FlxGraphic
 	
 	/**
 	 * FlxGraphic constructor
-	 * @param	Key			key string for this graphics object, with which you can get it from bitmap cache
-	 * @param	Bitmap		BitmapData for this graphics object
-	 * @param	Persist		Whether or not this graphics stay in the cache after reseting cache. Default value is false which means that this graphics will be destroyed at the cache reset.
+	 * @param	Key			key string for this graphic object, with which you can get it from bitmap cache
+	 * @param	Bitmap		BitmapData for this graphic object
+	 * @param	Persist		Whether or not this graphic stay in the cache after reseting cache. Default value is false which means that this graphic will be destroyed at the cache reset.
 	 */
 	@:allow(flixel.system.frontEnds.BitmapFrontEnd)
 	private function new(Key:String, Bitmap:BitmapData, Persist:Bool = false)
@@ -207,7 +207,7 @@ class FlxGraphic
 	
 	#if FLX_RENDER_TILE
 	/**
-	 * Tilesheet getter. Generates new one (and regenerates) if there is no tilesheet for this graphics yet.
+	 * Tilesheet getter. Generates new one (and regenerates) if there is no tilesheet for this graphic yet.
 	 */
 	private function get_tilesheet():TileSheetExt
 	{
@@ -227,8 +227,8 @@ class FlxGraphic
 	#end
 	
 	/**
-	 * Gets BitmapData for this graphics object from OpenFl.
-	 * This method is used for undumping graphics.
+	 * Gets BitmapData for this graphic object from OpenFl.
+	 * This method is used for undumping graphic.
 	 */
 	private function getBitmapFromSystem():BitmapData
 	{
@@ -293,7 +293,7 @@ class FlxGraphic
 	/**
 	 * Gets FlxGraphic object for specified Source object
 	 * @param	Source	You can specify FlxGraphic, BitmapData, String (asset path), Class<Dynamic>, FlxFramesCollection or FlxFrame as a source
-	 * @return	graphics object for specified source
+	 * @return	graphic object for specified source
 	 */
 	public static function resolveSource(Source:Dynamic):FlxGraphic
 	{

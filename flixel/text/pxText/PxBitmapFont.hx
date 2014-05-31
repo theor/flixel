@@ -45,7 +45,7 @@ class PxBitmapFont
 	private var _symbols:Array<HelperSymbol>;
 	// Prepared bitmapData with font glyphsW	
 	private var _region:Region;
-	private var graphics:FlxGraphic;
+	private var graphic:FlxGraphic;
 	
 	/**
 	 * Creates a new bitmap font using specified bitmap data and letter input.
@@ -89,16 +89,16 @@ class PxBitmapFont
 			_tileRects = [];
 			var result:BitmapData = preparePixelizerBitmapData(PxBitmapData, _tileRects);
 			var key:String = FlxG.bitmap.getUniqueKey("font");
-			setGraphics(FlxG.bitmap.add(result, false, key));
+			setGraphic(FlxG.bitmap.add(result, false, key));
 			_region = new Region();
-			_region.width = graphics.bitmap.width;
-			_region.height = graphics.bitmap.height;
+			_region.width = graphic.bitmap.width;
+			_region.height = graphic.bitmap.height;
 			var currRect:Rectangle;
 			
 			#if FLX_RENDER_BLIT
 			updateGlyphData();
 			#else
-			updateGlyphData(graphics);
+			updateGlyphData(graphic);
 			#end
 		}
 		
@@ -121,12 +121,12 @@ class PxBitmapFont
 			_symbols = new Array<HelperSymbol>();
 			var result:BitmapData = prepareAngelCodeBitmapData(pBitmapData, pXMLData, _symbols);
 			var key:String = FlxG.bitmap.getUniqueKey("font");
-			setGraphics(FlxG.bitmap.add(result, false, key));
+			setGraphic(FlxG.bitmap.add(result, false, key));
 			
 			#if FLX_RENDER_BLIT
 			updateGlyphData();
 			#else
-			updateGlyphData(graphics.tilesheet);
+			updateGlyphData(graphic.tilesheet);
 			#end
 		}
 		
@@ -136,7 +136,7 @@ class PxBitmapFont
 	/**
 	 * Updates and caches tile data for passed node object
 	 */
-	public function updateGlyphData(Graphics:FlxGraphic = null):Void
+	public function updateGlyphData(Graphic:FlxGraphic = null):Void
 	{
 		#if FLX_RENDER_TILE
 		_glyphs = new Map<Int, PxFontSymbol>();
@@ -187,7 +187,7 @@ class PxBitmapFont
 					bd = new BitmapData(charWidth, 1, true, 0x0);
 				}
 				
-				bd.copyPixels(graphics.bitmap, rect, point, null, null, true);
+				bd.copyPixels(graphic.bitmap, rect, point, null, null, true);
 				
 				// Store glyph
 				setGlyph(symbol.charCode, bd);
@@ -195,11 +195,11 @@ class PxBitmapFont
 				#else
 				if (charString != " " && charString != "")
 				{
-					setGlyph(Graphics, symbol.charCode, rect, Math.floor(point.x), Math.floor(point.y), charWidth);
+					setGlyph(Graphic, symbol.charCode, rect, Math.floor(point.x), Math.floor(point.y), charWidth);
 				}
 				else
 				{
-					setGlyph(Graphics, symbol.charCode, rect, Math.floor(point.x), 1, charWidth);
+					setGlyph(Graphic, symbol.charCode, rect, Math.floor(point.x), 1, charWidth);
 				}
 				#end
 			}
@@ -213,7 +213,7 @@ class PxBitmapFont
 				// Create glyph
 				#if FLX_RENDER_BLIT
 				var bd:BitmapData = new BitmapData(Std.int(rect.width), Std.int(rect.height), true, 0x0);
-				bd.copyPixels(graphics.bitmap, rect, ZERO_POINT, null, null, true);
+				bd.copyPixels(graphic.bitmap, rect, ZERO_POINT, null, null, true);
 				
 				// Store glyph
 				setGlyph(_glyphString.charCodeAt(letterID), bd);
@@ -433,7 +433,7 @@ class PxBitmapFont
 		
 		_symbols = null;
 		_tileRects = null;
-		setGraphics(null);
+		setGraphic(null);
 		_region = null;
 		_glyphs = null;
 	}
@@ -649,9 +649,9 @@ class PxBitmapFont
 	
 	private function get_pixels():BitmapData 
 	{
-		if (!graphics.isDumped)
+		if (!graphic.isDumped)
 		{
-			return graphics.bitmap;
+			return graphic.bitmap;
 		}
 		return null;
 	}
@@ -673,18 +673,18 @@ class PxBitmapFont
 		#end
 	}
 	
-	private function setGraphics(value:FlxGraphic):Void
+	private function setGraphic(value:FlxGraphic):Void
 	{
-		if (graphics != null && graphics != value)
+		if (graphic != null && graphic != value)
 		{
-			graphics.useCount--;
+			graphic.useCount--;
 		}
 		
-		if (graphics != value && value != null)
+		if (graphic != value && value != null)
 		{
 			value.useCount++;
 		}
-		graphics = value;
+		graphic = value;
 	}
 	
 	/**
