@@ -195,6 +195,7 @@ class FlxAtlas implements IFlxDestroyable
 		return node.getSpritesheetFrames(frameSize, frameSpacing);
 	}
 	
+	// TODO: move it into BitmapFrontEnd
 	/**
 	 * Internal method for getting key for image
 	 * 
@@ -218,7 +219,7 @@ class FlxAtlas implements IFlxDestroyable
 		else if (Std.is(Graphic, BitmapData))
 		{
 			// try to search in bitmap cache
-			key = FlxG.bitmap.getCacheKeyFor(cast Graphic);
+			key = FlxG.bitmap.getKeyForBitmap(cast Graphic);
 		}
 		else if (Std.is(Graphic, String))
 		{
@@ -228,6 +229,7 @@ class FlxAtlas implements IFlxDestroyable
 		return key;
 	}
 	
+	// TODO: move it into BitmapFrontEnd
 	/**
 	 * Internal method for resolving Graphic object to BitmapData
 	 */

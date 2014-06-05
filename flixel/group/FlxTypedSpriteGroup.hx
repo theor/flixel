@@ -931,30 +931,6 @@ class FlxTypedSpriteGroup<T:FlxSprite> extends FlxSprite
 	
 	/**
 	 * This functionality isn't supported in SpriteGroup
-	 * @return this sprite group
-	 */
-	override public function loadGraphicFromTexture(Data:Dynamic, Unique:Bool = false, ?FrameName:String):FlxSprite 
-	{
-		#if !FLX_NO_DEBUG
-		FlxG.log.error("loadGraphicFromTexture() is not supported in FlxSpriteGroups.");
-		#end
-		return this;
-	}
-	
-	/**
-	 * This functionality isn't supported in SpriteGroup
-	 * @return this sprite group
-	 */
-	override public function loadRotatedGraphicFromTexture(Data:Dynamic, Image:String, Rotations:Int = 16, AntiAliasing:Bool = false, AutoBuffer:Bool = false):FlxSprite 
-	{
-		#if !FLX_NO_DEBUG
-		FlxG.log.error("loadRotatedGraphicFromTexture() is not supported in FlxSpriteGroups.");
-		#end
-		return this;
-	}
-	
-	/**
-	 * This functionality isn't supported in SpriteGroup
 	 * @return the BitmapData passed in as parameter
 	 */
 	override private function set_pixels(Value:BitmapData):BitmapData 

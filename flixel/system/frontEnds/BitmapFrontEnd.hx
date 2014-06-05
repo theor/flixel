@@ -140,15 +140,12 @@ class BitmapFrontEnd
 	 */
 	public function create(Width:Int, Height:Int, Color:Int, Unique:Bool = false, ?Key:String):FlxGraphic
 	{
-		var key:String = Key;
-		if (key == null)
+		var key:String = (Key != null) ? Key : (Width + "x" + Height + ":" + Color);
+		if (Unique)
 		{
-			key = Width + "x" + Height + ":" + Color;
-			if (Unique && checkCache(key))
-			{
-				key = getUniqueKey(key);
-			}
+			key = getUniqueKey(key);
 		}
+		
 		if (!checkCache(key))
 		{
 			_cache.set(key, new FlxGraphic(key, new BitmapData(Width, Height, true, Color)));
@@ -158,138 +155,176 @@ class BitmapFrontEnd
 	}
 	
 	/**
-	 * Loads a bitmap from a file, clones it if necessary and caches it.
+	 * Gets the key for provided graphic source.
 	 * 
-	 * @param	Graphic		The image file that you want to load.
-	 * @param	Unique		Ensures that the bitmap data uses a new slot in the cache.
-	 * @param	Key			Force the cache to use a specific Key to index the bitmap.
-	 * @return	The FlxGraphic we just created.
+	 * @param	?Graphic		Optional FlxGraphics object to create FlxGraphic from.
+	 * @param	?Frame			Optional FlxFrame object to create FlxGraphic from.
+	 * @param	?Frames			Optional FlxFramesCollection object to create FlxGraphic from.
+	 * @param	?Bitmap			Optional BitmapData object to create FlxGraphic from.
+	 * @param	?BitmapClass	Optional Class for BitmapData to create FlxGraphic from.
+	 * @param	?Str			Optional String key to use for FlxGraphic instantiation.
+	 * @param	Unique			Ensures that the bitmap data uses a new slot in the cache.
+	 * @param	Key				Force the cache to use a specific Key to index the bitmap.
+	 * 
+	 * @return	Key string, which could be used for caching of provided graphic.
 	 */
-	public function add(Graphic:Dynamic, Unique:Bool = false, ?Key:String):FlxGraphic
+	public function resolveKey(	?Graphic:FlxGraphic, ?Frame:FlxFrame, ?Frames:FlxFramesCollection, 
+								?Bitmap:BitmapData, ?BitmapClass:Class<Dynamic>, ?Str:String,
+								Unique:Bool = false, ?Key:String):String
 	{
-		if (Graphic == null)
-		{
-			return null;
-		}
-		
-		var graphic:FlxGraphic = null;
-		var isClass:Bool = false;
-		var isBitmap:Bool = false;
-		var isGraphic:Bool = false;
-		var isFrameCollection:Bool = false;
-		var isFrame:Bool = false;
-		
-		if (Std.is(Graphic, FlxGraphic))
-		{
-			isGraphic = true;	
-			graphic = cast(Graphic, FlxGraphic);
-		}
-		else if (Std.is(Graphic, FlxFramesCollection))
-		{
-			isFrameCollection = true;
-			graphic = cast(Graphic, FlxFramesCollection).parent;
-		}
-		else if (Std.is(Graphic, FlxFrame))
-		{
-			isFrameCollection = true;
-			graphic = cast(Graphic, FlxFrame).parent;
-		}
-		else if (Std.is(Graphic, Class))
-		{
-			isClass = true;
-		}
-		else if (Std.is(Graphic, BitmapData))
-		{
-			isBitmap = true;
-		}
-		else if (Std.is(Graphic, String))
-		{
-			// don't need to set any of the flags
-		}
-		else
-		{
-			return null;
-		}
-		
-		if (graphic != null && !Unique)
-		{
-			return graphic;
-		}
-		
 		var key:String = Key;
+		
 		if (key == null)
 		{
-			if (isClass)
+			if (Str != null)
 			{
-				key = Type.getClassName(cast(Graphic, Class<Dynamic>));
+				key = Str;
 			}
-			else if (isBitmap)
+			else if (Bitmap != null)
 			{
-				if (!Unique)
-				{
-					key = getCacheKeyFor(cast Graphic);
-					if (key == null)
-					{
-						key = getUniqueKey();
-					}
-				}
+				key = getKeyForBitmap(Bitmap);
 			}
-			else if (isGraphic || isFrameCollection || isFrame)
+			else if (Graphic != null)
 			{
-				key = graphic.key; 
+				key = Graphic.key;
 			}
-			else // Graphic is String
+			else if (BitmapClass != null)
 			{
-				key = Graphic;	
+				key = Type.getClassName(BitmapClass);
 			}
-			
-			if (Unique)
+			else if (Frames != null)
 			{
-				key = getUniqueKey((key == null) ? "pixels" : key);
+				key = Frames.parent.key;
+			}
+			else if (Frame != null)
+			{
+				key = Frame.parent.key;
 			}
 		}
 		
-		// If there is no data for this key, generate the requested graphic
-		if (!checkCache(key))
+		if (key == null || Unique)
 		{
-			var bd:BitmapData = null;
-			if (isClass)
+			key = getUniqueKey(key);
+		}
+		
+		return key;
+	}
+	
+	/**
+	 * Gets the bitmap for provided graphic.
+	 * 
+	 * @param	?Graphic		Optional FlxGraphics object to create FlxGraphic from.
+	 * @param	?Frame 			Optional FlxFrame object to create FlxGraphic from.
+	 * @param	?Frames			Optional FlxFramesCollection object to create FlxGraphic from.
+	 * @param	?Bitmap			Optional BitmapData object to create FlxGraphic from.
+	 * @param	?BitmapClass	Optional Class for BitmapData to create FlxGraphic from.
+	 * @param	?Str			Optional String key to use for FlxGraphic instantiation.
+	 * 
+	 * @return	BitmapData object for provided graphic source.
+	 */
+	public function resolveBitmap(	?Graphic:FlxGraphic, ?Frame:FlxFrame, ?Frames:FlxFramesCollection, 
+									?Bitmap:BitmapData, ?BitmapClass:Class<Dynamic>, ?Str:String):BitmapData
+	{
+		var bd:BitmapData = null;
+		
+		if (Str != null)
+		{
+			bd = FlxAssets.getBitmapData(Str);
+		}
+		else if (Bitmap != null)
+		{
+			bd = Bitmap;
+		}
+		else if (Graphic != null)
+		{
+			bd = Graphic.bitmap;
+		}
+		else if (BitmapClass != null)
+		{
+			bd = Type.createInstance(BitmapClass, [0, 0]);
+		}
+		else if (Frames != null)
+		{
+			bd = Frames.parent.bitmap;
+		}
+		else if (Frame != null)
+		{
+			bd = Frame.parent.bitmap;
+		}
+		
+		return bd;
+	}
+	
+	/**
+	 * Creates (or gets from cache) graphic from provided BitmapData
+	 * @param	Bitmap			BitmapData for FlxGraphic object
+	 * @param	Unique			Do we need to create new one FlxGraphic object even if there is one already
+	 * @param	Key				Key string which will be used for caching of FlxGraphic object
+	 * @param	?AssetKey		
+	 * @param	?AssetClass
+	 * @return	Created and cached FlxGraphic object for provided BitmapData.
+	 */
+	public function resolveGraphic(Bitmap:BitmapData, Unique:Bool = false, Key:String, ?AssetKey:String, ?AssetClass:Class<BitmapData>):FlxGraphic
+	{
+		if (Key == null)
+		{
+			return null;
+		}
+		
+		if (!checkCache(Key))
+		{
+			if (Bitmap == null)
 			{
-				bd = Type.createInstance(cast(Graphic, Class<Dynamic>), [0, 0]);
-			}
-			else if (isBitmap)
-			{
-				bd = cast Graphic;
-			}
-			else if (isGraphic || isFrameCollection || isFrame)
-			{
-				bd = graphic.bitmap;
-			}
-			else	// Graphic is String
-			{
-				bd = FlxAssets.getBitmapData(Graphic);
+				return null;
 			}
 			
 			if (Unique)
 			{
-				bd = bd.clone();
+				Bitmap = Bitmap.clone();
 			}
 			
-			var graph:FlxGraphic = new FlxGraphic(key, bd);
+			var graph:FlxGraphic = new FlxGraphic(Key, Bitmap);
 			
-			if (isClass && !Unique)
+			// TODO: add unigue property to FlxGraphic object, 
+			// so if it will be regenerated, then it will have unique graphic again
+			graph.assetsKey = AssetKey;
+			
+			if (AssetClass != null)
 			{
-				graph.assetsClass = cast Graphic;
-			}
-			else if (!isClass && !isBitmap && !isFrameCollection && !isFrame && !Unique)
-			{
-				graph.assetsKey = cast Graphic;
+				graph.assetsClass = cast AssetClass;
 			}
 			
-			_cache.set(key, graph);
+			_cache.set(Key, graph);
 		}
 		
-		return _cache.get(key);
+		return _cache.get(Key);
+	}
+	
+	/**
+	 * Loads a bitmap from a file, clones it if necessary and caches it.
+	 * @param	?Graphic		Optional FlxGraphics object to create FlxGraphic from.
+	 * @param	?Frame			Optional FlxFrame object to create FlxGraphic from.
+	 * @param	?Frames			Optional FlxFramesCollection object to create FlxGraphic from.
+	 * @param	?Bitmap			Optional BitmapData object to create FlxGraphic from.
+	 * @param	?BitmapClass	Optional Class for BitmapData to create FlxGraphic from.
+	 * @param	?Str			Optional String key to use for FlxGraphic instantiation.
+	 * @param	Unique			Ensures that the bitmap data uses a new slot in the cache.
+	 * @param	Key				Force the cache to use a specific Key to index the bitmap.
+	 * @return	The FlxGraphic we just created.
+	 */
+	public function add(	?Graphic:FlxGraphic, ?Frame:FlxFrame, ?Frames:FlxFramesCollection, 
+							?Bitmap:BitmapData, ?BitmapClass:Class<BitmapData>, ?Str:String,
+							Unique:Bool = false, ?Key:String):FlxGraphic
+	{
+		var key:String = resolveKey(Graphic, Frame, Frames, Bitmap, BitmapClass, Str, Unique, Key);
+		
+		if (checkCache(Key))
+		{
+			return _cache.get(key);
+		}
+		
+		var bitmap:BitmapData = resolveBitmap(Graphic, Frame, Frames, Bitmap, BitmapClass, Str);
+		return resolveGraphic(bitmap, Unique, key, Str, BitmapClass);
 	}
 	
 	/**
@@ -308,7 +343,7 @@ class BitmapFrontEnd
 	 * @param	bmd	bitmapdata to find in cache
 	 * @return	bitmapdata's key or null if there isn't such bitmapdata in cache
 	 */
-	public function getCacheKeyFor(bmd:BitmapData):String
+	public function getKeyForBitmap(bmd:BitmapData):String
 	{
 		for (key in _cache.keys())
 		{
@@ -327,8 +362,10 @@ class BitmapFrontEnd
 	 * @param	baseKey	key's prefix
 	 * @return	unique key
 	 */
-	public function getUniqueKey(baseKey:String = "pixels"):String
+	public function getUniqueKey(baseKey:String = null):String
 	{
+		if (baseKey == null) baseKey = "pixels";
+		
 		if (checkCache(baseKey))
 		{
 			var inc:Int = 0;
@@ -362,6 +399,7 @@ class BitmapFrontEnd
 		}
 		
 		result += "_FrameSize:" + frameSize.x + "_" + frameSize.y + "_Spacing:" + frameSpacing.x + "_" + frameSpacing.y;
+		
 		return result;
 	}
 	

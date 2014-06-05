@@ -1311,7 +1311,7 @@ class FlxSprite extends FlxObject
 	
 	private function set_pixels(Pixels:BitmapData):BitmapData
 	{
-		var key:String = FlxG.bitmap.getCacheKeyFor(Pixels);
+		var key:String = FlxG.bitmap.getKeyForBitmap(Pixels);
 		
 		if (key == null)
 		{
