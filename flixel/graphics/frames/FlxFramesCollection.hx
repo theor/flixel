@@ -43,12 +43,12 @@ class FlxFramesCollection implements IFlxDestroyable
 		type = FrameCollectionType.USER;
 	}
 	
-	public function getFrameByName(name:String):FlxFrame
+	public function getByName(name:String):FlxFrame
 	{
 		return framesHash.get(name);
 	}
 	
-	public function getFrameByIndex(index:Int):FlxFrame
+	public function getByIndex(index:Int):FlxFrame
 	{
 		return frames[index];
 	}

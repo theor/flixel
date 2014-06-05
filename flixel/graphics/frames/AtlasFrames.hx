@@ -18,8 +18,7 @@ import haxe.Json;
  */
 class AtlasFrames extends FlxFramesCollection
 {
-	@:allow(flixel.atlas.FlxAtlas)
-	private function new(parent:FlxGraphic) 
+	public function new(parent:FlxGraphic) 
 	{
 		super(parent);
 		type = FrameCollectionType.ATLAS;

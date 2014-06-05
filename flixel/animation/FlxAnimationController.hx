@@ -187,18 +187,26 @@ class FlxAnimationController implements IFlxDestroyable
 		// Check _animations frames
 		var numFrames:Int = Frames.length - 1;
 		var i:Int = numFrames;
+		
+		var arr:Array<Int> = Frames;
+		
 		while (i >= 0)
 		{
 			if (Frames[i] >= frames)
 			{
-				Frames.splice(i, 1);
+				if (arr == Frames)
+				{
+					arr = Frames.copy();
+				}
+				
+				arr.splice(i, 1);
 			}
 			i--;
 		}
 		
-		if (Frames.length > 0)
+		if (arr.length > 0)
 		{
-			var anim:FlxAnimation = new FlxAnimation(this, Name, Frames, FrameRate, Looped);
+			var anim:FlxAnimation = new FlxAnimation(this, Name, arr, FrameRate, Looped);
 			_animations.set(Name, anim);
 		}
 	}

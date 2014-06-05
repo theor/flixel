@@ -306,40 +306,45 @@ class FlxSprite extends FlxObject
 	 */
 	public function loadGraphic(Graphic:Dynamic, Animated:Bool = false, Width:Int = 0, Height:Int = 0, Unique:Bool = false, ?Key:String):FlxSprite
 	{
+		// TODO: continue from here...
 		bakedRotationAngle = 0;
 		graphic = FlxG.bitmap.add(Graphic, Unique, Key);
 		
-		if (Width == 0)
+		if (Std.is(Graphic, FlxFramesCollection))
 		{
-			Width = (Animated == true) ? graphic.bitmap.height : graphic.bitmap.width;
-			Width = (Width > graphic.bitmap.width) ? graphic.bitmap.width : Width;
-		}
-		
-		if (Height == 0)
-		{
-			Height = (Animated == true) ? Width : graphic.bitmap.height;
-			Height = (Height > graphic.bitmap.height) ? graphic.bitmap.height : Height;
-		}
-		
-		if (!Std.is(Graphic, TextureRegion))
-		{
-			region = new Region(0, 0, Width, Height);
-			region.width = graphic.bitmap.width;
-			region.height = graphic.bitmap.height;
+			frames = cast Graphic;
+			
+			var frame:FlxFrame = frames.getByIndex(0);
+			Width = Std.int(frame.sourceSize.x);
+			Height = Std.int(frame.sourceSize.y);
 		}
 		else
 		{
-			region = cast(Graphic, TextureRegion).region.clone();
+			frames = null;
 			
-			if (region.tileWidth > 0)
-				Width = region.tileWidth;
-			else
-				region.tileWidth = region.width;
 			
-			if (region.tileHeight > 0)
-				Height = region.tileWidth;
+			
+			if (Width == 0)
+			{
+				Width = (Animated == true) ? graphic.height : graphic.width;
+				Width = (Width > graphic.width) ? graphic.width : Width;
+			}
+			
+			if (Height == 0)
+			{
+				Height = (Animated == true) ? Width : graphic.height;
+				Height = (Height > graphic.height) ? graphic.height : Height;
+			}
+			
+			if (Std.is(Graphic, FlxFrame))
+			{
+				
+			}
 			else
-				region.tileHeight = region.height;
+			{
+				
+			}
+			
 		}
 		
 		width = frameWidth = Width;
@@ -502,86 +507,6 @@ class FlxSprite extends FlxObject
 		}
 		
 		animation.createPrerotated();
-		return this;
-	}
-	
-	/**
-	 * Loads TexturePacker atlas.
-	 * 
-	 * @param	Data		Atlas data holding links to json-data and atlas image
-	 * @param	Unique		Optional, whether the graphic should be a unique instance in the graphics cache.  Default is false.
-	 * @param	FrameName	Default frame to show. If null then will be used first available frame.
-	 * @return This FlxSprite instance (nice for chaining stuff together, if you're into that).
-	 */
-	public function loadGraphicFromTexture(Data:Dynamic, Unique:Bool = false, ?FrameName:String):FlxSprite
-	{
-		bakedRotationAngle = 0;
-		
-		if (Std.is(Data, FlxGraphic))
-		{
-			graphic = cast Data;
-			if (graphic.data == null)
-			{
-				return null;
-			}
-		}
-		else if (Std.is(Data, TexturePackerData))
-		{
-			graphic = FlxG.bitmap.add(Data.assetName, Unique);
-			graphic.data = cast Data;
-		}
-		else
-		{
-			return null;
-		}
-		
-		region = new Region();
-		region.width = graphic.width;
-		region.height = graphic.height;
-		
-		animation.destroyAnimations();
-		updateFrameData();
-		resetHelpers();
-		
-		if (FrameName != null)
-		{
-			animation.frameName = FrameName;
-		}
-		
-		resetSizeFromFrame();
-		centerOrigin();
-		return this;
-	}
-	
-	/**
-	 * Creates a pre-rotated sprite sheet from provided image in atlas.
-	 * This can make a huge difference in graphical performance on flash target!
-	 * 
-	 * @param	Data			Atlas data holding links to json-data and atlas image
-	 * @param	Image			The image from atlas you want to rotate and stamp.
-	 * @param	Rotations		The number of rotation frames the final sprite should have.  For small sprites this can be quite a large number (360 even) without any problems.
-	 * @param	AntiAliasing	Whether to use high quality rotations when creating the graphic.  Default is false.
-	 * @param	AutoBuffer		Whether to automatically increase the image size to accomodate rotated corners.
-	 * @return This FlxSprite instance (nice for chaining stuff together, if you're into that).
-	 */
-	public function loadRotatedGraphicFromTexture(Data:Dynamic, Image:String, Rotations:Int = 16, AntiAliasing:Bool = false, AutoBuffer:Bool = false):FlxSprite
-	{
-		var temp = loadGraphicFromTexture(Data);
-		
-		if (temp == null)
-		{
-			return null;
-		}
-		
-		animation.frameName = Image;
-		
-		#if FLX_RENDER_TILE
-		antialiasing = AntiAliasing;
-		#else
-		var frameBitmapData:BitmapData = getFlxFrameBitmapData();
-		loadRotatedGraphic(frameBitmapData, Rotations, -1, AntiAliasing, AutoBuffer, Data.assetName + ":" + Image);
-		#end
-		
 		return this;
 	}
 	
@@ -813,7 +738,8 @@ class FlxSprite extends FlxObject
 			var b:Float = ssx;
 			var c:Float = ssy;
 			var d:Float = csy;
-			
+			// TODO: add matrix2x2util class which will handle 
+			// this mess
 			if (!simpleRender)
 			{
 				if (_angleChanged && (bakedRotationAngle <= 0))
