@@ -318,7 +318,7 @@ class BitmapFrontEnd
 	{
 		var key:String = resolveKey(Graphic, Frame, Frames, Bitmap, BitmapClass, Str, Unique, Key);
 		
-		if (checkCache(Key))
+		if (checkCache(key))
 		{
 			return _cache.get(key);
 		}
