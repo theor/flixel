@@ -1,4 +1,5 @@
 package flixel.util;
+import flash.geom.Matrix;
 
 // TODO: move this class to flixel.math package
 
@@ -7,7 +8,7 @@ package flixel.util;
  * It mostly copies Matrix class, but with some additions for
  * faster rotation by 90 degrees.
  */
-class FlxMatrix
+class FlxMatrix extends Matrix
 {
 	/**
 	 * Helper object, which you can use without instantiation of
@@ -16,33 +17,12 @@ class FlxMatrix
 	public static var matrix:FlxMatrix = new FlxMatrix();
 	
 	/**
-	 * Just transformation coeeficient
-	 */
-	public var a:Float = 0;
-	public var b:Float = 0;
-	public var c:Float = 0;
-	public var d:Float = 0;
-	
-	/**
 	 * Matrix constructor, just initializes matrix coefficients.
 	 * Nothing fancy.
 	 */
-	public function new(a:Float = 1, b:Float = 0, c:Float = 0, d:Float = 1) 
+	public function new(a:Float = 1, b:Float = 0, c:Float = 0, d:Float = 1, tx:Float = 0, ty:Float = 0) 
 	{  
-		this.set(a, b, c, d);
-	}
-	
-	/**
-	 * Set matrix coeeficients in one step
-	 */
-	public inline function set(a:Float, b:Float, c:Float, d:Float):FlxMatrix
-	{
-		this.a = a;
-		this.b = b;
-		this.c = c;
-		this.d = d;
-		
-		return this;
+		super(a, b, c, d, tx, ty);
 	}
 	
 	/**
@@ -50,23 +30,12 @@ class FlxMatrix
 	 * @param	point	FlxPoint to transform
 	 * @return	transformed point
 	 */
-	public inline function rotatePoint(point:FlxPoint):FlxPoint
+	public inline function transformFlxPoint(point:FlxPoint):FlxPoint
 	{
-		var x:Float = point.x * a + point.y * c;
-		var y:Float = point.x * b + point.y * d;
+		var x:Float = point.x * a + point.y * c + tx;
+		var y:Float = point.x * b + point.y * d + ty;
 		
 		return point.set(x, y);
-	}
-	
-	/**
-	 * Applies rotation to this matrix.
-	 */
-	public inline function rotate(radians:Float):FlxMatrix
-	{
-		var cos:Float = Math.cos(radians);
-		var sin:Float = Math.sin(radians);
-		
-		return this.rotateWithTrig(cos, sin);
 	}
 	
 	/**
@@ -86,6 +55,10 @@ class FlxMatrix
 		d = c * sin + d * cos;
 		c = c1;
 		
+		var tx1:Float = tx * cos - ty * sin;
+		ty = tx * sin + ty * cos;
+		tx = tx1;
+		
 		return this;
 	}
 	
@@ -95,7 +68,7 @@ class FlxMatrix
 	 */
 	public inline function rotateByPositive90():FlxMatrix
 	{
-		return this.set(-b, a, -d, c);
+		return this.setTo(-b, a, -d, c, -ty, tx);
 	}
 	
 	/**
@@ -104,50 +77,6 @@ class FlxMatrix
 	 */
 	public inline function rotateByNegative90():FlxMatrix
 	{
-		return this.set(b, -a, d, -c);
-	}
-	
-	/**
-	 * Applies scale to this matrix
-	 * @param	sx	Scale by x axis
-	 * @param	sy	Scale by y axis
-	 * @return	Scaled matrix
-	 */
-	public inline function scale(sx:Float = 1, sy:Float = 1):FlxMatrix
-	{
-		a *= sx;
-		b *= sy;
-		
-		c *= sx;
-		d *= sy;
-		
-		return this;
-	}
-	
-	/**
-	 * Merges this tranformation matrix with specified.
-	 */
-	public inline function concat(m:FlxMatrix):FlxMatrix
-	{
-		var a1:Float = a * m.a + b * m.c;
-		b = a * m.b + b * m.d;
-		a = a1;
-		
-		var c1:Float = c * m.a + d * m.c;
-		d = c * m.b + d * m.d;
-		c = c1;
-		
-		return this;
-	}
-	
-	/**
-	 * Removes all transformations from this matrix
-	 * @return	identity matrix
-	 */
-	public inline function identity():FlxMatrix
-	{
-		a = d = 1;
-		b = c = 0;
-		return this;
+		return this.setTo(b, -a, d, -c, ty, -tx);
 	}
 }

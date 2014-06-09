@@ -21,6 +21,11 @@ class BitmapFrontEnd
 	@:allow(flixel.system.frontEnds.BitmapLogFrontEnd)
 	private var _cache:Map<String, FlxGraphic>;
 	
+	// TODO: add vars which reflects type of object loaded last	
+	// TODO: use these vars
+	public var isLastFrame:Bool = false;
+	public var isLastFramesCollection:Bool = false;
+	
 	public function new()
 	{
 		clearCache();
@@ -182,7 +187,7 @@ class BitmapFrontEnd
 			}
 			else if (Bitmap != null)
 			{
-				key = getKeyForBitmap(Bitmap);
+				key = findKeyForBitmap(Bitmap);
 			}
 			else if (Graphic != null)
 			{
@@ -285,7 +290,7 @@ class BitmapFrontEnd
 			
 			var graph:FlxGraphic = new FlxGraphic(Key, Bitmap);
 			
-			// TODO: add unigue property to FlxGraphic object, 
+			// TODO: add unique property to FlxGraphic object, 
 			// so if it will be regenerated, then it will have unique graphic again
 			graph.assetsKey = AssetKey;
 			
@@ -343,7 +348,7 @@ class BitmapFrontEnd
 	 * @param	bmd	bitmapdata to find in cache
 	 * @return	bitmapdata's key or null if there isn't such bitmapdata in cache
 	 */
-	public function getKeyForBitmap(bmd:BitmapData):String
+	public function findKeyForBitmap(bmd:BitmapData):String
 	{
 		for (key in _cache.keys())
 		{

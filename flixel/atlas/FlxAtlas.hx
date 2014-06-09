@@ -219,7 +219,7 @@ class FlxAtlas implements IFlxDestroyable
 		else if (Std.is(Graphic, BitmapData))
 		{
 			// try to search in bitmap cache
-			key = FlxG.bitmap.getKeyForBitmap(cast Graphic);
+			key = FlxG.bitmap.findKeyForBitmap(cast Graphic);
 		}
 		else if (Std.is(Graphic, String))
 		{
