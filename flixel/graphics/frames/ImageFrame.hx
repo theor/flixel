@@ -62,18 +62,15 @@ class ImageFrame extends FlxFramesCollection
 		return fromRectangle(source, null);
 	}
 	
+	// TODO: document it
 	/**
-	 * Creates ImageFrame object for specified region of image
-	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphic or FlxFrameCollection
-	 * @param	region	region of image to create ImageFrame for
-	 * @return	Newly created ImageFrame object for specified region of image
+	 * 
+	 * @param	graphic
+	 * @param	region
+	 * @return
 	 */
-	public static function fromRectangle(source:Dynamic, region:Rectangle = null):ImageFrame
+	public static function fromGraphic(graphic:FlxGraphic, region:Rectangle = null):ImageFrame
 	{
-		var graphic:FlxGraphic = FlxG.bitmap.add(source, false);
-		
-		if (graphic == null)	return null;
-		
 		// find ImageFrame, if there is one already
 		var imageFrame:ImageFrame = null;
 		
@@ -119,6 +116,21 @@ class ImageFrame extends FlxFramesCollection
 		
 		graphic.imageFrames.push(imageFrame);
 		return imageFrame;
+	}
+	
+	/**
+	 * Creates ImageFrame object for specified region of image
+	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphic or FlxFrameCollection
+	 * @param	region	region of image to create ImageFrame for
+	 * @return	Newly created ImageFrame object for specified region of image
+	 */
+	public static function fromRectangle(source:Dynamic, region:Rectangle = null):ImageFrame
+	{
+		var graphic:FlxGraphic = FlxG.bitmap.add(source, false);
+		
+		if (graphic == null)	return null;
+		
+		return fromGraphic(graphic, region);
 	}
 	
 	/**

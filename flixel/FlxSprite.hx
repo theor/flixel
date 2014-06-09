@@ -10,6 +10,7 @@ import flixel.animation.FlxAnimationController;
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.graphics.frames.FlxFramesCollection;
+import flixel.graphics.frames.SpritesheetFrames;
 import flixel.system.layer.DrawStackItem;
 import flixel.graphics.frames.FlxFrame;
 import flixel.graphics.frames.FlxFramesCollection;
@@ -306,24 +307,15 @@ class FlxSprite extends FlxObject
 	 */
 	public function loadGraphic(Graphic:Dynamic, Animated:Bool = false, Width:Int = 0, Height:Int = 0, Unique:Bool = false, ?Key:String):FlxSprite
 	{
-		// TODO: continue from here...
 		bakedRotationAngle = 0;
 		graphic = FlxG.bitmap.add(Graphic, Unique, Key);
 		
 		if (Std.is(Graphic, FlxFramesCollection))
 		{
 			frames = cast Graphic;
-			
-			var frame:FlxFrame = frames.getByIndex(0);
-			Width = Std.int(frame.sourceSize.x);
-			Height = Std.int(frame.sourceSize.y);
 		}
 		else
 		{
-			frames = null;
-			
-			
-			
 			if (Width == 0)
 			{
 				Width = (Animated == true) ? graphic.height : graphic.width;
@@ -336,23 +328,13 @@ class FlxSprite extends FlxObject
 				Height = (Height > graphic.height) ? graphic.height : Height;
 			}
 			
-			if (Std.is(Graphic, FlxFrame))
-			{
-				
-			}
-			else
-			{
-				
-			}
-			
+			frames = SpritesheetFrames.fromGraphic(graphic, new Point(Width, Height));
 		}
 		
-		width = frameWidth = Width;
-		height = frameHeight = Height;
+		frame = frames.getByIndex(0);
+		numFrames = frames.frames.length;
 		
 		animation.destroyAnimations();
-		
-		updateFrameData();
 		resetHelpers();
 		
 		return this;
@@ -372,6 +354,9 @@ class FlxSprite extends FlxObject
 	 */
 	public function loadRotatedGraphic(Graphic:Dynamic, Rotations:Int = 16, Frame:Int = -1, AntiAliasing:Bool = false, AutoBuffer:Bool = false, ?Key:String):FlxSprite
 	{
+		// TODO: continue from here.
+		// TODO: move part to bitmap util, part to bitmap front-end
+		
 		//Create the brush and canvas
 		var rows:Int = Std.int(Math.sqrt(Rotations));
 		var brush:BitmapData = FlxG.bitmap.add(Graphic, false, Key).bitmap;
@@ -609,11 +594,12 @@ class FlxSprite extends FlxObject
 	 */
 	private function resetHelpers():Void
 	{
-		resetSize();
+		resetFrameSize();
+		resetSizeFromFrame();
 		_flashRect2.x = 0;
 		_flashRect2.y = 0;
-		_flashRect2.width = graphic.bitmap.width;
-		_flashRect2.height = graphic.bitmap.height;
+		_flashRect2.width = graphic.width;
+		_flashRect2.height = graphic.height;
 		centerOrigin();
 		
 	#if FLX_RENDER_BLIT
@@ -1100,20 +1086,9 @@ class FlxSprite extends FlxObject
 	 */
 	public function updateFrameData():Void
 	{
-		if (graphic == null)
-		{
-			return;
-		}
+		if (frame != null)	return;
 		
-		if ((graphic.data != null) && (region.tileWidth == 0 && region.tileHeight == 0))
-		{
-			frames = graphic.tilesheet.getTexturePackerFrames(graphic.data);
-		}
-		else
-		{
-			frames = graphic.tilesheet.getSpriteSheetFrames(region, null);
-		}
-		
+		frames = graphic.tilesheet.getSpriteSheetFrames(region, null);
 		frame = frames.frames[0];
 		numFrames = frames.frames.length;
 		resetSizeFromFrame();
@@ -1194,7 +1169,7 @@ class FlxSprite extends FlxObject
 	 */
 	public inline function resetFrameBitmaps():Void
 	{
-		graphic.tilesheet.destroyBitmaps();
+		graphic.destroyBitmaps();
 	}
 	
 	/**

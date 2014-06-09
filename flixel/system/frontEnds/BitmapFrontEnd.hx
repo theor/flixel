@@ -390,6 +390,14 @@ class BitmapFrontEnd
 		return result;
 	}
 	
+	// TODO: implement this method...
+	public function getKeyWithRotations():String
+	{
+		
+		
+		return null;
+	}
+	
 	/**
 	 * Totally removes FlxGraphic object with specified key.
 	 * @param	key	the key for cached FlxGraphic object.

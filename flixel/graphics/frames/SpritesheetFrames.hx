@@ -218,22 +218,17 @@ class SpritesheetFrames extends FlxFramesCollection
 	
 	// TODO: use FlxPoint and FlxRect as method arguments
 	
+	// TODO: document this
 	/**
-	 * Generates spritesheet frame collection from provided region of image.
-	 * @param	source			source graphic for spritesheet.
-	 * 							It can be BitmapData, Class<Dynamic>, String, FlxGraphic or FlxFramesCollection
-	 * @param	frameSize		the size of tiles in spritesheet
-	 * @param	region			region of image to use for spritesheet generation. Default value is null,
-	 * 							which means that whole image will be used for it.
-	 * @param	frameSpacing	offsets between frames in spritesheet. Default value is null, which means no offsets between tiles
-	 * @return	Newly created spritesheet frame collection
+	 * 
+	 * @param	graphic
+	 * @param	frameSize
+	 * @param	region
+	 * @param	frameSpacing
+	 * @return
 	 */
-	public static function fromRectangle(source:Dynamic, frameSize:Point, region:Rectangle = null, frameSpacing:Point = null):SpritesheetFrames
+	public static function fromGraphic(graphic:FlxGraphic, frameSize:Point, region:Rectangle = null, frameSpacing:Point = null):SpritesheetFrames
 	{
-		var graphic:FlxGraphic = FlxG.bitmap.add(source, false);
-		
-		if (graphic == null)	return null;
-		
 		// find SpritesheetFrames object, if there is one already
 		var spritesheetFrames:SpritesheetFrames = null;
 		
@@ -315,6 +310,25 @@ class SpritesheetFrames extends FlxFramesCollection
 		
 		graphic.spritesheetFrames.push(spritesheetFrames);
 		return spritesheetFrames;
+	}
+	
+	/**
+	 * Generates spritesheet frame collection from provided region of image.
+	 * @param	source			source graphic for spritesheet.
+	 * 							It can be BitmapData, Class<Dynamic>, String, FlxGraphic or FlxFramesCollection
+	 * @param	frameSize		the size of tiles in spritesheet
+	 * @param	region			region of image to use for spritesheet generation. Default value is null,
+	 * 							which means that whole image will be used for it.
+	 * @param	frameSpacing	offsets between frames in spritesheet. Default value is null, which means no offsets between tiles
+	 * @return	Newly created spritesheet frame collection
+	 */
+	public static function fromRectangle(source:Dynamic, frameSize:Point, region:Rectangle = null, frameSpacing:Point = null):SpritesheetFrames
+	{
+		var graphic:FlxGraphic = FlxG.bitmap.add(source, false);
+		
+		if (graphic == null)	return null;
+		
+		return fromGraphic(graphic, frameSize, region, frameSpacing);
 	}
 	
 	/**

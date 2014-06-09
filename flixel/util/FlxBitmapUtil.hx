@@ -302,4 +302,12 @@ class FlxBitmapUtil
 		result.unlock();
 		return result;
 	}
+	
+	// TODO: implement this method
+	public static function generateRotations(bitmapData:BitmapData, region:Rectangle = null, rotations:Int = 16, antiAliasing:Bool = false, autoBuffer:Bool = false):BitmapData
+	{
+		
+		
+		return null;
+	}
 }
