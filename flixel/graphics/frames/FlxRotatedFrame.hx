@@ -3,6 +3,7 @@ package flixel.graphics.frames;
 import flash.display.BitmapData;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
+import flixel.util.FlxMatrix;
 
 /**
  * Rotated frame. It uses more math for rendering, that's why it has been moved in separate class 
@@ -14,6 +15,27 @@ class FlxRotatedFrame extends FlxFrame
 		super(parent);
 		
 		type = FrameType.ROTATED;
+	}
+	
+	/**
+	 * Appends additional rotation (if required) to the sprite matrix.
+	 * 
+	 * @param	mat		Sprite matrix to transform.
+	 * @return	Tranformed sprite matrix.
+	 */
+	override public function prepareFrameMatrix(mat:FlxMatrix):FlxMatrix 
+	{
+		// TODO: check this later
+		if (additionalAngle == 90)
+		{
+			mat.rotateByPositive90();
+		}
+		else if (additionalAngle == -90)
+		{
+			mat.rotateByNegative90();
+		}
+		
+		return mat;
 	}
 	
 	override public function paintOnBitmap(bmd:BitmapData = null):BitmapData 

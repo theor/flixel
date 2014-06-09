@@ -96,7 +96,7 @@ class FlxAtlas implements IFlxDestroyable
 	 */
 	public function addNode(Graphic:Dynamic, ?Key:String):FlxNode
 	{
-		var key:String = getKeyForGraphic(Graphic, Key);
+		var key:String = FlxG.bitmap.resolveKey(Graphic, false, Key);
 		
 		if (key == null) return null;
 		
@@ -105,7 +105,7 @@ class FlxAtlas implements IFlxDestroyable
 			return nodes.get(key);
 		}
 		
-		var data:BitmapData = getBitmapForGraphic(Graphic);
+		var data:BitmapData = FlxG.bitmap.resolveBitmap(Graphic);
 		
 		if (data == null)	return null;
 		
@@ -175,7 +175,7 @@ class FlxAtlas implements IFlxDestroyable
 	 */
 	public function addNodeWithSpacings(Graphic:Dynamic, ?Key:String, frameSize:Point, frameSpacing:Point, region:Rectangle = null):SpritesheetFrames
 	{
-		var key:String = getKeyForGraphic(Graphic, Key);
+		var key:String = FlxG.bitmap.resolveKey(Graphic, false, Key);
 		
 		if (key == null) return null;
 		
@@ -186,71 +186,16 @@ class FlxAtlas implements IFlxDestroyable
 			return nodes.get(key).getSpritesheetFrames(frameSize, frameSpacing);
 		}
 		
-		var data:BitmapData = getBitmapForGraphic(Graphic);
+		var data:BitmapData = FlxG.bitmap.resolveBitmap(Graphic);
+		
+		if (data == null) return null;
+		
 		var nodeData:BitmapData = FlxBitmapUtil.addSpacing(data, frameSize, frameSpacing, region);
 		var node:FlxNode = addNode(nodeData, key);
 		
 		if (node == null) return null;
 		
 		return node.getSpritesheetFrames(frameSize, frameSpacing);
-	}
-	
-	// TODO: move it into BitmapFrontEnd
-	/**
-	 * Internal method for getting key for image
-	 * 
-	 * @param	Graphic	Image source to get key for. Could be BitmapData, Class<Dynamic> or String
-	 * @param	?Key	Optional key. If it's not null then this string will be returned as a key
-	 * @return	The key for provided graphic
-	 */
-	private function getKeyForGraphic(Graphic:Dynamic, ?Key:String):String
-	{
-		var key:String = null;
-		
-		if (Key != null)
-		{
-			return Key;
-		}
-		
-		if (Std.is(Graphic, Class))
-		{
-			key = Type.getClassName(cast(Graphic, Class<Dynamic>));
-		}
-		else if (Std.is(Graphic, BitmapData))
-		{
-			// try to search in bitmap cache
-			key = FlxG.bitmap.findKeyForBitmap(cast Graphic);
-		}
-		else if (Std.is(Graphic, String))
-		{
-			key = cast Graphic;
-		}
-		
-		return key;
-	}
-	
-	// TODO: move it into BitmapFrontEnd
-	/**
-	 * Internal method for resolving Graphic object to BitmapData
-	 */
-	private function getBitmapForGraphic(Graphic:Dynamic):BitmapData
-	{
-		var data:BitmapData = null;
-		
-		if (Std.is(Graphic, BitmapData))
-		{
-			data = cast Graphic;
-		}
-		else if (Std.is(Graphic, Class))
-		{
-			data = Type.createInstance(cast(Graphic, Class<Dynamic>), []).bitmapData;
-		}
-		else if (Std.is(Graphic, String))
-		{
-			data = FlxAssets.getBitmapData(Graphic);
-		}
-		
-		return data;
 	}
 	
 	/**

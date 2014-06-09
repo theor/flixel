@@ -21,11 +21,6 @@ class BitmapFrontEnd
 	@:allow(flixel.system.frontEnds.BitmapLogFrontEnd)
 	private var _cache:Map<String, FlxGraphic>;
 	
-	// TODO: add vars which reflects type of object loaded last	
-	// TODO: use these vars
-	public var isLastFrame:Bool = false;
-	public var isLastFramesCollection:Bool = false;
-	
 	public function new()
 	{
 		clearCache();
@@ -163,7 +158,6 @@ class BitmapFrontEnd
 	 * Gets the key for provided graphic source.
 	 * 
 	 * @param	?Graphic		Optional FlxGraphics object to create FlxGraphic from.
-	 * @param	?Frame			Optional FlxFrame object to create FlxGraphic from.
 	 * @param	?Frames			Optional FlxFramesCollection object to create FlxGraphic from.
 	 * @param	?Bitmap			Optional BitmapData object to create FlxGraphic from.
 	 * @param	?BitmapClass	Optional Class for BitmapData to create FlxGraphic from.
@@ -173,7 +167,7 @@ class BitmapFrontEnd
 	 * 
 	 * @return	Key string, which could be used for caching of provided graphic.
 	 */
-	public function resolveKey(	?Graphic:FlxGraphic, ?Frame:FlxFrame, ?Frames:FlxFramesCollection, 
+	public function resolveKey(	?Graphic:FlxGraphic, ?Frames:FlxFramesCollection, 
 								?Bitmap:BitmapData, ?BitmapClass:Class<Dynamic>, ?Str:String,
 								Unique:Bool = false, ?Key:String):String
 	{
@@ -201,10 +195,6 @@ class BitmapFrontEnd
 			{
 				key = Frames.parent.key;
 			}
-			else if (Frame != null)
-			{
-				key = Frame.parent.key;
-			}
 		}
 		
 		if (key == null || Unique)
@@ -219,7 +209,6 @@ class BitmapFrontEnd
 	 * Gets the bitmap for provided graphic.
 	 * 
 	 * @param	?Graphic		Optional FlxGraphics object to create FlxGraphic from.
-	 * @param	?Frame 			Optional FlxFrame object to create FlxGraphic from.
 	 * @param	?Frames			Optional FlxFramesCollection object to create FlxGraphic from.
 	 * @param	?Bitmap			Optional BitmapData object to create FlxGraphic from.
 	 * @param	?BitmapClass	Optional Class for BitmapData to create FlxGraphic from.
@@ -227,7 +216,7 @@ class BitmapFrontEnd
 	 * 
 	 * @return	BitmapData object for provided graphic source.
 	 */
-	public function resolveBitmap(	?Graphic:FlxGraphic, ?Frame:FlxFrame, ?Frames:FlxFramesCollection, 
+	public function resolveBitmap(	?Graphic:FlxGraphic, ?Frames:FlxFramesCollection, 
 									?Bitmap:BitmapData, ?BitmapClass:Class<Dynamic>, ?Str:String):BitmapData
 	{
 		var bd:BitmapData = null;
@@ -251,10 +240,6 @@ class BitmapFrontEnd
 		else if (Frames != null)
 		{
 			bd = Frames.parent.bitmap;
-		}
-		else if (Frame != null)
-		{
-			bd = Frame.parent.bitmap;
 		}
 		
 		return bd;
@@ -289,9 +274,7 @@ class BitmapFrontEnd
 			}
 			
 			var graph:FlxGraphic = new FlxGraphic(Key, Bitmap);
-			
-			// TODO: add unique property to FlxGraphic object, 
-			// so if it will be regenerated, then it will have unique graphic again
+			graph.unique = Unique;
 			graph.assetsKey = AssetKey;
 			
 			if (AssetClass != null)
@@ -308,7 +291,6 @@ class BitmapFrontEnd
 	/**
 	 * Loads a bitmap from a file, clones it if necessary and caches it.
 	 * @param	?Graphic		Optional FlxGraphics object to create FlxGraphic from.
-	 * @param	?Frame			Optional FlxFrame object to create FlxGraphic from.
 	 * @param	?Frames			Optional FlxFramesCollection object to create FlxGraphic from.
 	 * @param	?Bitmap			Optional BitmapData object to create FlxGraphic from.
 	 * @param	?BitmapClass	Optional Class for BitmapData to create FlxGraphic from.
@@ -317,18 +299,18 @@ class BitmapFrontEnd
 	 * @param	Key				Force the cache to use a specific Key to index the bitmap.
 	 * @return	The FlxGraphic we just created.
 	 */
-	public function add(	?Graphic:FlxGraphic, ?Frame:FlxFrame, ?Frames:FlxFramesCollection, 
+	public function add(	?Graphic:FlxGraphic, ?Frames:FlxFramesCollection, 
 							?Bitmap:BitmapData, ?BitmapClass:Class<BitmapData>, ?Str:String,
 							Unique:Bool = false, ?Key:String):FlxGraphic
 	{
-		var key:String = resolveKey(Graphic, Frame, Frames, Bitmap, BitmapClass, Str, Unique, Key);
+		var key:String = resolveKey(Graphic, Frames, Bitmap, BitmapClass, Str, Unique, Key);
 		
 		if (checkCache(key))
 		{
 			return _cache.get(key);
 		}
 		
-		var bitmap:BitmapData = resolveBitmap(Graphic, Frame, Frames, Bitmap, BitmapClass, Str);
+		var bitmap:BitmapData = resolveBitmap(Graphic, Frames, Bitmap, BitmapClass, Str);
 		return resolveGraphic(bitmap, Unique, key, Str, BitmapClass);
 	}
 	

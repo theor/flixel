@@ -9,6 +9,7 @@ import flixel.interfaces.IFlxDestroyable;
 import flixel.util.FlxAngle;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
+import flixel.util.FlxMatrix;
 import flixel.util.FlxPoint;
 import flixel.graphics.FlxGraphic;
 
@@ -69,6 +70,11 @@ class FlxFrame implements IFlxDestroyable
 		center = FlxPoint.get();
 		
 		type = FrameType.REGULAR;
+	}
+	
+	public function prepareFrameMatrix(mat:FlxMatrix):FlxMatrix
+	{
+		return mat;
 	}
 	
 	/**

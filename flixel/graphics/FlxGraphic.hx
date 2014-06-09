@@ -95,6 +95,14 @@ class FlxGraphic
 	public var spritesheetFrames:Array<SpritesheetFrames>;
 	
 	/**
+	 * Shows whether this object unique in cache or not.
+	 * 
+	 * Whether undumped BitmapData should be cloned or not.
+	 * It is false by default, since significantly reduces memory consumption.
+	 */
+	public var unique:Bool = false;
+	
+	/**
 	 * Internal var holding ImageFrame for the whole bitmap of this graphic.
 	 * Use public imageFrame var to access/generate it.
 	 */
@@ -240,6 +248,11 @@ class FlxGraphic
 		else if (assetsKey != null)
 		{
 			newBitmap = FlxAssets.getBitmapData(assetsKey);
+			
+			if (unique)
+			{
+				newBitmap = newBitmap.clone();
+			}
 		}
 		
 		return newBitmap;
@@ -288,37 +301,5 @@ class FlxGraphic
 		}
 		
 		return _imageFrame;
-	}
-	
-	/**
-	 * Gets FlxGraphic object for specified Source object
-	 * @param	Source	You can specify FlxGraphic, BitmapData, String (asset path), Class<Dynamic>, FlxFramesCollection or FlxFrame as a source
-	 * @return	graphic object for specified source
-	 */
-	public static function resolveSource(Source:Dynamic):FlxGraphic
-	{
-		if (Source == null)
-		{
-			return null;
-		}
-		
-		if (Std.is(Source, FlxGraphic))
-		{
-			return cast Source;
-		}
-		else if (Std.is(Source, BitmapData) || Std.is(Source, String) || Std.is(Source, Class))
-		{
-			return FlxG.bitmap.add(Source);
-		}
-		else if (Std.is(Source, FlxFramesCollection))
-		{
-			return cast(Source, FlxFramesCollection).parent;
-		}
-		else if (Std.is(Source, FlxFrame))
-		{
-			return cast(Source, FlxFrame).parent;
-		}
-		
-		return null;
 	}
 }

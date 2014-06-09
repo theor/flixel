@@ -64,13 +64,16 @@ class ImageFrame extends FlxFramesCollection
 	
 	/**
 	 * Creates ImageFrame object for specified region of image
-	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphic, FlxFrame or FlxFrameCollection
+	 * @param	source	image graphic for ImageFrame. It could be String, BitmapData, Class<Dynamic>, FlxGraphic or FlxFrameCollection
 	 * @param	region	region of image to create ImageFrame for
 	 * @return	Newly created ImageFrame object for specified region of image
 	 */
 	public static function fromRectangle(source:Dynamic, region:Rectangle = null):ImageFrame
 	{
-		var graphic:FlxGraphic = FlxGraphic.resolveSource(source);
+		var graphic:FlxGraphic = FlxG.bitmap.add(source, false);
+		
+		if (graphic == null)	return null;
+		
 		// find ImageFrame, if there is one already
 		var imageFrame:ImageFrame = null;
 		

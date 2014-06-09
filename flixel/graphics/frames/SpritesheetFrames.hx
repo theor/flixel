@@ -49,7 +49,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	 * Gets source bitmapdata, generates new bitmapdata with spaces between frames (if there is no such bitmapdata in the cache already) 
 	 * and creates SpritesheetFrames collection
 	 * @param	source			the source of graphic for frame collection 
-	 * 							(can be String, Class<Dynamic>, BitmapData, FlxGraphic, FlxFrame or FlxFramesCollection)
+	 * 							(can be String, Class<Dynamic>, BitmapData, FlxGraphic or FlxFramesCollection)
 	 * @param	frameSize		the size of tiles in spritesheet
 	 * @param	frameSpacing	desired offsets between frames in spritesheet
 	 * 							(this method takes spritesheet bitmap without offsets between frames and adds them).
@@ -59,7 +59,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	public static function fromBitmapWithSpacings(source:Dynamic, frameSize:Point, frameSpacing:Point, region:Rectangle = null):SpritesheetFrames
 	{
-		var graphic:FlxGraphic = FlxGraphic.resolveSource(source);
+		var graphic:FlxGraphic = FlxG.bitmap.add(source, false);
 		
 		if (graphic == null) return null;
 		
@@ -221,7 +221,7 @@ class SpritesheetFrames extends FlxFramesCollection
 	/**
 	 * Generates spritesheet frame collection from provided region of image.
 	 * @param	source			source graphic for spritesheet.
-	 * 							It can be BitmapData, Class<Dynamic>, String, FlxGraphic, FlxFrame or FlxFramesCollection
+	 * 							It can be BitmapData, Class<Dynamic>, String, FlxGraphic or FlxFramesCollection
 	 * @param	frameSize		the size of tiles in spritesheet
 	 * @param	region			region of image to use for spritesheet generation. Default value is null,
 	 * 							which means that whole image will be used for it.
@@ -230,7 +230,9 @@ class SpritesheetFrames extends FlxFramesCollection
 	 */
 	public static function fromRectangle(source:Dynamic, frameSize:Point, region:Rectangle = null, frameSpacing:Point = null):SpritesheetFrames
 	{
-		var graphic:FlxGraphic = FlxGraphic.resolveSource(source);
+		var graphic:FlxGraphic = FlxG.bitmap.add(source, false);
+		
+		if (graphic == null)	return null;
 		
 		// find SpritesheetFrames object, if there is one already
 		var spritesheetFrames:SpritesheetFrames = null;

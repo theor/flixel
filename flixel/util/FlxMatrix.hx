@@ -68,7 +68,8 @@ class FlxMatrix extends Matrix
 	 */
 	public inline function rotateByPositive90():FlxMatrix
 	{
-		return this.setTo(-b, a, -d, c, -ty, tx);
+		this.setTo( -b, a, -d, c, -ty, tx);
+		return this;
 	}
 	
 	/**
@@ -77,6 +78,7 @@ class FlxMatrix extends Matrix
 	 */
 	public inline function rotateByNegative90():FlxMatrix
 	{
-		return this.setTo(b, -a, d, -c, ty, -tx);
+		this.setTo(b, -a, d, -c, ty, -tx);
+		return this;
 	}
 }
