@@ -3,6 +3,7 @@ package flixel.util;
 import flash.display.BitmapData;
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import openfl.geom.Matrix;
 
 class FlxBitmapUtil
 {
@@ -304,10 +305,52 @@ class FlxBitmapUtil
 	}
 	
 	// TODO: implement this method
-	public static function generateRotations(bitmapData:BitmapData, region:Rectangle = null, rotations:Int = 16, antiAliasing:Bool = false, autoBuffer:Bool = false):BitmapData
+	public static function generateRotations(brush:BitmapData, rotations:Int = 16, antiAliasing:Bool = false, autoBuffer:Bool = false):BitmapData
 	{
+		var brushWidth:Int = brush.width;
+		var brushHeight:Int = brush.height;
+		var max:Int = (brushHeight > brushWidth) ? brushHeight : brushWidth;
 		
+		if (autoBuffer)
+		{
+			max = Std.int(max * 1.5);
+		}
 		
-		return null;
+		var rows:Int = Std.int(Math.sqrt(rotations));
+		var columns:Int = Math.ceil(rotations / rows);
+		var bakedRotationAngle:Float = 360 / rotations;
+		
+		var width:Int = max * columns;
+		var height:Int = max * rows;
+		
+		var result:BitmapData = new BitmapData(width, height);
+		
+		var row:Int = 0;
+		var column:Int = 0;
+		var bakedAngle:Float = 0;
+		var halfBrushWidth:Int = Std.int(brushWidth * 0.5);
+		var halfBrushHeight:Int = Std.int(brushHeight * 0.5);
+		var midpointX:Int = Std.int(max * 0.5);
+		var midpointY:Int = Std.int(max * 0.5);
+		while (row < rows)
+		{
+			column = 0;
+			while (column < columns)
+			{
+				matrix.identity();
+				matrix.translate( -halfBrushWidth, -halfBrushHeight);
+				matrix.rotate(bakedAngle * FlxAngle.TO_RAD);
+				matrix.translate(max * column + midpointX, midpointY);
+				bakedAngle += bakedRotationAngle;
+				result.draw(brush, matrix, null, null, null, antiAliasing);
+				column++;
+			}
+			midpointY += max;
+			row++;
+		}
+		
+		return result;
 	}
+	
+	public static var matrix:Matrix = new Matrix();
 }

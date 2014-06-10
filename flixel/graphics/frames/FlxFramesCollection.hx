@@ -16,6 +16,8 @@ class FlxFramesCollection implements IFlxDestroyable
 {
 	public var frames:Array<FlxFrame>;
 	
+	public var numFrames(get, null):Int;
+	
 	/**
 	 * Hash of frames for this frame collection.
 	 * Used only in AtlasFrames and FontFrames (not implemented yet), 
@@ -44,19 +46,19 @@ class FlxFramesCollection implements IFlxDestroyable
 	}
 	
 	// TODO: document this method
-	public function getByName(name:String):FlxFrame
+	public inline function getByName(name:String):FlxFrame
 	{
 		return framesHash.get(name);
 	}
 	
 	// TODO: document this method
-	public function getByIndex(index:Int):FlxFrame
+	public inline function getByIndex(index:Int):FlxFrame
 	{
 		return frames[index];
 	}
 	
 	// TODO: document this method
-	public function getIndexByName(name:String):Int
+	public inline function getIndexByName(name:String):Int
 	{
 		var numFrames:Int = frames.length;
 		var frame:FlxFrame;
@@ -70,6 +72,12 @@ class FlxFramesCollection implements IFlxDestroyable
 		}
 		
 		return -1;
+	}
+	
+	// TODO: document this method
+	public inline function getFrameIndex(frame:FlxFrame):Int
+	{
+		return frames.indexOf(frame);
 	}
 	
 	public function destroy():Void
@@ -168,5 +176,10 @@ class FlxFramesCollection implements IFlxDestroyable
 		}
 		
 		return texFrame;
+	}
+	
+	private inline function get_numFrames():Int
+	{
+		return frames.length;
 	}
 }
